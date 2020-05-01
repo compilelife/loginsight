@@ -38,7 +38,7 @@ public:
     ~FileLog() override;
 
 public:
-    bool open(const QString& path);
+    bool open(const QString& path, LongtimeOperation& op);
     void close();
 
 public:

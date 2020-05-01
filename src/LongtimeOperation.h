@@ -5,7 +5,7 @@ struct LongtimeOperation {
     int from;
     int to;
     int cur;
-    bool terminate;
+    bool terminate{false};
 };
 
 #endif // LONGTIMEOPERATION_H

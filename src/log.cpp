@@ -95,7 +95,7 @@ FileLog::~FileLog() {
     }
 }
 
-bool FileLog::open(const QString &path) {
+bool FileLog::open(const QString &path, LongtimeOperation& op) {
     if (mFile) {
         close();
     }
@@ -115,13 +115,24 @@ bool FileLog::open(const QString &path) {
     time.restart();
     mEnters.push_back(-1);//插入“第0行”方便处理。假设第0行的行结束标记在-1字节
 
-    for (qint64 i = 0; i < mSize; ) {
+    op.cur = 0;
+    op.from = 0;
+    op.to = mSize/100;//按一行100个字符估计总行数
+    for (qint64 i = 0; i < mSize; ) {//TODO:进一步优化
         if (mMem[i] == '\r') {
             mEnters.push_back(i);
             i+=2;
+            if (op.terminate) {
+                return false;
+            }
+            ++op.cur;
         } else if (mMem[i] == '\n') {
             mEnters.push_back(i);
             ++i;
+            if (op.terminate) {
+                return false;
+            }
+            ++op.cur;
         } else {
             ++i;
         }

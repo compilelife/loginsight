@@ -71,7 +71,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->subLogEdit->setSlave(true);
     connect(ui->subLogEdit, SIGNAL(requestLocateMaster(int)), this, SLOT(handleLocateMaster(int)));
 
-    mLog.open("/Users/chenyong/Downloads/rtsp_crash_log.txt");
+    LongtimeOperation op;
+    mLog.open("/Users/chenyong/Downloads/rtsp_crash_log.txt", op);
     ui->logEdit->setLog(&mLog);
 }
 
@@ -143,7 +144,16 @@ void MainWindow::handleOpenFile()
         return;
     }
 
-    if (!mLog.open(path)) {
+    bool ret = false;
+    bool canceled = BackgroundRunner::instance().exec("打开文件", [&](LongtimeOperation& op){
+        ret = mLog.open(path, op);
+    });
+
+    if (canceled) {
+        return;
+    }
+
+    if (!ret) {
         toast("文件打开失败");
         return;
     }

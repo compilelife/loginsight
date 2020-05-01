@@ -35,5 +35,6 @@ void ProgressDialog::updateValue()
 {
     auto value = (mOp.cur - mOp.from) * 1.0f / (mOp.to - mOp.from) * 100;
     ui->progressBar->setValue(value);
-    ui->label->setText(QString("%1 / %2 - %3").arg(mOp.cur).arg(mOp.from).arg(mOp.to));
+
+    ui->label->setText(QString("%1 / %2 - %3  (%4%)").arg(mOp.cur).arg(mOp.from).arg(mOp.to).arg(ui->progressBar->value()));
 }
