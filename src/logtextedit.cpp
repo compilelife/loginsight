@@ -360,6 +360,7 @@ void LogTextEdit::setVisible(bool visible)
 void LogTextEdit::scrollToLine(int lineNum, int col)
 {
     auto cursor = textCursor();
+    //TODO：连续search是这里的push有问题（复现，先search几次然后后退）
     mHistory.push(fromViewPortToLog(cursor.blockNumber()), cursor.columnNumber());
 
     handleExternalScroll(centerLineGetTopRow(lineNum));//将target行滚动到窗口中间

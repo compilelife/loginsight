@@ -22,6 +22,7 @@ public:
 //===实现大文件的显示===>
 public:
     void setLog(Log* log);
+    Log* getLog(){return mLog;}
     void setScrollBar(QScrollBar* scrollbar);
 protected:
     void resizeEvent(QResizeEvent *e) override;

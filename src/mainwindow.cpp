@@ -22,8 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("loginsight");
 
-    //TODO:取消标题栏，释放更大空间
-
     resize(800,500);
 //    showMaximized();
 
@@ -70,6 +68,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->subLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
     ui->subLogEdit->setSlave(true);
     connect(ui->subLogEdit, SIGNAL(requestLocateMaster(int)), this, SLOT(handleLocateMaster(int)));
+
+    ui->openAction->setShortcut(QKeySequence::Open);
+    ui->gotoLineAction->setShortcut(QKeySequence("Ctrl+G"));
+    ui->filterAction->setShortcut(QKeySequence("Ctrl+L"));
+    ui->navBackAction->setShortcut(QKeySequence("Ctrl+["));
+    ui->navAheadAction->setShortcut(QKeySequence("Ctrl+]"));
+    ui->exportTimeLineAction->setShortcut(QKeySequence::Save);
 
     doOpenFile("/Users/chenyong/Downloads/gbk.txt");
 }
@@ -130,7 +135,12 @@ void MainWindow::handleSearchFoward()
 void MainWindow::handleGotoLine()
 {
     bool ok = false;
-    auto lineNum = QInputDialog::getInt(this, "跳转到行", "请选择要跳转到的行", 1, 1, mCurLogEdit->getLineCount(),1,&ok);
+    auto log = mCurLogEdit->getLog();
+
+    auto lineNum = QInputDialog::getInt(this,
+                                        "跳转到行",
+                                        QString("范围：1 - %1").arg(log->lineCount()),
+                                        1, 1, mCurLogEdit->getLineCount(),1,&ok);
     if (ok)
         mCurLogEdit->scrollToLine(lineNum);
 }
@@ -230,4 +240,11 @@ void MainWindow::doOpenFile(const QString &path)
     }
     ui->subLogEdit->setLog(nullptr);
     ui->subLogEdit->setVisible(false);
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *ev)
+{
+    if ((ev->modifiers() & Qt::CTRL) && (ev->key() == Qt::Key_F)) {
+        ui->searchEdit->setFocus();
+    }
 }
