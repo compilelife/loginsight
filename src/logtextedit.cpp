@@ -357,11 +357,11 @@ void LogTextEdit::setVisible(bool visible)
     setEnabled(visible);
 }
 
-void LogTextEdit::scrollToLine(int lineNum, int col)
+void LogTextEdit::scrollToLine(int lineNum, int col, bool recordToHistory)
 {
     auto cursor = textCursor();
-    //TODO：连续search是这里的push有问题（复现，先search几次然后后退）
-    mHistory.push(fromViewPortToLog(cursor.blockNumber()), cursor.columnNumber());
+    if (recordToHistory)
+        mHistory.push(fromViewPortToLog(cursor.blockNumber()), cursor.columnNumber());
 
     handleExternalScroll(centerLineGetTopRow(lineNum));//将target行滚动到窗口中间
 
@@ -372,7 +372,8 @@ void LogTextEdit::scrollToLine(int lineNum, int col)
     cursor.setPosition(pos);
     setTextCursor(cursor);
 
-    mHistory.push(lineNum, col);
+    if (recordToHistory)
+        mHistory.push(lineNum, col);
     repaint();
 }
 
@@ -386,7 +387,7 @@ void LogTextEdit::handleMarkLineAction()
 
 void LogTextEdit::onReplay(const NavPos &pos)
 {
-    scrollToLine(pos.line, pos.col);
+    scrollToLine(pos.line, pos.col, false);
 }
 
 void LogTextEdit::setSlave(bool value)

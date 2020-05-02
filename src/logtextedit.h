@@ -110,7 +110,7 @@ protected:
 public:
     void setVisible(bool visible) override;
 public:
-    void scrollToLine(int lineNum, int col = 0);
+    void scrollToLine(int lineNum, int col = 0, bool recordToHistory=true);
 //<===其他===
 
 };
