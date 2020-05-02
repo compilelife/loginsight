@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QTextDocument>
 #include "LongtimeOperation.h"
+#include <QTextCodec>
 
 struct SearchResult {
     int line;
@@ -17,6 +18,12 @@ class Log {
 public:
     virtual QString getLine(int from, int to) = 0;
     virtual int lineCount() = 0;
+
+public:
+    void setCodec(QTextCodec* codec){mCodec=codec;}
+    QTextCodec* getCodec(){return mCodec;}
+protected:
+    QTextCodec* mCodec;
 
 public:
     virtual ~Log();
@@ -48,6 +55,7 @@ public:
 
 private:
     qint64 getLineStart(int num);
+    void detectTextCodec();
 
 private:
     const char* mMem{nullptr};

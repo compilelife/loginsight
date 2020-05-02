@@ -34,6 +34,7 @@ private slots:
 private:
     void search(bool foward);
     void toast(const QString& text);
+    void doOpenFile(const QString& path);
 private:
     Ui::MainWindow *ui;
     FileLog mLog;

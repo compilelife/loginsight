@@ -71,9 +71,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->subLogEdit->setSlave(true);
     connect(ui->subLogEdit, SIGNAL(requestLocateMaster(int)), this, SLOT(handleLocateMaster(int)));
 
-    LongtimeOperation op;
-    mLog.open("/Users/chenyong/Downloads/rtsp_crash_log.txt", op);
-    ui->logEdit->setLog(&mLog);
+    doOpenFile("/Users/chenyong/Downloads/gbk.txt");
 }
 
 MainWindow::~MainWindow()
@@ -144,27 +142,7 @@ void MainWindow::handleOpenFile()
         return;
     }
 
-    bool ret = false;
-    bool canceled = BackgroundRunner::instance().exec("打开文件", [&](LongtimeOperation& op){
-        ret = mLog.open(path, op);
-    });
-
-    if (canceled) {
-        return;
-    }
-
-    if (!ret) {
-        toast("文件打开失败");
-        return;
-    }
-
-    ui->logEdit->setLog(&mLog);
-    if (mSubLog){
-        delete mSubLog;
-        mSubLog = nullptr;
-    }
-    ui->subLogEdit->setLog(nullptr);
-    ui->subLogEdit->setVisible(false);
+    doOpenFile(path);
 }
 
 void MainWindow::handleHistoryPosChanged()
@@ -227,4 +205,29 @@ void MainWindow::search(bool foward)
 void MainWindow::toast(const QString &text)
 {
     QMessageBox::information(this, "toast", text);
+}
+
+void MainWindow::doOpenFile(const QString &path)
+{
+    bool ret = false;
+    bool canceled = BackgroundRunner::instance().exec("打开文件", [&](LongtimeOperation& op){
+        ret = mLog.open(path, op);
+    });
+
+    if (canceled) {
+        return;
+    }
+
+    if (!ret) {
+        toast("文件打开失败");
+        return;
+    }
+
+    ui->logEdit->setLog(&mLog);
+    if (mSubLog){
+        delete mSubLog;
+        mSubLog = nullptr;
+    }
+    ui->subLogEdit->setLog(nullptr);
+    ui->subLogEdit->setVisible(false);
 }

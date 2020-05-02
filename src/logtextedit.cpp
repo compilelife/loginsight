@@ -32,7 +32,6 @@ private:
     LogTextEdit *mEditor;
 };
 
-//TODO: 编码问题
 LogTextEdit::LogTextEdit(QWidget* parent)
     :QPlainTextEdit(parent)
 {
@@ -341,7 +340,7 @@ void LogTextEdit::mouseDoubleClickEvent(QMouseEvent *e)
         return;
 
     auto cursor = cursorForPosition(e->pos());
-    auto lineNum = fromViewPortToLog(cursor.blockNumber());
+    auto lineNum = mLog->sourceLine(fromViewPortToLog(cursor.blockNumber()));
     emit requestLocateMaster(lineNum);
 }
 

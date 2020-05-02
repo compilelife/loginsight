@@ -3,6 +3,7 @@
 #include <QByteArray>
 #include <QTime>
 #include <regex>
+#include <QTextCodec>
 
 using namespace std;
 
@@ -142,6 +143,8 @@ bool FileLog::open(const QString &path, LongtimeOperation& op) {
 
     mLineCnt = mEnters.size()-1;
 
+    detectTextCodec();
+
     return true;
 }
 
@@ -169,6 +172,20 @@ qint64 FileLog::getLineStart(int num) {
     return lastLineEndPos+1;
 }
 
+void FileLog::detectTextCodec()
+{
+    //先只判断两种类型：UTF-8/GBK
+
+    QTextCodec::ConverterState state;
+    auto utf8 = QTextCodec::codecForName("UTF-8");
+    utf8->toUnicode(mMem, 4096, &state);//取4k来判断
+    if (state.invalidChars > 0) {
+        setCodec(QTextCodec::codecForName("GBK"));
+    } else {
+        setCodec(utf8);
+    }
+}
+
 QString FileLog::getLine(int from, int to) {
     if (from <= 0 || from > mLineCnt) {
         return "";
@@ -179,7 +196,8 @@ QString FileLog::getLine(int from, int to) {
     }
 
     auto start = getLineStart(from);
-    return QByteArray::fromRawData(mMem + start, (int)(mEnters[to] - start));
+    auto ba = QByteArray::fromRawData(mMem + start, (int)(mEnters[to] - start));
+    return mCodec->toUnicode(ba);
 }
 
 SubLog *FileLog::createSubLog(const QString &text, bool /*caseSensitive*/, LongtimeOperation& op)
@@ -193,8 +211,7 @@ SubLog *FileLog::createSubLog(const QString &text, bool /*caseSensitive*/, Longt
     QTime time;
     time.start();
 
-    auto s = text.toStdString();
-    auto ps = s.c_str();
+    auto ps = mCodec->fromUnicode(text).toStdString().c_str();
     SubLog* sub = new SubLog(this);
 
     op.from = 1;
