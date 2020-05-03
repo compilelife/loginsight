@@ -119,25 +119,31 @@ bool FileLog::open(const QString &path, LongtimeOperation& op) {
     op.cur = 0;
     op.from = 0;
     op.to = mSize/100;//按一行100个字符估计总行数
-    for (qint64 i = 0; i < mSize; ) {//TODO:进一步优化
-        if (mMem[i] == '\r') {
-            mEnters.push_back(i);
-            i+=2;
-            if (op.terminate) {
-                return false;
-            }
+
+    //分割为一行一行；MacBook 2005 2.4G耗时3.2s左右
+    const char* ptr = mMem;
+    const char* pEnd = mMem + mSize;
+
+    int enterCharOffset = 2;
+    auto firstNewLine = strchr(mMem, '\n');
+    if (firstNewLine != nullptr) {
+        if (firstNewLine == mMem || *(firstNewLine - 1) != '\r') {
+            enterCharOffset = 1;
+        }
+
+        --enterCharOffset;
+        while (ptr < pEnd && (ptr=strchr(ptr, '\n')) != nullptr) {
+            mEnters.push_back(ptr - mMem - enterCharOffset);//定位在\r（如有）或\n上
             ++op.cur;
-        } else if (mMem[i] == '\n') {
-            mEnters.push_back(i);
-            ++i;
-            if (op.terminate) {
-                return false;
-            }
-            ++op.cur;
-        } else {
-            ++i;
+            ++ptr;
         }
     }
+
+    if (ptr < pEnd) {//没有\n的最后一行
+        qDebug()<<"add last line:"<<(pEnd - ptr);
+        mEnters.push_back(mSize);
+    }
+
     qDebug()<<"create enters cost "<<time.elapsed();//2G+release: 5s
     //TODO mEnters记录到工程文件中，下次秒开
 
