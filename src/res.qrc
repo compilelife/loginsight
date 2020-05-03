@@ -8,5 +8,6 @@
         <file>img/locate.png</file>
         <file>img/open.png</file>
         <file>img/right.png</file>
+        <file>img/logo.png</file>
     </qresource>
 </RCC>

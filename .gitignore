@@ -1,2 +1,4 @@
 build-*
-src/qt.pro.user
+src/*.pro.user.*
+.DS_Store
+build

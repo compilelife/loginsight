@@ -2,6 +2,7 @@
 #define HISTORY_H
 
 #include <QList>
+#include <QObject>
 
 struct NavPos {
     int line;

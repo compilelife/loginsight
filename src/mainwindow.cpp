@@ -76,7 +76,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->navAheadAction->setShortcut(QKeySequence("Ctrl+]"));
     ui->exportTimeLineAction->setShortcut(QKeySequence::Save);
 
-    doOpenFile("/Users/chenyong/Downloads/gbk.txt");
+//    doOpenFile("/Users/chenyong/Downloads/gbk.txt");
 }
 
 MainWindow::~MainWindow()

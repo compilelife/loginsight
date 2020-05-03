@@ -11,6 +11,7 @@
 class TimeNode: public QObject, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 public:
     TimeNode(int lineNum, const QString& locateText, const QString& detailText);
 
