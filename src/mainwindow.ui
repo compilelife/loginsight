@@ -89,6 +89,9 @@
               <height>18</height>
              </size>
             </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -109,6 +112,9 @@
               <height>18</height>
              </size>
             </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -126,6 +132,9 @@
               <height>18</height>
              </size>
             </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -142,6 +151,9 @@
               <width>18</width>
               <height>18</height>
              </size>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -270,6 +282,9 @@
             <width>18</width>
             <height>18</height>
            </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

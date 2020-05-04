@@ -117,7 +117,7 @@ bool FileLog::open(const QString &path, LongtimeOperation& op) {
     mEnters.push_back(-1);//插入“第0行”方便处理。假设第0行的行结束标记在-1字节
 
     op.cur = 0;
-    op.from = 0;
+    op.from = 1;
     op.to = mSize/100;//按一行100个字符估计总行数
 
     //分割为一行一行；MacBook 2005 2.4G耗时3.2s左右
@@ -222,14 +222,18 @@ SubLog *FileLog::createSubLog(const QString &text, bool /*caseSensitive*/, Longt
 
     op.from = 1;
     op.to = lineCount();
-//    for (op.cur = op.from; op.cur <= op.to; op.cur++) {
-//        if (op.terminate)
-//            break;
+    for (op.cur = op.from; op.cur <= op.to; op.cur++) {
+        if (op.terminate)
+            break;
 
+        //14s, strnstr在linux/windows上没有实现……
+        if (-1 != QByteArray::fromRawData(mMem + mEnters[op.cur-1]+1, mEnters[op.cur]-mEnters[op.cur-1]).indexOf(ps)) {
+            sub->addLine(op.cur);
+        }
 //        if (strnstr(mMem + mEnters[op.cur-1]+1, ps, mEnters[op.cur]-mEnters[op.cur-1])) {
 //            sub->addLine(op.cur);
 //        }
-//    }
+    }
     qDebug()<<"create sub cost "<<time.elapsed();
 
     return sub;
