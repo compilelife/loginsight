@@ -58,3 +58,4 @@ RESOURCES += \
     res.qrc
 
 ICON = Icon.icns
+RC_ICONS = logo.ico

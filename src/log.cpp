@@ -222,14 +222,14 @@ SubLog *FileLog::createSubLog(const QString &text, bool /*caseSensitive*/, Longt
 
     op.from = 1;
     op.to = lineCount();
-    for (op.cur = op.from; op.cur <= op.to; op.cur++) {
-        if (op.terminate)
-            break;
+//    for (op.cur = op.from; op.cur <= op.to; op.cur++) {
+//        if (op.terminate)
+//            break;
 
-        if (strnstr(mMem + mEnters[op.cur-1]+1, ps, mEnters[op.cur]-mEnters[op.cur-1])) {
-            sub->addLine(op.cur);
-        }
-    }
+//        if (strnstr(mMem + mEnters[op.cur-1]+1, ps, mEnters[op.cur]-mEnters[op.cur-1])) {
+//            sub->addLine(op.cur);
+//        }
+//    }
     qDebug()<<"create sub cost "<<time.elapsed();
 
     return sub;
