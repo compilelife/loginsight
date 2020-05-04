@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 
 #include <QApplication>
-#include "../../codeeditor/codeeditor.h"
 
 int main(int argc, char *argv[])
 {
