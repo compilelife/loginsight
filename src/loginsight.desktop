@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=loginsight
+GenericName=log viewer
+Comment=analyze log file
+Icon=logo
+Terminal=false
+Exec=loginsight
+Categories=Qt;Utility;TextEditor;Office;

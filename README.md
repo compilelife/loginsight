@@ -1,3 +1,5 @@
+![Linux](https://github.com/compilelife/loginsight/workflows/Linux/badge.svg)
+
 loginsight致力于打造一款日志分析的利器
 
 ![preview](doc/img/preview.png)
