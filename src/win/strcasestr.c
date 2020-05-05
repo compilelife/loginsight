@@ -36,7 +36,6 @@
 /* Two-Way algorithm.  */
 #include <limits.h>
 #include <stdint.h>
-#include <sys/param.h>                  /* Defines MAX.  */
 
 #define RETURN_TYPE const char *
 #define AVAILABLE(h, h_l, j, n_l)			\
