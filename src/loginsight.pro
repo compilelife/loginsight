@@ -57,5 +57,13 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     res.qrc
 
+macx {
 ICON = Icon.icns
+}
+
+win32 {
+SOURCES += \
+    win/strcasestr.c
 RC_ICONS = logo.ico
+}
+

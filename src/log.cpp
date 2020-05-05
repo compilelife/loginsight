@@ -1,3 +1,13 @@
+#ifdef Q_OS_LINUX
+#define _GNU_SOURCE //strcasestr in linux
+#endif
+
+#include <string.h>
+
+//#ifdef Q_OS_WIN
+extern "C" char *strcasestr(const char *haystack, const char *needle);
+//#endif
+
 #include "log.h"
 #include <QDebug>
 #include <QByteArray>
@@ -209,8 +219,8 @@ QString FileLog::getLine(int from, int to) {
 SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeOperation& op)
 {
     //Log的默认实现太慢了，直接操作内存块会快很多。
-    //2G文件在2015 Macbook上耗时只有默认实现的1/7 (8787 ms vs 58255 ms)
-    //release可降到4s左右
+    //2G文件（已cache）在2015 Macbook上耗时只有默认实现的1/11 (3500~5000 ms vs 58255 ms)
+    //release会更低
 
     //TODO:记录到工程文件中，下次秒载。记录过去2次结果
 
@@ -223,32 +233,24 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
     op.from = 1;
     op.to = lineCount();
     op.cur = op.from;
-//    for (op.cur = op.from; op.cur <= op.to; op.cur++) {
-//        if (op.terminate)
-//            break;
 
-//        //14s, strnstr在linux/windows上没有实现……
-//        if (-1 != QByteArray::fromRawData(mMem + mEnters[op.cur-1]+1, mEnters[op.cur]-mEnters[op.cur-1]).indexOf(ps)) {
-//            sub->addLine(op.cur);
-//        }
-////        if (strnstr(mMem + mEnters[op.cur-1]+1, ps, mEnters[op.cur]-mEnters[op.cur-1])) {
-////            sub->addLine(op.cur);
-////        }
-//    }
-
+#ifdef Q_OS_LINUX
+    typedef const char*(*StrstrFunc)(const char*,const char*);
+#else
     typedef char*(*StrstrFunc)(const char*,const char*);
-    StrstrFunc strstrFunc = strstr;
+#endif
+    StrstrFunc strstrFunc = (StrstrFunc)strstr;
     if (!caseSensitive) {
-        strstrFunc = strcasestr;
+        strstrFunc = (StrstrFunc)strcasestr;
     }
 
     const char* ptr = mMem;
     while ((ptr = strstrFunc(ptr, ps)) != nullptr) {
         auto pos = ptr - mMem;
-        while (op.cur <= op.to) {
+        while (op.cur <= op.to) { // pos => line，可能还能再优化？
             if (mEnters[op.cur] >= pos) {
                 sub->addLine(op.cur);
-                if (op.cur < op.to)
+                if (op.cur != op.to)
                     ptr = mMem + mEnters[op.cur+1];//直接到下一行
                 else
                     ptr = nullptr;
