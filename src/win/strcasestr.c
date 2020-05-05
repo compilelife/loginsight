@@ -30,7 +30,6 @@
 
 #include <ctype.h>
 #include <stdbool.h>
-#include <strings.h>
 
 #define TOLOWER(Ch) tolower (Ch)
 
