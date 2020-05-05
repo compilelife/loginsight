@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build linux:
+  build_linux:
     runs-on: ubuntu-16.04
 
     steps:
@@ -25,7 +25,7 @@ jobs:
         name: linux
         path: build/artifact 
 
-  build mac:
+  build_mac:
     runs-on: macos-latest
 
     steps:
@@ -41,7 +41,7 @@ jobs:
         name: macos
         path: build/artifact 
 
-  build windows:
+  build_windows:
     runs-on: windows-latest
 
     steps:
