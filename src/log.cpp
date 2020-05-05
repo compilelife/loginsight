@@ -1,12 +1,13 @@
+#include <QtGlobal>
 #ifdef Q_OS_LINUX
 #define _GNU_SOURCE //strcasestr in linux
 #endif
 
 #include <string.h>
 
-//#ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
 extern "C" char *strcasestr(const char *haystack, const char *needle);
-//#endif
+#endif
 
 #include "log.h"
 #include <QDebug>
