@@ -81,8 +81,10 @@ SubLog *Log::createSubLog(const QString &text, bool caseSensitive, LongtimeOpera
     op.from = 1;
     op.to = lineCount();
     for (op.cur = op.from; op.cur <= op.to; op.cur++) {
-        if (op.terminate)
-            break;
+        if (op.terminate) {
+            delete sub;
+            return nullptr;
+        }
 
         auto s = getLine(op.cur);
         if (s.indexOf(text, 0, caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive) >= 0) {
@@ -139,12 +141,15 @@ bool FileLog::open(const QString &path, LongtimeOperation& op) {
         }
 
         --enterCharOffset;
-        while (ptr < pEnd && (ptr=strchr(ptr, '\n')) != nullptr) {
+        while (!op.terminate && ptr < pEnd && (ptr=strchr(ptr, '\n')) != nullptr) {
             mEnters.push_back(ptr - mMem - enterCharOffset);//定位在\r（如有）或\n上
             ++op.cur;
             ++ptr;
         }
     }
+
+    if (op.terminate)
+        return false;
 
     if (ptr < pEnd) {//没有\n的最后一行
         qDebug()<<"add last line:"<<(pEnd - ptr);
@@ -239,10 +244,6 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
     auto ps = mCodec->fromUnicode(text).toStdString().c_str();
     SubLog* sub = new SubLog(this);
 
-    op.from = 1;
-    op.to = lineCount();
-    op.cur = op.from;
-
 #if defined (Q_OS_MACOS) || defined (__MINGW32__)
     typedef char*(*StrstrFunc)(const char*,const char*);
 #else
@@ -254,7 +255,10 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
     }
 
     const char* ptr = mMem;
-    while ((ptr = strstrFunc(ptr, ps)) != nullptr) {
+    op.from = 1;
+    op.to = mLineCnt;
+    op.cur = 1;
+    while (!op.terminate && (ptr = strstrFunc(ptr, ps)) != nullptr) {
         op.cur = lineFromPos(ptr - mMem, op.cur);
         sub->addLine(op.cur);
         if (op.cur != op.to)
@@ -262,6 +266,11 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
         else
             ptr = nullptr;
         ++op.cur;
+    }
+
+    if (op.terminate) {
+        delete sub;
+        return nullptr;
     }
 
     qDebug()<<"create sub cost "<<time.elapsed();
@@ -288,7 +297,10 @@ SearchResult FileLog::search(const QString &text, QTextDocument::FindFlags flag,
     }
 
     auto ps = mCodec->fromUnicode(text).toStdString().c_str();
-    ptr = strstrFunc(ptr, ps);
+    op.from = fromLine;
+    op.to = mLineCnt;
+    op.cur = fromLine;
+    ptr = strstrFunc(ptr, ps);//坏处是没法中途停下来……
     SearchResult ret{0,0};
     if (ptr == nullptr) {
         return ret;
@@ -297,6 +309,7 @@ SearchResult FileLog::search(const QString &text, QTextDocument::FindFlags flag,
     auto offset = ptr - mMem;
     ret.line = lineFromPos(offset);
     ret.pos = offset - getLineStart(ret.line) + text.length();
+    op.cur = op.to;
 
     return ret;
 }

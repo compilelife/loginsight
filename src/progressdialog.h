@@ -17,6 +17,9 @@ public:
     ~ProgressDialog() override;
 public:
     int exec() override;
+    void finish();
+public slots:
+    void handleUserCancel();
 protected:
     void timerEvent(QTimerEvent *event) override;
     void closeEvent(QCloseEvent *) override;
@@ -26,6 +29,8 @@ private:
     Ui::ProgressDialog *ui;
     LongtimeOperation& mOp;
     int mTimerId;
+    int mLast;
+    bool mCanceled{false};
 };
 
 #endif // PROGRESSDIALOG_H

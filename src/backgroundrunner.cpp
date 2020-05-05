@@ -48,14 +48,7 @@ bool BackgroundRunner::exec(const QString& name, BackgroundTask task)
 
     //else 还没执行完，就弹出一个进度框
     mDlg.setWindowTitle(name);
-    ret = mDlg.exec();
-    if (ret == QDialog::Rejected) {
-        mOp.terminate = true;
-        mLoop.exec(QEventLoop::ExcludeUserInputEvents);//用户取消了任务，要等待taskDone
-        return true;
-    }
-
-    return false;
+    return mDlg.exec() == QDialog::Rejected;
 }
 
 void BackgroundRunner::timerEvent(QTimerEvent *)
@@ -70,7 +63,5 @@ void BackgroundRunner::taskDone()
     killTimer(mTimerId);
     mTimerId = 0;
     mLoop.exit(TIMER_STOP_FOR_DONE);
-    if (!mOp.terminate) {//没被取消，就accept对话框
-        mDlg.accept();
-    }
+    mDlg.finish();
 }
