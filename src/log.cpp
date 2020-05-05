@@ -206,7 +206,7 @@ QString FileLog::getLine(int from, int to) {
     return mCodec->toUnicode(ba);
 }
 
-SubLog *FileLog::createSubLog(const QString &text, bool /*caseSensitive*/, LongtimeOperation& op)
+SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeOperation& op)
 {
     //Log的默认实现太慢了，直接操作内存块会快很多。
     //2G文件在2015 Macbook上耗时只有默认实现的1/7 (8787 ms vs 58255 ms)
@@ -222,18 +222,42 @@ SubLog *FileLog::createSubLog(const QString &text, bool /*caseSensitive*/, Longt
 
     op.from = 1;
     op.to = lineCount();
-    for (op.cur = op.from; op.cur <= op.to; op.cur++) {
-        if (op.terminate)
-            break;
+    op.cur = op.from;
+//    for (op.cur = op.from; op.cur <= op.to; op.cur++) {
+//        if (op.terminate)
+//            break;
 
-        //14s, strnstr在linux/windows上没有实现……
-        if (-1 != QByteArray::fromRawData(mMem + mEnters[op.cur-1]+1, mEnters[op.cur]-mEnters[op.cur-1]).indexOf(ps)) {
-            sub->addLine(op.cur);
-        }
-//        if (strnstr(mMem + mEnters[op.cur-1]+1, ps, mEnters[op.cur]-mEnters[op.cur-1])) {
+//        //14s, strnstr在linux/windows上没有实现……
+//        if (-1 != QByteArray::fromRawData(mMem + mEnters[op.cur-1]+1, mEnters[op.cur]-mEnters[op.cur-1]).indexOf(ps)) {
 //            sub->addLine(op.cur);
 //        }
+////        if (strnstr(mMem + mEnters[op.cur-1]+1, ps, mEnters[op.cur]-mEnters[op.cur-1])) {
+////            sub->addLine(op.cur);
+////        }
+//    }
+
+    typedef char*(*StrstrFunc)(const char*,const char*);
+    StrstrFunc strstrFunc = strstr;
+    if (!caseSensitive) {
+        strstrFunc = strcasestr;
     }
+
+    const char* ptr = mMem;
+    while ((ptr = strstrFunc(ptr, ps)) != nullptr) {
+        auto pos = ptr - mMem;
+        while (op.cur <= op.to) {
+            if (mEnters[op.cur] >= pos) {
+                sub->addLine(op.cur);
+                if (op.cur < op.to)
+                    ptr = mMem + mEnters[op.cur+1];//直接到下一行
+                else
+                    ptr = nullptr;
+                break;
+            }
+            ++op.cur;
+        }
+    }
+
     qDebug()<<"create sub cost "<<time.elapsed();
 
     return sub;
