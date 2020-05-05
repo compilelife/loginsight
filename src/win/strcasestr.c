@@ -39,7 +39,7 @@
 #include <stdint.h>
 #include <sys/param.h>                  /* Defines MAX.  */
 
-#define RETURN_TYPE char *
+#define RETURN_TYPE const char *
 #define AVAILABLE(h, h_l, j, n_l)			\
   (((j) + (n_l) <= (h_l)) \
    || ((h_l) += strnlen ((void*)((h) + (h_l)), (n_l) + 512), \

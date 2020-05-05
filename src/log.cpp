@@ -6,7 +6,7 @@
 #include <string.h>
 
 #ifdef Q_OS_WIN
-extern "C" char *strcasestr(const char *haystack, const char *needle);
+extern "C" const char *strcasestr(const char *haystack, const char *needle);
 #endif
 
 #include "log.h"
@@ -235,10 +235,10 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
     op.to = lineCount();
     op.cur = op.from;
 
-#ifdef Q_OS_LINUX
-    typedef const char*(*StrstrFunc)(const char*,const char*);
-#else
+#ifdef Q_OS_MACOS
     typedef char*(*StrstrFunc)(const char*,const char*);
+#else
+    typedef const char*(*StrstrFunc)(const char*,const char*);
 #endif
     StrstrFunc strstrFunc = (StrstrFunc)strstr;
     if (!caseSensitive) {

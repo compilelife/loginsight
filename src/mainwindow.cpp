@@ -14,6 +14,8 @@
 #include "history.h"
 #include <QSplitterHandle>
 #include "backgroundrunner.h"
+#include <QVBoxLayout>
+#include <QDialogButtonBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -92,26 +94,41 @@ void MainWindow::handleExportTimeLine()
 
 void MainWindow::handleFilter()
 {
-    auto text = QInputDialog::getText(this, "过滤日志", "输入关键字:");
-    if (!text.isEmpty()) {
-        if (mSubLog) {
-            delete mSubLog;
-        }
+    QDialog inputDlg;
+    inputDlg.setWindowTitle("过滤日志");
+    QVBoxLayout layout(&inputDlg);
+    QCheckBox caseSensentiveCheckBox("大小写敏感");
+    layout.addWidget(&caseSensentiveCheckBox);
+    QLineEdit lineEdit;
+    lineEdit.setPlaceholderText("请输入要过滤的关键字");
+    layout.addWidget(&lineEdit);
+    QDialogButtonBox btnBox(QDialogButtonBox::Ok);
+    layout.addWidget(&btnBox);
+    connect(&btnBox, SIGNAL(accepted()), &inputDlg, SLOT(accept()));
 
-        auto canceled = BackgroundRunner::instance().exec(QString("过滤%1").arg(text), [&](LongtimeOperation& op){
-            mSubLog = mLog.createSubLog(text, false, op);
-        });
+    if (inputDlg.exec() != QDialog::Accepted || lineEdit.text().isEmpty()) {
+        return;
+    }
 
-        if (canceled)
-            return;
+    auto text = lineEdit.text();
 
-        if (mSubLog->lineCount() > 0) {
-            ui->subLogEdit->setLog(mSubLog);
-            ui->subLogEdit->setVisible(true);
-            toast(QString("一共过滤到%1行").arg(mSubLog->lineCount()));
-        } else {
-            toast("没有找到匹配项");
-        }
+    if (mSubLog) {
+        delete mSubLog;
+    }
+
+    auto canceled = BackgroundRunner::instance().exec(QString("过滤%1").arg(text), [&](LongtimeOperation& op){
+        mSubLog = mLog.createSubLog(text, caseSensentiveCheckBox.isChecked(), op);
+    });
+
+    if (canceled)
+        return;
+
+    if (mSubLog->lineCount() > 0) {
+        ui->subLogEdit->setLog(mSubLog);
+        ui->subLogEdit->setVisible(true);
+        toast(QString("一共过滤到%1行").arg(mSubLog->lineCount()));
+    } else {
+        toast("没有找到匹配项");
     }
 }
 
