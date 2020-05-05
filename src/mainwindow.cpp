@@ -129,6 +129,8 @@ void MainWindow::handleFilter()
         toast(QString("一共过滤到%1行").arg(mSubLog->lineCount()));
     } else {
         toast("没有找到匹配项");
+        ui->subLogEdit->setLog(nullptr);
+        ui->subLogEdit->setVisible(false);
     }
 }
 

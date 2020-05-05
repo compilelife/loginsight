@@ -28,9 +28,6 @@ QString Log::getLine(int num) {
 
 SearchResult Log::search(const QString &text, QTextDocument::FindFlags flag, int fromLine, int fromPos, LongtimeOperation& op)
 {
-    QTime time;
-    time.start();
-
     //因为文本里可能有汉字，要定位关键字出现在行里的位置，用strstr定位受编码影响，会定位偏。
     //最简单的做法是直接用QString的indexOf查找好位置返回出去
     auto caseSensitivity = Qt::CaseInsensitive;
@@ -67,7 +64,6 @@ SearchResult Log::search(const QString &text, QTextDocument::FindFlags flag, int
             ret.pos = cur.indexOf(text, fromPos, caseSensitivity);
             if (ret.pos >= 0) {
                 ret.pos += text.length();
-                qDebug()<<"search cost: "<<time.elapsed();
                 return ret;
             }
             fromPos = 0;
@@ -203,6 +199,18 @@ void FileLog::detectTextCodec()
     }
 }
 
+int FileLog::lineFromPos(qint64 pos, int from)
+{
+    while (from <= mLineCnt) { // pos => line，可能还能再优化？
+        if (mEnters[from] >= pos) {
+            return from;
+        }
+        ++from;
+    }
+
+    return -1;
+}
+
 QString FileLog::getLine(int from, int to) {
     if (from <= 0 || from > mLineCnt) {
         return "";
@@ -247,23 +255,50 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
 
     const char* ptr = mMem;
     while ((ptr = strstrFunc(ptr, ps)) != nullptr) {
-        auto pos = ptr - mMem;
-        while (op.cur <= op.to) { // pos => line，可能还能再优化？
-            if (mEnters[op.cur] >= pos) {
-                sub->addLine(op.cur);
-                if (op.cur != op.to)
-                    ptr = mMem + mEnters[op.cur+1];//直接到下一行
-                else
-                    ptr = nullptr;
-                break;
-            }
-            ++op.cur;
-        }
+        op.cur = lineFromPos(ptr - mMem, op.cur);
+        sub->addLine(op.cur);
+        if (op.cur != op.to)
+            ptr = mMem + mEnters[op.cur+1];//直接到下一行
+        else
+            ptr = nullptr;
+        ++op.cur;
     }
 
     qDebug()<<"create sub cost "<<time.elapsed();
 
     return sub;
+}
+
+SearchResult FileLog::search(const QString &text, QTextDocument::FindFlags flag, int fromLine, int fromPos, LongtimeOperation &op)
+{
+    if (flag.testFlag(QTextDocument::FindBackward)) {//对于向后查找，我们需要str[r]casestr来作优化
+        return Log::search(text, flag, fromLine, fromPos, op);
+    }
+
+    const char* ptr = mMem + getLineStart(fromLine) + fromPos;
+
+#if defined (Q_OS_MACOS) || defined (__MINGW32__)
+    typedef char*(*StrstrFunc)(const char*,const char*);
+#else
+    typedef const char*(*StrstrFunc)(const char*,const char*);
+#endif
+    StrstrFunc strstrFunc = (StrstrFunc)strstr;
+    if (!flag.testFlag(QTextDocument::FindCaseSensitively)) {
+        strstrFunc = (StrstrFunc)strcasestr;
+    }
+
+    auto ps = mCodec->fromUnicode(text).toStdString().c_str();
+    ptr = strstrFunc(ptr, ps);
+    SearchResult ret{0,0};
+    if (ptr == nullptr) {
+        return ret;
+    }
+
+    auto offset = ptr - mMem;
+    ret.line = lineFromPos(offset);
+    ret.pos = offset - getLineStart(ret.line) + text.length();
+
+    return ret;
 }
 
 

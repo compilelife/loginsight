@@ -52,10 +52,15 @@ public:
     QString getLine(int from, int to) override;
     int lineCount() override {return mLineCnt;}
     SubLog* createSubLog(const QString& text, bool caseSensitive, LongtimeOperation& op) override;
+    SearchResult search(const QString& text,
+                        QTextDocument::FindFlags flag,
+                        int fromLine, int fromPos,
+                        LongtimeOperation& op) override;
 
 private:
     qint64 getLineStart(int num);
     void detectTextCodec();
+    int lineFromPos(qint64 pos, int from = 1);
 
 private:
     const char* mMem{nullptr};

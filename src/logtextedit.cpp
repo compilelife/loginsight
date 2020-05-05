@@ -64,9 +64,10 @@ LogTextEdit::~LogTextEdit()
 void LogTextEdit::setLog(Log *log)
 {
     mLog = log;
+    mHistory.clear();
+
     if (log == nullptr) {
         mFromLine = mToLine = 0;
-        mHistory.clear();
         clear();
         return;
     }
@@ -283,7 +284,7 @@ bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options)
         return true;
     }
 
-    if (target.pos < 0) {
+    if (target.line <= 0) {
         return false;
     }
 
