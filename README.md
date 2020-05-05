@@ -1,4 +1,4 @@
-![Build](https://github.com/compilelife/loginsight/workflows/Build/badge.svg
+![Build](https://github.com/compilelife/loginsight/workflows/Build/badge.svg)
 
 loginsight致力于打造一款日志分析的利器
 
