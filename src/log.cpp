@@ -235,7 +235,7 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
     op.to = lineCount();
     op.cur = op.from;
 
-#ifdef Q_OS_MACOS
+#if defined (Q_OS_MACOS) || defined (__MINGW32__)
     typedef char*(*StrstrFunc)(const char*,const char*);
 #else
     typedef const char*(*StrstrFunc)(const char*,const char*);

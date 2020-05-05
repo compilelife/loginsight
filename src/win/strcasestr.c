@@ -27,6 +27,7 @@
 
 /* Specification.  */
 #include <string.h>
+#include <QtGlobal>
 
 #include <ctype.h>
 #include <stdbool.h>
@@ -45,8 +46,13 @@
 #define CHECK_EOL (1)
 #define RET0_IF_0(a) if (!a) goto ret0
 #define CANON_ELEMENT(c) TOLOWER (c)
+#ifdef Q_OS_WIN
+#define CMP_FUNC(p1, p2, l)				\
+  strnicmp ((const char *) (p1), (const char *) (p2), l)
+#else
 #define CMP_FUNC(p1, p2, l)				\
   strncasecmp ((const char *) (p1), (const char *) (p2), l)
+#endif
 
 /* We use the Two-Way string matching algorithm, which guarantees
    linear complexity with constant space.  Additionally, for long
@@ -367,7 +373,7 @@ two_way_short_needle (const unsigned char *haystack, size_t haystack_len,
         j += i - suffix + 1;
     }
     }
- ret0: __attribute__ ((unused))
+ ret0:
   return NULL;
 }
 
@@ -386,7 +392,7 @@ two_way_short_needle (const unsigned char *haystack, size_t haystack_len,
 
    Since this function is large and complex, block inlining to avoid
    slowing down the common case of small needles.  */
-__attribute__((noinline)) static RETURN_TYPE
+static RETURN_TYPE
 two_way_long_needle (const unsigned char *haystack, size_t haystack_len,
              const unsigned char *needle, size_t needle_len)
 {
