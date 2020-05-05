@@ -21,6 +21,7 @@ public:
 private slots:
     void handleExportTimeLine();
     void handleFilter();
+    void handleFilterRequest(const QString &text);
     void handleNodeSelected(TimeNode* node);
     void handleSearchBackward();
     void handleSearchFoward();
@@ -35,6 +36,7 @@ private:
     void search(bool foward);
     void toast(const QString& text);
     void doOpenFile(const QString& path);
+    void filter(const QString& text, bool caseSenesitive);
 protected:
     void keyReleaseEvent(QKeyEvent* ev) override;
 private:

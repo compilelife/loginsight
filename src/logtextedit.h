@@ -70,6 +70,10 @@ private:
 //===实现搜索===>
 public:
     bool search(const QString& text, QTextDocument::FindFlags options);
+signals:
+    void requestFilter(const QString& text);
+private slots:
+    void handleFilterUnderCursor();
 //<===实现搜索===
 
 //===实现时间线===>

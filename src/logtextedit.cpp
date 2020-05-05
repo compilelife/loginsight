@@ -298,6 +298,17 @@ bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options)
     return true;
 }
 
+void LogTextEdit::handleFilterUnderCursor()
+{
+    auto cursor = textCursor();
+
+    if (!cursor.hasSelection()) {
+        cursor.select(QTextCursor::WordUnderCursor);
+    }
+
+    emit requestFilter(cursor.selectedText());
+}
+
 void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
 {
     QMenu* menu = new QMenu();
@@ -312,8 +323,11 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
 
     menu->addSeparator();
     cursor.select(QTextCursor::WordUnderCursor);
-    auto action = menu->addAction(QString("高亮\"%1\"").arg(cursor.selectedText()));
+    auto cursorWord = cursor.selectedText();
+    auto action = menu->addAction(QString("高亮\"%1\"").arg(cursorWord));
     connect(action, SIGNAL(triggered()), this, SLOT(addWordHighlightUnderCursor()));
+    action = menu->addAction(QString("过滤含\"%1\"的行").arg(cursorWord));
+    connect(action, SIGNAL(triggered()), this, SLOT(handleFilterUnderCursor()));
 
     if (mHighlighter->isQuickHighlightOn()||mHighlighter->isSearchHighlightOn()){
         menu->addSeparator();

@@ -70,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->subLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
     ui->subLogEdit->setSlave(true);
     connect(ui->subLogEdit, SIGNAL(requestLocateMaster(int)), this, SLOT(handleLocateMaster(int)));
+    connect(ui->logEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
+    connect(ui->subLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
 
     ui->openAction->setShortcut(QKeySequence::Open);
     ui->gotoLineAction->setShortcut(QKeySequence("Ctrl+G"));
@@ -111,27 +113,12 @@ void MainWindow::handleFilter()
     }
 
     auto text = lineEdit.text();
+    filter(text, caseSensentiveCheckBox.isChecked());
+}
 
-    if (mSubLog) {
-        delete mSubLog;
-    }
-
-    auto canceled = BackgroundRunner::instance().exec(QString("过滤%1").arg(text), [&](LongtimeOperation& op){
-        mSubLog = mLog.createSubLog(text, caseSensentiveCheckBox.isChecked(), op);
-    });
-
-    if (canceled)
-        return;
-
-    if (mSubLog->lineCount() > 0) {
-        ui->subLogEdit->setLog(mSubLog);
-        ui->subLogEdit->setVisible(true);
-        toast(QString("一共过滤到%1行").arg(mSubLog->lineCount()));
-    } else {
-        toast("没有找到匹配项");
-        ui->subLogEdit->setLog(nullptr);
-        ui->subLogEdit->setVisible(false);
-    }
+void MainWindow::handleFilterRequest(const QString& text)
+{
+    filter(text, true);
 }
 
 void MainWindow::handleNodeSelected(TimeNode *node)
@@ -259,6 +246,30 @@ void MainWindow::doOpenFile(const QString &path)
     }
     ui->subLogEdit->setLog(nullptr);
     ui->subLogEdit->setVisible(false);
+}
+
+void MainWindow::filter(const QString &text, bool caseSenesitive)
+{
+    if (mSubLog) {
+        delete mSubLog;
+    }
+
+    auto canceled = BackgroundRunner::instance().exec(QString("过滤%1").arg(text), [&](LongtimeOperation& op){
+        mSubLog = mLog.createSubLog(text, caseSenesitive, op);
+    });
+
+    if (canceled)
+        return;
+
+    if (mSubLog->lineCount() > 0) {
+        ui->subLogEdit->setLog(mSubLog);
+        ui->subLogEdit->setVisible(true);
+        toast(QString("一共过滤到%1行").arg(mSubLog->lineCount()));
+    } else {
+        toast("没有找到匹配项");
+        ui->subLogEdit->setLog(nullptr);
+        ui->subLogEdit->setVisible(false);
+    }
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *ev)
