@@ -48,3 +48,7 @@ TODO:
 PS：
 
 如果你在GitHub上看不到图片、速度慢；可以移步到镜像仓库：https://gitee.com/compilelife/loginsight
+
+如果在release页面下载速度慢，可以移步百度网盘下载:
+
+链接: https://pan.baidu.com/s/1DzKTmmVL34qQdHKlrs8LCg 提取码: x46v
