@@ -241,7 +241,7 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
     QTime time;
     time.start();
 
-    auto ps = mCodec->fromUnicode(text).toStdString().c_str();
+    auto textInRaw = mCodec->fromUnicode(text).toStdString();
     SubLog* sub = new SubLog(this);
 
 #if defined (Q_OS_MACOS) || defined (__MINGW32__)
@@ -258,7 +258,7 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
     op.from = 1;
     op.to = mLineCnt;
     op.cur = 1;
-    while (!op.terminate && (ptr = strstrFunc(ptr, ps)) != nullptr) {
+    while (!op.terminate && (ptr = strstrFunc(ptr, textInRaw.c_str())) != nullptr) {
         op.cur = lineFromPos(ptr - mMem, op.cur);
         sub->addLine(op.cur);
         if (op.cur != op.to)
@@ -296,11 +296,11 @@ SearchResult FileLog::search(const QString &text, QTextDocument::FindFlags flag,
         strstrFunc = (StrstrFunc)strcasestr;
     }
 
-    auto ps = mCodec->fromUnicode(text).toStdString().c_str();
+    auto textInRaw = mCodec->fromUnicode(text).toStdString();
     op.from = fromLine;
     op.to = mLineCnt;
     op.cur = fromLine;
-    ptr = strstrFunc(ptr, ps);//坏处是没法中途停下来……
+    ptr = strstrFunc(ptr, textInRaw.c_str());//坏处是没法中途停下来……
     SearchResult ret{0,0};
     if (ptr == nullptr) {
         return ret;
