@@ -18,13 +18,15 @@ jobs:
       run: |
         sudo DEBIAN_FRONTEND=noninteractive apt-get update
         sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libfcitx-qt5-dev fcitx-frontend-qt5
-        cp /usr/lib/x86_64-linux-gnu/libFcitxQt5DBusAddons.so* $Qt5_Dir/lib/
-        cp /usr/lib/x86_64-linux-gnu/libFcitxQt5WidgetsAddons.so* $Qt5_Dir/lib
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.6.2
 
     - name: do build
-      run: cd src;./release_linux.sh
+      run: |
+        cp /usr/lib/x86_64-linux-gnu/libFcitxQt5DBusAddons.so* $Qt5_Dir/lib/
+        cp /usr/lib/x86_64-linux-gnu/libFcitxQt5WidgetsAddons.so* $Qt5_Dir/lib
+        cd src
+        ./release_linux.sh
     
     - uses: actions/upload-artifact@v1
       with:
