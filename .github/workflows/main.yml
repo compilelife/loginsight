@@ -25,7 +25,7 @@ jobs:
       run: |
         cp /usr/lib/x86_64-linux-gnu/libFcitxQt5DBusAddons.so* $Qt5_Dir/lib/
         cp /usr/lib/x86_64-linux-gnu/libFcitxQt5WidgetsAddons.so* $Qt5_Dir/lib
-        cp /usr/lib/qt5/plugins/platforminputcontexts/libfcitxplatforminputcontextplugin.so $Qt5_Dir/plugins/platforminputcontexts/
+        cp /usr/lib/x86_64-linux-gnu/qt5/plugins/platforminputcontexts/libfcitxplatforminputcontextplugin.so $Qt5_Dir/plugins/platforminputcontexts/
         cd src
         ./release_linux.sh
     
