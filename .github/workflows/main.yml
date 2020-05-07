@@ -5,6 +5,8 @@ on:
     branches: [ master ]
     paths:
       - 'src/*'
+  watch:
+    types: started
 
 jobs:
   build_linux:
@@ -15,7 +17,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo DEBIAN_FRONTEND=noninteractive apt-get update
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libfcitx-qt5-dev
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libfcitx-qt5-dev fcitx-frontend-qt5
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.6.2
 
