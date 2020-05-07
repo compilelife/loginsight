@@ -90,7 +90,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleExportTimeLine()
 {
-    auto filename = QFileDialog::getSaveFileName(this, "保存时间线到", QString(), "Images (*.png *.jpg)");
+    auto filename = QFileDialog::getSaveFileName(this, "保存时间线到", QString(), "Images (*.png)");
+    if (!filename.contains('.')) {
+        filename += ".png";
+    }
     ui->timeLine->exportToImage(filename);
 }
 
