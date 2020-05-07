@@ -10,7 +10,8 @@ void Highlighter::highlightBlock(const QString &text) {
         int i = 0;
         auto len = p->key.length();
         QTextCharFormat fmt;
-        fmt.setForeground(p->color);
+//        fmt.setForeground(p->color);
+        fmt.setBackground(p->color);
 
         while ((i = text.indexOf(p->key, i, p->caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive)) >= 0) {
             setFormat(i, len, fmt);
