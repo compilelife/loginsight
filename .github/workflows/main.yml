@@ -18,6 +18,8 @@ jobs:
       run: |
         sudo DEBIAN_FRONTEND=noninteractive apt-get update
         sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libfcitx-qt5-dev fcitx-frontend-qt5
+        cp /usr/lib/x86_64-linux-gnu/libFcitxQt5DBusAddons.so* $Qt5_Dir/lib/
+        cp /usr/lib/x86_64-linux-gnu/libFcitxQt5WidgetsAddons.so* $Qt5_Dir/lib
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.6.2
 
