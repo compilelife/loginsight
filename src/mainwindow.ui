@@ -158,7 +158,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="searchEdit">
+           <widget class="SearchEdit" name="searchEdit">
             <property name="placeholderText">
              <string>输入文本进行搜索</string>
             </property>
@@ -316,6 +316,11 @@
    <extends>QWidget</extends>
    <header>timeline.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SearchEdit</class>
+   <extends>QLineEdit</extends>
+   <header>searchedit.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -47,12 +47,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->exportTimeLineAction, SIGNAL(clicked()), this, SLOT(handleExportTimeLine()));
     connect(ui->filterAction, SIGNAL(clicked()), this, SLOT(handleFilter()));
 
-    auto a = ui->searchEdit->addAction(QIcon(":/res/img/up.png"), QLineEdit::TrailingPosition);
-    connect(a, SIGNAL(triggered()), this, SLOT(handleSearchBackward()));
-    a = ui->searchEdit->addAction(QIcon(":/res/img/down.png"), QLineEdit::TrailingPosition);
-    connect(a, SIGNAL(triggered()), this, SLOT(handleSearchFoward()));
+    connect(ui->searchEdit, SIGNAL(searchFoward()), this, SLOT(handleSearchFoward()));
+    connect(ui->searchEdit, SIGNAL(searchBackward()), this, SLOT(handleSearchBackward()));
 
-    connect(ui->searchEdit, SIGNAL(returnPressed()), this, SLOT(handleSearchFoward()));
     connect(ui->gotoLineAction, SIGNAL(clicked()), this, SLOT(handleGotoLine()));
     connect(ui->openAction, SIGNAL(clicked()), this, SLOT(handleOpenFile()));
 
@@ -278,6 +275,10 @@ void MainWindow::filter(const QString &text, bool caseSenesitive)
 void MainWindow::keyReleaseEvent(QKeyEvent *ev)
 {
     if ((ev->modifiers() & Qt::CTRL) && (ev->key() == Qt::Key_F)) {
+        if (ev->modifiers() & Qt::SHIFT)
+            ui->searchEdit->setSearchFoward(false);
+        else
+            ui->searchEdit->setSearchFoward(true);
         ui->searchEdit->setFocus();
     }
 }

@@ -25,6 +25,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     progressdialog.cpp \
+    searchedit.cpp \
     timeline.cpp \
     timenode.cpp \
     timenodebody.cpp \
@@ -40,6 +41,7 @@ HEADERS += \
     logtextedit.h \
     mainwindow.h \
     progressdialog.h \
+    searchedit.h \
     timeline.h \
     timenode.h \
     timenodebody.h \

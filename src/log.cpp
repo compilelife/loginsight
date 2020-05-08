@@ -71,7 +71,7 @@ SearchResult Log::search(const QString &text, QTextDocument::FindFlags flag, int
         }
     }
 
-    return ret;
+    return {0,0};
 }
 
 SubLog *Log::createSubLog(const QString &text, bool caseSensitive, LongtimeOperation& op)

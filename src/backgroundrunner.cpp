@@ -41,7 +41,6 @@ bool BackgroundRunner::exec(const QString& name, BackgroundTask task)
     mTimerId = startTimer(500);//singleshot
 
     int ret = mLoop.exec(QEventLoop::ExcludeUserInputEvents);//looper用来保证界面不会未响应
-    qDebug()<<"loop ret: "<<ret;
     if (ret == TIMER_STOP_FOR_DONE) {//if 已经执行完成，直接退出
         return false;
     }

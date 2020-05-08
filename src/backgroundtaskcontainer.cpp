@@ -9,7 +9,6 @@ BackgroundTaskContainer::BackgroundTaskContainer(BackgroundTask task, LongtimeOp
 
 void BackgroundTaskContainer::runTask()
 {
-    qDebug()<<"run task";
     mTask(mOp);
     emit taskDone();
 }

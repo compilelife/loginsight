@@ -138,7 +138,7 @@ void LogTextEdit::handleInternalScroll(int)
         windowBottom = mLog->lineCount();
     }
 
-    qDebug()<<windowTop<<","<<windowBottom<<";"<<mFromLine<<","<<mToLine;
+//    qDebug()<<windowTop<<","<<windowBottom<<";"<<mFromLine<<","<<mToLine;
 
     if (!(mFromLine<=windowTop && mToLine>=windowBottom)) {//window滑出预加载区了
         load(topLine);
