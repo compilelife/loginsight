@@ -34,7 +34,6 @@ private slots:
     void handleLocateMaster(int lineNum);
 private:
     void search(bool foward);
-    void toast(const QString& text);
     void doOpenFile(const QString& path);
     void filter(const QString& text, bool caseSenesitive);
 protected:

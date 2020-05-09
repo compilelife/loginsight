@@ -29,7 +29,8 @@ SOURCES += \
     timeline.cpp \
     timenode.cpp \
     timenodebody.cpp \
-    timenodehead.cpp
+    timenodehead.cpp \
+    toast.cpp
 
 HEADERS += \
     LongtimeOperation.h \
@@ -45,7 +46,8 @@ HEADERS += \
     timeline.h \
     timenode.h \
     timenodebody.h \
-    timenodehead.h
+    timenodehead.h \
+    toast.h
 
 FORMS += \
     mainwindow.ui \

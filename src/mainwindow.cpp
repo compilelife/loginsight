@@ -16,6 +16,8 @@
 #include "backgroundrunner.h"
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
+#include <QResizeEvent>
+#include "toast.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -211,20 +213,15 @@ void MainWindow::search(bool foward)
 
     if (!mCurLogEdit->search(keyword, flag)) {
         if (flag.testFlag(QTextDocument::FindBackward)) {
-            toast("到达顶部，没有找到匹配项");
+            Toast::instance().show(Toast::INFO, "到达顶部，没有找到匹配项");
         } else {
-            toast("到达底部，没有找到匹配项");
+            Toast::instance().show(Toast::INFO, "到达底部，没有找到匹配项");
         }
     }
 }
 
-void MainWindow::toast(const QString &text)
-{
-    QMessageBox::information(this, "toast", text);
-}
-
 void MainWindow::doOpenFile(const QString &path)
-{
+{    
     bool ret = false;
     bool canceled = BackgroundRunner::instance().exec("打开文件", [&](LongtimeOperation& op){
         ret = mLog.open(path, op);
@@ -235,7 +232,7 @@ void MainWindow::doOpenFile(const QString &path)
     }
 
     if (!ret) {
-        toast("文件打开失败");
+        Toast::instance().show(Toast::INFO, "文件打开失败");
         return;
     }
 
@@ -264,9 +261,9 @@ void MainWindow::filter(const QString &text, bool caseSenesitive)
     if (mSubLog->lineCount() > 0) {
         ui->subLogEdit->setLog(mSubLog);
         ui->subLogEdit->setVisible(true);
-        toast(QString("一共过滤到%1行").arg(mSubLog->lineCount()));
+        Toast::instance().show(Toast::INFO, QString("一共过滤到%1行").arg(mSubLog->lineCount()));
     } else {
-        toast("没有找到匹配项");
+        Toast::instance().show(Toast::INFO, "没有找到匹配项");
         ui->subLogEdit->setLog(nullptr);
         ui->subLogEdit->setVisible(false);
     }
