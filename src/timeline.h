@@ -21,6 +21,7 @@ public:
 public slots:
     void addNode(int lineNum, const QString& text);//TODO: lineNum只是在nodeSelected时被读取,改为QVariant
     void exportToImage(const QString& path);
+    void exportToClipboard();
 
 signals:
     void nodeSelected(TimeNode* node);

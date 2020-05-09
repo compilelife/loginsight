@@ -60,6 +60,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->navBackAction->setEnabled(false);
     ui->navAheadAction->setEnabled(false);
 
+    connect(ui->clipboardAction, SIGNAL(clicked()), ui->timeLine, SLOT(exportToClipboard()));
+
     connect(ui->logEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
     connect(ui->subLogEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
 
@@ -77,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->filterAction->setShortcut(QKeySequence("Ctrl+L"));
     ui->navBackAction->setShortcut(QKeySequence("Ctrl+["));
     ui->navAheadAction->setShortcut(QKeySequence("Ctrl+]"));
-    ui->exportTimeLineAction->setShortcut(QKeySequence::Save);
+    ui->clipboardAction->setShortcut(QKeySequence::Save);
 
 //    doOpenFile("/Users/chenyong/Downloads/gbk.txt");
 }

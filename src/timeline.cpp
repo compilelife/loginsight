@@ -4,6 +4,10 @@
 #include <QGraphicsDropShadowEffect>
 #include "timenode.h"
 #include <QImage>
+#include <QtGlobal>
+#include <QApplication>
+#include "toast.h"
+#include <QClipboard>
 
 TimeLine::TimeLine(QWidget* parent)
     :QGraphicsView(parent)
@@ -74,14 +78,36 @@ void TimeLine::addNode(int lineNum, const QString &text) {
 void TimeLine::exportToImage(const QString& path)
 {
     auto rect = sceneRect();
-    //TODO：高分屏才需要放大2倍吧？
+#ifdef Q_OS_MAC
+    //避免图片发虚
     QImage img((int)(rect.width()*2), (int)(rect.height()*2), QImage::Format_RGB32);
+#else
+    QImage img((int)(rect.width()), (int)(rect.height()), QImage::Format_RGB32);
+#endif
 
     QPainter painter(&img);
     painter.fillRect(img.rect(), QColor(250,250,250));
     scene()->render(&painter);
 
     img.save(path);
+}
+
+void TimeLine::exportToClipboard()
+{
+    auto rect = sceneRect();
+#ifdef Q_OS_MAC
+    //避免图片发虚
+    QImage img((int)(rect.width()*2), (int)(rect.height()*2), QImage::Format_RGB32);
+#else
+    QImage img((int)(rect.width()), (int)(rect.height()), QImage::Format_RGB32);
+#endif
+
+    QPainter painter(&img);
+    painter.fillRect(img.rect(), QColor(250,250,250));
+    scene()->render(&painter);
+
+    QApplication::clipboard()->setImage(img);
+    Toast::instance().show(Toast::INFO, "时间线已复制到剪贴板");
 }
 
 void TimeLine::deleteNode(TimeNode *node)
