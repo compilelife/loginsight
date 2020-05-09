@@ -17,6 +17,7 @@ protected:
                 accept();
             }
         }
+        return QObject::eventFilter(obj, ev);
     }
 public:
     ToastDlg() {
