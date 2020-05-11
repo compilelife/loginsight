@@ -118,8 +118,12 @@ bool FileLog::open(const QString &path, LongtimeOperation& op) {
         return false;
     }
 
-    mMem = (const char*)(mFile->map(0, mFile->size()));
     mSize = mFile->size();
+    auto mem = mFile->map(0, mSize, QFileDevice::MapPrivateOption);
+    //由于map出的内存是不带\0的，所以可能会导致越界访问
+    //一个临时的修复方法是把最后一个字节改为\0
+    mem[mSize-1]='\0';
+    mMem = (const char*)(mem);
 
     QTime time;
     time.restart();
@@ -151,9 +155,13 @@ bool FileLog::open(const QString &path, LongtimeOperation& op) {
     if (op.terminate)
         return false;
 
-    if (ptr < pEnd) {//没有\n的最后一行
-        qDebug()<<"add last line:"<<(pEnd - ptr);
-        mEnters.push_back(mSize);
+    if (mEnters.last() < mSize) {//没有\n的最后一行
+        qDebug()<<"add last line";
+        if (mSize >=2 && mMem[mSize-2]=='\r') {//\r\0
+            mEnters.push_back(mSize - 2);
+        } else {
+            mEnters.push_back(mSize - 1);
+        }
     }
 
     qDebug()<<"create enters cost "<<time.elapsed();//2G+release: 5s

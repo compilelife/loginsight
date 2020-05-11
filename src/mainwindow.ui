@@ -288,12 +288,6 @@
              <iconset resource="res.qrc">
               <normaloff>:/res/img/export.png</normaloff>:/res/img/export.png</iconset>
             </property>
-            <property name="iconSize">
-             <size>
-              <width>18</width>
-              <height>18</height>
-             </size>
-            </property>
             <property name="autoRaise">
              <bool>true</bool>
             </property>
