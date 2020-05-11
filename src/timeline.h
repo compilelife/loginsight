@@ -31,6 +31,7 @@ private slots:
 
 private:
     int calNodeY(int index);
+    void fitLine();
 
 private:
     QGraphicsLineItem* mLine;

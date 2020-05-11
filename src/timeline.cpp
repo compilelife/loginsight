@@ -57,12 +57,7 @@ void TimeLine::addNode(int lineNum, const QString &text) {
     auto node = new TimeNode(lineNum, QString("%1").arg(lineNum), text);
     mNodes.insert(pos, node);
 
-    auto minHeight = calNodeY(mNodes.size());
-    if (mHeight < minHeight) {
-        mHeight = minHeight;
-        scene()->setSceneRect(0,0, mWidth, mHeight);
-        mLine->setLine(mLineX, mLineY, mLineX, mHeight);
-    }
+    fitLine();
 
     node->setX(0);
     node->setY(calNodeY(pos));
@@ -118,9 +113,22 @@ void TimeLine::deleteNode(TimeNode *node)
     for (int i = 0; i < mNodes.size(); i++) {
         mNodes.at(i)->setY(calNodeY(i));
     }
+
+    fitLine();
 }
 
 int TimeLine::calNodeY(int index)
 {
     return index * mNodeStep + mNodeTop;
+}
+
+void TimeLine::fitLine()
+{
+    auto minHeight = calNodeY(mNodes.size());
+    if (minHeight < 100)
+        minHeight = 100;
+
+    mHeight = minHeight;
+    scene()->setSceneRect(0,0, mWidth, mHeight);
+    mLine->setLine(mLineX, mLineY, mLineX, mHeight);
 }
