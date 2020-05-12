@@ -21,9 +21,9 @@ TimeLine::TimeLine(QWidget* parent)
     setScene(scene);
 
     mLineX = LINE_X;
-    mLineY = 4;
-    const double d = mLineY;
-    auto lineHead = scene->addEllipse({(double)mLineX-d/2, 0, d, d}, Qt::NoPen, QColor(180,180,180));
+    mLineY = 8;
+    const double d = 4;
+    auto lineHead = scene->addEllipse({(double)mLineX-d/2, 4, d, d}, Qt::NoPen, QColor(180,180,180));
 
     mLine = new QGraphicsLineItem();
     mLine->setLine(mLineX, mLineY, mLineX, mHeight);
@@ -72,37 +72,17 @@ void TimeLine::addNode(int lineNum, const QString &text) {
 //TODO:截图加阴影，加水印(created by xxx)，加文件名
 void TimeLine::exportToImage(const QString& path)
 {
-    auto rect = sceneRect();
-#ifdef Q_OS_MAC
-    //避免图片发虚
-    QImage img((int)(rect.width()*2), (int)(rect.height()*2), QImage::Format_RGB32);
-#else
-    QImage img((int)(rect.width()), (int)(rect.height()), QImage::Format_RGB32);
-#endif
-
-    QPainter painter(&img);
-    painter.fillRect(img.rect(), QColor(250,250,250));
-    scene()->render(&painter);
-
-    img.save(path);
+    withExportedImage([&path](QImage& img){
+        img.save(path);
+    });
 }
 
 void TimeLine::exportToClipboard()
 {
-    auto rect = sceneRect();
-#ifdef Q_OS_MAC
-    //避免图片发虚
-    QImage img((int)(rect.width()*2), (int)(rect.height()*2), QImage::Format_RGB32);
-#else
-    QImage img((int)(rect.width()), (int)(rect.height()), QImage::Format_RGB32);
-#endif
-
-    QPainter painter(&img);
-    painter.fillRect(img.rect(), QColor(250,250,250));
-    scene()->render(&painter);
-
-    QApplication::clipboard()->setImage(img);
-    Toast::instance().show(Toast::INFO, "时间线已复制到剪贴板");
+    withExportedImage([](QImage& img){
+        QApplication::clipboard()->setImage(img);
+        Toast::instance().show(Toast::INFO, "时间线已复制到剪贴板");
+    });
 }
 
 void TimeLine::deleteNode(TimeNode *node)
@@ -124,11 +104,43 @@ int TimeLine::calNodeY(int index)
 
 void TimeLine::fitLine()
 {
-    auto minHeight = calNodeY(mNodes.size());
+    auto minHeight = calNodeY(mNodes.size())+30;
     if (minHeight < 100)
         minHeight = 100;
 
     mHeight = minHeight;
     scene()->setSceneRect(0,0, mWidth, mHeight);
     mLine->setLine(mLineX, mLineY, mLineX, mHeight);
+}
+
+void TimeLine::withExportedImage(std::function<void (QImage &)> handler)
+{
+    auto rect = sceneRect();
+#ifdef Q_OS_MAC
+    int borderMargin = 10;
+    //避免图片发虚
+    QImage img((int)(rect.width()*2) + 2*borderMargin, (int)(rect.height()*2) + 2*borderMargin, QImage::Format_RGB32);
+#else
+    int borderMargin = 5;
+    QImage img((int)(rect.width()) + 2*borderMargin, (int)(rect.height()) + 2*borderMargin, QImage::Format_RGB32);
+#endif
+
+    QPainter painter(&img);
+    painter.fillRect(img.rect(), QColor(250,250,250));
+    auto borderRect = img.rect().adjusted(borderMargin,borderMargin, -borderMargin, -borderMargin);
+    scene()->render(&painter, borderRect);
+
+    painter.drawRect(borderRect);
+
+    auto metrics = painter.fontMetrics();
+    QString author("created by loginsight");
+    painter.setPen(Qt::gray);
+    QString site("https://github.com/compilelife/loginsight");
+    auto width = metrics.horizontalAdvance(site);
+    auto x = img.width() - width - 2*borderMargin;
+    auto y = img.height() - metrics.height() - 2*borderMargin;
+    painter.drawText(x, y, author);
+    painter.drawText(x, y+metrics.height(), site);
+
+    handler(img);
 }

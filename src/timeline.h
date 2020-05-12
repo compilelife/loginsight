@@ -4,6 +4,7 @@
 #include <QGraphicsView>
 #include "timenode.h"
 #include <QList>
+#include <functional>
 
 #define LINE_X 70
 
@@ -32,6 +33,7 @@ private slots:
 private:
     int calNodeY(int index);
     void fitLine();
+    void withExportedImage(std::function<void(QImage&)> handler);
 
 private:
     QGraphicsLineItem* mLine;
