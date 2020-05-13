@@ -17,13 +17,12 @@ TimeLine::TimeLine(QWidget* parent)
     mWidth = 350;
     mHeight = 400;
     scene->setSceneRect(0,0,mWidth,mHeight);
-    setBackgroundBrush(QBrush(QColor(250,250,250)));
     setScene(scene);
 
     mLineX = LINE_X;
     mLineY = 8;
     const double d = 4;
-    auto lineHead = scene->addEllipse({(double)mLineX-d/2, 4, d, d}, Qt::NoPen, QColor(180,180,180));
+    mLineHead = scene->addEllipse({(double)mLineX-d/2, 4, d, d}, Qt::NoPen, QColor(180,180,180));
 
     mLine = new QGraphicsLineItem();
     mLine->setLine(mLineX, mLineY, mLineX, mHeight);
@@ -32,10 +31,21 @@ TimeLine::TimeLine(QWidget* parent)
 
     mNodeTop = 20;
 
-    lineHead->ensureVisible();
+    mSupportImg = new QGraphicsPixmapItem();
+    mSupportImg->setPixmap(QPixmap(":/res/img/support.png").scaledToWidth(300));
+    scene->addItem(mSupportImg);
+
+    mSupportText = new QGraphicsTextItem();
+    mSupportText->setHtml("感谢支持! 让我们把<a href=\"https://github.com/compilelife/loginsight\">loginsight</a>打造的更加强大吧!");
+    mSupportText->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    scene->addItem(mSupportText);
+
+    showSupport();
 }
 
 void TimeLine::addNode(int lineNum, const QString &text) {
+    hideSupport();
+
     //找到插入位置
     int pos = mNodes.size();
     for (int i = 0; i < mNodes.size(); i++) {
@@ -69,7 +79,6 @@ void TimeLine::addNode(int lineNum, const QString &text) {
     connect(node, SIGNAL(selected(TimeNode*)), this, SIGNAL(nodeSelected(TimeNode*)));
 }
 
-//TODO:截图加阴影，加水印(created by xxx)，加文件名
 void TimeLine::exportToImage(const QString& path)
 {
     withExportedImage([&path](QImage& img){
@@ -94,7 +103,11 @@ void TimeLine::deleteNode(TimeNode *node)
         mNodes.at(i)->setY(calNodeY(i));
     }
 
-    fitLine();
+    if (mNodes.empty()) {
+        showSupport();
+    } else {
+        fitLine();
+    }
 }
 
 int TimeLine::calNodeY(int index)
@@ -143,4 +156,28 @@ void TimeLine::withExportedImage(std::function<void (QImage &)> handler)
     painter.drawText(x, y+metrics.height(), site);
 
     handler(img);
+}
+
+void TimeLine::showSupport()
+{
+    mLine->setVisible(false);
+    mLineHead->setVisible(false);
+
+    auto y = (mHeight - mSupportImg->boundingRect().height())/2;
+    mSupportImg->setY(y);
+    mSupportText->setY(y+mSupportImg->boundingRect().height());
+
+    mSupportImg->setVisible(true);
+    mSupportText->setVisible(true);
+    mSupportImg->ensureVisible(QRect(), -300, 0);
+}
+
+void TimeLine::hideSupport()
+{
+    mSupportImg->setVisible(false);
+    mSupportText->setVisible(false);
+
+    mLine->setVisible(true);
+    mLineHead->setVisible(true);
+    mLineHead->ensureVisible();
 }

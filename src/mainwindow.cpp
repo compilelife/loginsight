@@ -26,11 +26,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("loginsight");
 
-    resize(800,500);
-//    showMaximized();
-
-    ui->timeLineSplitter->setStretchFactor(0, 8);
-    ui->timeLineSplitter->setStretchFactor(1, 2);
+    ui->timeLineSplitter->setStretchFactor(0, 14);
+    ui->timeLineSplitter->setStretchFactor(1, 5);
 
     ui->logSplitter->setStretchFactor(0, 8);
     ui->logSplitter->setStretchFactor(1, 2);
@@ -81,7 +78,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->navAheadAction->setShortcut(QKeySequence("Ctrl+]"));
     ui->clipboardAction->setShortcut(QKeySequence::Save);
 
-//    doOpenFile("/Users/chenyong/Downloads/gbk.txt");
+    //    resize(800,500);
+    showMaximized();
 }
 
 MainWindow::~MainWindow()

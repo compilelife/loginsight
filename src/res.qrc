@@ -11,5 +11,6 @@
         <file>img/logo.png</file>
         <file>img/close.png</file>
         <file>img/clipboard.png</file>
+        <file>img/support.png</file>
     </qresource>
 </RCC>
