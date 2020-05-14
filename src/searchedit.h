@@ -16,11 +16,13 @@ protected:
     void focusInEvent(QFocusEvent *) override;
 public slots:
     void transferReturnBehavior();
+    void switchSearchDirection();
 signals:
     void searchBackward();
     void searchFoward();
 private:
-    bool mFoward=true;
+    bool mFoward{true};
+    QAction* mSearchDirectionStatus;
 };
 
 #endif // SEARCHEDIT_H

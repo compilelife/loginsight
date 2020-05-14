@@ -12,5 +12,7 @@
         <file>img/close.png</file>
         <file>img/clipboard.png</file>
         <file>img/support.png</file>
+        <file>img/enter_down.png</file>
+        <file>img/enter_up.png</file>
     </qresource>
 </RCC>
