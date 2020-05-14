@@ -35,6 +35,7 @@ public:
 
         setLayout(layout);
         setWindowFlag(Qt::FramelessWindowHint);
+        setAttribute(Qt::WA_ShowWithoutActivating,true);
     }
 
     void show(Toast::Level level, const QString& text) {
