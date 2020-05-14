@@ -187,7 +187,7 @@ void LogTextEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
     QColor fgColor(Qt::gray);
     if (mFocused) {
         bgColor.setRgb(0, 153, 204);
-        fgColor.setRgb(0, 0, 0);
+        fgColor.setRgb(255, 255, 255);
     }
     painter.fillRect(event->rect(), bgColor);
 
@@ -246,9 +246,10 @@ void LogTextEdit::highlightCurrentLine()
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
-        QColor lineColor = QColor(Qt::blue).lighter(160);
+        QColor lineColor = QColor(Qt::darkBlue).lighter(160);
 
-        selection.format.setBackground(lineColor);
+//        selection.format.setBackground(lineColor);
+        selection.format.setForeground(lineColor);
         selection.format.setProperty(QTextFormat::FullWidthSelection, true);
         selection.cursor = textCursor();
         selection.cursor.clearSelection();
