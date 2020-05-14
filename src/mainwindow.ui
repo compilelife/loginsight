@@ -164,7 +164,7 @@
            <bool>true</bool>
           </property>
           <property name="handleWidth">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="layoutWidget">
            <layout class="QHBoxLayout" name="logContainer">

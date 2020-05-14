@@ -22,13 +22,12 @@ void SearchEdit::focusInEvent(QFocusEvent *)
     selectAll();
 }
 
-void SearchEdit::focusOutEvent(QFocusEvent *)
-{
-    mFoward = true;
-}
-
 void SearchEdit::transferReturnBehavior()
 {
+    if (this->text().isEmpty()) {
+        return;
+    }
+
     if (mFoward)
         emit searchFoward();
     else

@@ -61,6 +61,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->logEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
     connect(ui->subLogEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
+    connect(ui->logEdit, SIGNAL(returnPressed()), ui->searchEdit, SLOT(transferReturnBehavior()));
+    connect(ui->subLogEdit, SIGNAL(returnPressed()), ui->searchEdit, SLOT(transferReturnBehavior()));
 
     mCurLogEdit = ui->logEdit;
     mCurLogEdit->drawFocused();
@@ -105,6 +107,7 @@ void MainWindow::handleFilter()
     layout.addWidget(&caseSensentiveCheckBox);
     QLineEdit lineEdit;
     lineEdit.setPlaceholderText("请输入要过滤的关键字");
+    lineEdit.setFocus();
     layout.addWidget(&lineEdit);
     QDialogButtonBox btnBox(QDialogButtonBox::Ok);
     layout.addWidget(&btnBox);

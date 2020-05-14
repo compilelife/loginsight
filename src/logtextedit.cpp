@@ -359,6 +359,14 @@ void LogTextEdit::mouseDoubleClickEvent(QMouseEvent *e)
     emit requestLocateMaster(lineNum);
 }
 
+void LogTextEdit::keyReleaseEvent(QKeyEvent *e)
+{
+    if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
+        emit returnPressed();
+    }
+    QPlainTextEdit::keyReleaseEvent(e);
+}
+
 void LogTextEdit::focusInEvent(QFocusEvent *e)
 {
     emit beenFocused(this);

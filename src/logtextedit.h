@@ -111,10 +111,13 @@ private:
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
     void mouseDoubleClickEvent(QMouseEvent *e) override;
+    void keyReleaseEvent(QKeyEvent *e) override;
 public:
     void setVisible(bool visible) override;
 public:
     void scrollToLine(int lineNum, int col = 0, bool recordToHistory=true);
+signals:
+    void returnPressed();
 //<===其他===
 
 };

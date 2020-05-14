@@ -14,8 +14,7 @@ public:
 
 protected:
     void focusInEvent(QFocusEvent *) override;
-    void focusOutEvent(QFocusEvent *) override;
-private slots:
+public slots:
     void transferReturnBehavior();
 signals:
     void searchBackward();
