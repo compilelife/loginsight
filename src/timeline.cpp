@@ -143,11 +143,12 @@ void TimeLine::withExportedImage(std::function<void (QImage &)> handler)
     auto borderRect = img.rect().adjusted(borderMargin,borderMargin, -borderMargin, -borderMargin);
     scene()->render(&painter, borderRect);
 
+    painter.setPen(Qt::gray);
     painter.drawRect(borderRect);
 
     auto metrics = painter.fontMetrics();
     QString author("created by loginsight");
-    painter.setPen(Qt::gray);
+
     QString site("https://github.com/compilelife/loginsight");
     auto width = metrics.horizontalAdvance(site);
     auto x = img.width() - width - 2*borderMargin;
