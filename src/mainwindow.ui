@@ -66,6 +66,9 @@
            </widget>
           </item>
           <item>
+           <widget class="QComboBox" name="encodingComboBox"/>
+          </item>
+          <item>
            <widget class="QToolButton" name="gotoLineAction">
             <property name="toolTip">
              <string>定位到行</string>

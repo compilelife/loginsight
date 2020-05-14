@@ -18,6 +18,8 @@
 #include <QDialogButtonBox>
 #include <QResizeEvent>
 #include "toast.h"
+#include <QMenu>
+#include <QTextCodec>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -38,6 +40,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->subLogEdit->setScrollBar(ui->subLogEditVBar);
     ui->subLogEdit->setVisible(false);
+
+    ui->encodingComboBox->addItem("UTF-8");
+    ui->encodingComboBox->addItem("GBK");
+
+    connect(ui->encodingComboBox, SIGNAL(currentTextChanged(const QString&)), this, SLOT(handleEncodingChanged(const QString&)));
 
     connect(ui->logEdit, SIGNAL(requestMarkLine(int, const QString&)), ui->timeLine, SLOT(addNode(int,const QString&)));
     connect(ui->subLogEdit, SIGNAL(requestMarkLine(int, const QString&)), ui->timeLine, SLOT(addNode(int,const QString&)));
@@ -199,6 +206,18 @@ void MainWindow::handleLocateMaster(int lineNum)
     handleLogEditFocus(ui->logEdit);
 }
 
+void MainWindow::handleEncodingChanged(const QString& text)
+{
+    if (text != mLog.getCodec()->name()) {
+        qDebug()<<"change to encoding:"<<text;
+        mLog.setCodec(QTextCodec::codecForName(text.toStdString().c_str()));
+        ui->logEdit->refresh();
+        if (ui->subLogEdit->isVisible()) {
+            ui->subLogEdit->refresh();
+        }
+    }
+}
+
 void MainWindow::search(bool foward)
 {
     auto keyword = ui->searchEdit->text();
@@ -240,6 +259,8 @@ void MainWindow::doOpenFile(const QString &path)
     }
 
     ui->logEdit->setLog(&mLog);
+    ui->encodingComboBox->setCurrentText(mLog.getCodec()->name());
+
     if (mSubLog){
         delete mSubLog;
         mSubLog = nullptr;

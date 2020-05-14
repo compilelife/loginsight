@@ -32,6 +32,7 @@ private slots:
     void handleNavFoward();
     void handleLogEditFocus(LogTextEdit* logEdit);
     void handleLocateMaster(int lineNum);
+    void handleEncodingChanged(const QString& text);
 private:
     void search(bool foward);
     void filter(const QString& text, bool caseSenesitive);

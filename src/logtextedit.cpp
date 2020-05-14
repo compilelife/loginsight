@@ -367,6 +367,20 @@ void LogTextEdit::keyReleaseEvent(QKeyEvent *e)
     QPlainTextEdit::keyReleaseEvent(e);
 }
 
+void LogTextEdit::refresh()
+{
+    auto hlLine = fromViewPortToLog(textCursor().blockNumber());
+    auto topLine = fromViewPortToLog(firstVisibleBlock().blockNumber());
+
+    load(topLine);
+
+    auto cursor = textCursor();
+    auto block = document()->findBlockByLineNumber(fromLogToViewPort(hlLine));
+    cursor.setPosition(block.position());
+
+    setTextCursor(cursor);
+}
+
 void LogTextEdit::focusInEvent(QFocusEvent *e)
 {
     emit beenFocused(this);

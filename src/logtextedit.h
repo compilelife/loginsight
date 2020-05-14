@@ -113,6 +113,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *e) override;
     void keyReleaseEvent(QKeyEvent *e) override;
 public:
+    void refresh();
     void setVisible(bool visible) override;
 public:
     void scrollToLine(int lineNum, int col = 0, bool recordToHistory=true);
