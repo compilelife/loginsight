@@ -269,11 +269,13 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
     while (!op.terminate && (ptr = strstrFunc(ptr, textInRaw.c_str())) != nullptr) {
         op.cur = lineFromPos(ptr - mMem, op.cur);
         sub->addLine(op.cur);
-        if (op.cur != op.to)
-            ptr = mMem + mEnters[op.cur+1];//直接到下一行
-        else
-            ptr = nullptr;
-        ++op.cur;
+        if (op.cur < op.to) {
+            ptr = mMem + mEnters[op.cur];//直接到下一行
+            op.cur++;
+        }
+        else {
+            break;
+        }
     }
 
     if (op.terminate) {
