@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("loginsight");
 
-    ui->timeLineSplitter->setStretchFactor(0, 14);
+    ui->timeLineSplitter->setStretchFactor(0, 10);
     ui->timeLineSplitter->setStretchFactor(1, 5);
 
     ui->logSplitter->setStretchFactor(0, 8);
@@ -89,6 +89,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     //    resize(800,500);
     showMaximized();
+
+    ui->caseSensitivityCheckBox->setChecked(true);
 }
 
 MainWindow::~MainWindow()
@@ -111,6 +113,7 @@ void MainWindow::handleFilter()
     inputDlg.setWindowTitle("过滤日志");
     QVBoxLayout layout(&inputDlg);
     QCheckBox caseSensentiveCheckBox("大小写敏感");
+    caseSensentiveCheckBox.setChecked(true);
     layout.addWidget(&caseSensentiveCheckBox);
     QLineEdit lineEdit;
     lineEdit.setPlaceholderText("请输入要过滤的关键字");
@@ -301,5 +304,6 @@ void MainWindow::keyReleaseEvent(QKeyEvent *ev)
         else
             ui->searchEdit->setSearchFoward(true);
         ui->searchEdit->setFocus();
+        ui->searchEdit->selectAll();
     }
 }

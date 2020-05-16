@@ -2,6 +2,8 @@
 #define SEARCHEDIT_H
 
 #include <QLineEdit>
+#include <QCompleter>
+#include <QStringListModel>
 
 class SearchEdit: public QLineEdit
 {
@@ -12,17 +14,18 @@ public:
 public:
     void setSearchFoward(bool foward);
 
-protected:
-    void focusInEvent(QFocusEvent *) override;
 public slots:
     void transferReturnBehavior();
     void switchSearchDirection();
 signals:
     void searchBackward();
     void searchFoward();
+private slots:
+    void editComplete();
 private:
     bool mFoward{true};
     QAction* mSearchDirectionStatus;
+    QStringListModel* mModel;
 };
 
 #endif // SEARCHEDIT_H
