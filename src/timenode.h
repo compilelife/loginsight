@@ -8,7 +8,7 @@
 
 //TODO:就地编辑而非弹窗编辑备注
 //FIXME:双击的时候不要滚动到高亮行
-class TimeNode: public QObject, public QGraphicsItem
+class TimeNode: public QGraphicsObject
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)

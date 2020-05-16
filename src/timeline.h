@@ -5,6 +5,7 @@
 #include "timenode.h"
 #include <QList>
 #include <functional>
+#include <QTimeLine>
 
 #define LINE_X 70
 
@@ -35,6 +36,8 @@ private:
 
     void showSupport();
     void hideSupport();
+
+    void highlightItem(QGraphicsObject *item);
 
 private:
     QGraphicsLineItem* mLine;

@@ -8,6 +8,7 @@
 #include <QApplication>
 #include "toast.h"
 #include <QClipboard>
+#include <QPropertyAnimation>
 
 TimeLine::TimeLine(QWidget* parent)
     :QGraphicsView(parent)
@@ -77,6 +78,8 @@ void TimeLine::addNode(int lineNum, const QString &text) {
 
     connect(node, SIGNAL(requestDel(TimeNode*)), this, SLOT(deleteNode(TimeNode*)));
     connect(node, SIGNAL(selected(TimeNode*)), this, SIGNAL(nodeSelected(TimeNode*)));
+
+    highlightItem(node);
 }
 
 void TimeLine::exportToImage(const QString& path)
@@ -181,4 +184,14 @@ void TimeLine::hideSupport()
     mLine->setVisible(true);
     mLineHead->setVisible(true);
     mLineHead->ensureVisible();
+}
+
+void TimeLine::highlightItem(QGraphicsObject *item)
+{
+    auto anim = new QPropertyAnimation(item, "scale");
+    anim->setDuration(500);
+    anim->setKeyValueAt(0, 1.0);
+    anim->setKeyValueAt(0.5, 1.2);
+    anim->setKeyValueAt(1, 1.0);
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
