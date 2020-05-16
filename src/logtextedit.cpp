@@ -246,7 +246,7 @@ void LogTextEdit::highlightCurrentLine()
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
-        QColor lineColor = QColor(Qt::darkBlue).lighter(160);
+        QColor lineColor = QColor(Qt::blue);
 
 //        selection.format.setBackground(lineColor);
         selection.format.setForeground(lineColor);
