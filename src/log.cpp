@@ -15,6 +15,7 @@ extern "C" const char *strcasestr(const char *haystack, const char *needle);
 #include <QTime>
 #include <regex>
 #include <QTextCodec>
+#include <future>
 
 using namespace std;
 
@@ -123,33 +124,23 @@ bool FileLog::open(const QString &path, LongtimeOperation& op) {
     //由于map出的内存是不带\0的，所以可能会导致越界访问
     //一个临时的修复方法是把最后一个字节改为\0
     mem[mSize-1]='\0';
-    mMem = (const char*)(mem);
+    mMem = (char*)(mem);
 
     QTime time;
     time.restart();
     mEnters.push_back(-1);//插入“第0行”方便处理。假设第0行的行结束标记在-1字节
 
-    op.cur = 0;
-    op.from = 1;
-    op.to = mSize/100;//按一行100个字符估计总行数
 
-    //分割为一行一行；MacBook 2005 2.4G耗时3.2s左右
-    const char* ptr = mMem;
-    const char* pEnd = mMem + mSize;
-
-    int enterCharOffset = 2;
+    //分割为一行一行；MacBook 2005 2.4G（已被）耗时3.2s左右
+    mEnterCharOffset = 2;
     auto firstNewLine = strchr(mMem, '\n');
     if (firstNewLine != nullptr) {
         if (firstNewLine == mMem || *(firstNewLine - 1) != '\r') {
-            enterCharOffset = 1;
+            mEnterCharOffset = 1;
         }
 
-        --enterCharOffset;
-        while (!op.terminate && ptr < pEnd && (ptr=strchr(ptr, '\n')) != nullptr) {
-            mEnters.push_back(ptr - mMem - enterCharOffset);//定位在\r（如有）或\n上
-            ++op.cur;
-            ++ptr;
-        }
+        --mEnterCharOffset;
+        splitLines(op);
     }
 
     if (op.terminate)
@@ -189,13 +180,7 @@ qint64 FileLog::getLineStart(int num) {
         return 0;
     }
 
-    auto lastLineEndPos = mEnters[num - 1];
-    auto p = mMem + lastLineEndPos;
-
-    if (*p == '\r')
-        return lastLineEndPos+2;
-
-    return lastLineEndPos+1;
+    return mEnters[num - 1] + 1 + mEnterCharOffset;
 }
 
 void FileLog::detectTextCodec()
@@ -222,6 +207,67 @@ int FileLog::lineFromPos(qint64 pos, int from)
     }
 
     return -1;
+}
+
+//这里我们尝试以500M为块，作多线程加速
+void FileLog::splitLines(LongtimeOperation& op)
+{
+    const qint64 blockSize = 524288000; //500M
+    int extraParts = mSize / blockSize;
+
+    if (mSize - extraParts * blockSize == 0) {//临界情况，刚好是500M的整数倍
+        extraParts -= 1;
+    }
+
+    qDebug()<<"open using extra thread count: "<<extraParts;
+
+    op.cur = 0;
+    op.from = 1;
+    op.to = mSize/100;//按一行100个字符估计总行数
+
+    QVector<qint64> extraEnters[extraParts];
+    future<void> extraRets[extraParts];
+    char chBackup[extraParts];
+    for (int i = 0; i < extraParts; i++) {
+        qint64 pos = blockSize * (i + 1);
+        QVector<qint64>* enters = &extraEnters[i];
+        enters->clear();
+
+        //临时把mMem[pos]修改为0，方便分段处理
+        chBackup[i] = mMem[pos];
+        if (chBackup[i] == '\n') {
+            enters->push_back(i - mEnterCharOffset);
+        }
+        mMem[pos] = 0;
+
+        extraRets[i] = async(launch::async, [&, enters]{
+            splitLine(op, enters, mMem + pos + 1, false);
+        });
+    }
+
+    splitLine(op, &mEnters, mMem, true);//FIXME:extraParts>0的时候进度统计的有问题
+
+    for (int i = 0; i < extraParts; i++) {
+        extraRets[i].wait();
+
+        //恢复mMem[pos]
+        qint64 pos = blockSize * (i + 1);
+        mMem[pos] = chBackup[i];
+
+        //合并结果
+        mEnters.append(extraEnters[i]);
+        QVector<qint64>().swap(extraEnters[i]);//提前释放内存
+    }
+}
+
+void FileLog::splitLine(LongtimeOperation& op, QVector<qint64>* enters, char *ptr, bool progress)
+{
+    while (!op.terminate && (ptr=strchr(ptr, '\n')) != nullptr) {
+        enters->push_back(ptr - mMem - mEnterCharOffset);//定位在\r（如有）或\n上
+        if (progress)
+            ++op.cur;
+        ++ptr;
+    }
 }
 
 QString FileLog::getLine(int from, int to) {

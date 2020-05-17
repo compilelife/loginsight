@@ -59,12 +59,16 @@ private:
     void detectTextCodec();
     int lineFromPos(qint64 pos, int from = 1);
 
+    void splitLines(LongtimeOperation& op);
+    void splitLine(LongtimeOperation &op, QVector<qint64> *enters, char* ptr, bool progress);
+
 private:
-    const char* mMem{nullptr};
+    char* mMem{nullptr};
     qint64 mSize{0};
     QVector<qint64> mEnters;
     int mLineCnt{0};
     QFile* mFile{nullptr};
+    int mEnterCharOffset;
 };
 
 class SubLog: public Log
