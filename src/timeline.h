@@ -17,9 +17,10 @@ class TimeLine: public QGraphicsView
     Q_OBJECT
 public:
     TimeLine(QWidget* parent);
+    void highlightNode(int lineNum);
 
 public slots:
-    void addNode(int lineNum, const QString& text);//TODO: lineNum只是在nodeSelected时被读取,改为QVariant
+    void addNode(int lineNum, const QString& text);
     void exportToImage(const QString& path);
     void exportToClipboard();
 

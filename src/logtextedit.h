@@ -95,16 +95,14 @@ private:
 //===实现主从窗口焦点切换==>
 signals:
     void beenFocused(LogTextEdit*);
-    void requestLocateMaster(int lineNum);
+    void emphasizeLine(int lineNum);
 public:
-    void setSlave(bool value);
     void drawFocused();
     void drawUnFocused();
 protected:
     void focusInEvent(QFocusEvent *e) override;
 private:
     bool mFocused{false};
-    bool mIsSlave{false};
 //<===实现主从窗口焦点切换==
 
 //===其他===>

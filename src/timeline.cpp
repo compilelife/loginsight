@@ -44,13 +44,28 @@ TimeLine::TimeLine(QWidget* parent)
     showSupport();
 }
 
+void TimeLine::highlightNode(int lineNum)
+{
+    TimeNode* node = nullptr;
+    for (int i = 0; i < mNodes.size(); i++) {
+        if (lineNum == mNodes.at(i)->lineNumber()) {
+            node = mNodes.at(i);
+            break;
+        }
+    }
+
+    if (node) {
+        highlightItem(node);
+    }
+}
+
 void TimeLine::addNode(int lineNum, const QString &text) {
     hideSupport();
 
     //找到插入位置
     int pos = mNodes.size();
     for (int i = 0; i < mNodes.size(); i++) {
-        auto order = mNodes.at(i)->order();
+        auto order = mNodes.at(i)->lineNumber();
         if (lineNum < order) {
             pos = i;
             break;

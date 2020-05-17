@@ -17,7 +17,7 @@ public:
 
 public:
     int data() {return mLineNum;}
-    int order() {return mLineNum;}
+    int lineNumber() {return mLineNum;}
 protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;

@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->encodingComboBox, SIGNAL(currentTextChanged(const QString&)), this, SLOT(handleEncodingChanged(const QString&)));
 
     connect(ui->logEdit, SIGNAL(requestMarkLine(int, const QString&)), ui->timeLine, SLOT(addNode(int,const QString&)));
-    connect(ui->subLogEdit, SIGNAL(requestMarkLine(int, const QString&)), ui->timeLine, SLOT(addNode(int,const QString&)));
+    connect(ui->subLogEdit, SIGNAL(requestMarkLine(int, const QString&)), this, SLOT(handleSubLogMarkLine(int, const QString&)));
     connect(ui->timeLine, SIGNAL(nodeSelected(TimeNode*)), this, SLOT(handleNodeSelected(TimeNode*)));
 
     connect(ui->exportTimeLineAction, SIGNAL(clicked()), this, SLOT(handleExportTimeLine()));
@@ -75,8 +75,9 @@ MainWindow::MainWindow(QWidget *parent)
     mCurLogEdit->drawFocused();
     connect(ui->logEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
     connect(ui->subLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
-    ui->subLogEdit->setSlave(true);
-    connect(ui->subLogEdit, SIGNAL(requestLocateMaster(int)), this, SLOT(handleLocateMaster(int)));
+    connect(ui->logEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleLogEditEmphasizeLine(int)));
+    connect(ui->subLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleSubLogEditEmphasizeLine(int)));
+
     connect(ui->logEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
     connect(ui->subLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
 
@@ -139,8 +140,12 @@ void MainWindow::handleFilterRequest(const QString& text)
 void MainWindow::handleNodeSelected(TimeNode *node)
 {
     auto lineNum = node->data();
-    ui->logEdit->setFocus();
     ui->logEdit->scrollToLine(lineNum);
+    if (mSubLog) {
+        auto subLogLine = mSubLog->fromParentLine(lineNum);
+        if (subLogLine > 0)
+            ui->subLogEdit->scrollToLine(subLogLine);
+    }
 }
 
 void MainWindow::handleSearchBackward()
@@ -203,12 +208,6 @@ void MainWindow::handleLogEditFocus(LogTextEdit *logEdit)
     }
 }
 
-void MainWindow::handleLocateMaster(int lineNum)
-{
-    ui->logEdit->scrollToLine(lineNum);
-    handleLogEditFocus(ui->logEdit);
-}
-
 void MainWindow::handleEncodingChanged(const QString& text)
 {
     if (text != mLog.getCodec()->name()) {
@@ -219,6 +218,30 @@ void MainWindow::handleEncodingChanged(const QString& text)
             ui->subLogEdit->refresh();
         }
     }
+}
+
+void MainWindow::handleLogEditEmphasizeLine(int lineNum)
+{
+    if (mSubLog) {
+        auto subLogLine = mSubLog->fromParentLine(lineNum);
+        if (subLogLine > 0)
+            ui->subLogEdit->scrollToLine(subLogLine);
+    }
+
+    ui->timeLine->highlightNode(lineNum);
+}
+
+void MainWindow::handleSubLogEditEmphasizeLine(int lineNum)
+{
+    auto logLine = mSubLog->toParentLine(lineNum);
+    ui->logEdit->scrollToLine(logLine);
+
+    ui->timeLine->highlightNode(logLine);
+}
+
+void MainWindow::handleSubLogMarkLine(int line, const QString &text)
+{
+    ui->timeLine->addNode(mSubLog->toParentLine(line), text);
 }
 
 void MainWindow::search(bool foward)

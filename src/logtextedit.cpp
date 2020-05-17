@@ -352,12 +352,8 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
 
 void LogTextEdit::mouseDoubleClickEvent(QMouseEvent *e)
 {
-    if (!mIsSlave)
-        return;
-
     auto cursor = cursorForPosition(e->pos());
-    auto lineNum = mLog->sourceLine(fromViewPortToLog(cursor.blockNumber()));
-    emit requestLocateMaster(lineNum);
+    emit emphasizeLine(fromViewPortToLog(cursor.blockNumber()));
 }
 
 void LogTextEdit::keyReleaseEvent(QKeyEvent *e)
@@ -419,18 +415,13 @@ void LogTextEdit::handleMarkLineAction()
 {
     auto cursor = textCursor();
     auto s = cursor.block().text();
-    auto line = mLog->sourceLine(fromViewPortToLog(cursor.blockNumber()));
+    auto line = fromViewPortToLog(cursor.blockNumber());
     emit requestMarkLine(line, s);
 }
 
 void LogTextEdit::onReplay(const NavPos &pos)
 {
     scrollToLine(pos.line, pos.col, false);
-}
-
-void LogTextEdit::setSlave(bool value)
-{
-    mIsSlave = value;
 }
 
 void LogTextEdit::drawFocused()

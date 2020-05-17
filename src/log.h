@@ -33,9 +33,6 @@ public:
                                 int fromLine, int fromPos,
                                 LongtimeOperation& op);
     virtual SubLog* createSubLog(const QString& text, bool caseSensitive, LongtimeOperation& op);
-
-public:
-    virtual int sourceLine(int lineNum) {return lineNum;}
 };
 
 class FileLog : public Log
@@ -81,7 +78,8 @@ public:
 public:
     QString getLine(int from, int to) override;
     int lineCount() override {return mLines.size();}
-    int sourceLine(int lineNum) override;
+    int toParentLine(int lineNum);
+    int fromParentLine(int lineNum);
 
 private:
     QVector<int> mLines;

@@ -336,19 +336,29 @@ void SubLog::addLine(int lineNum) {
 
 QString SubLog::getLine(int from, int to) {
     if (from == to) {
-        return mParent->getLine(sourceLine(from));
+        return mParent->getLine(toParentLine(from));
     }
 
     QStringList list;
     while (from <= to) {
-        list.append(mParent->getLine(sourceLine(from)));
+        list.append(mParent->getLine(toParentLine(from)));
         ++from;
     }
 
     return list.join("\n");
 }
 
-int SubLog::sourceLine(int lineNum)
+int SubLog::toParentLine(int lineNum)
 {
     return mLines[lineNum - 1];
+}
+
+int SubLog::fromParentLine(int lineNum)
+{
+    auto it = lower_bound(mLines.begin(), mLines.end(), lineNum);
+    if (it == mLines.end()) {
+        return -1;
+    }
+
+    return distance(mLines.begin(), it)+1;
 }
