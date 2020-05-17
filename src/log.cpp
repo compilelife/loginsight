@@ -225,9 +225,9 @@ void FileLog::splitLines(LongtimeOperation& op)
     op.from = 1;
     op.to = mSize/100;//按一行100个字符估计总行数
 
-    QVector<qint64> extraEnters[extraParts];
-    future<void> extraRets[extraParts];
-    char chBackup[extraParts];
+    auto* extraEnters = new QVector<qint64>[extraParts];
+    auto* extraRets = new future<void>[extraParts];
+    auto* chBackup = new char[extraParts];
     for (int i = 0; i < extraParts; i++) {
         qint64 pos = blockSize * (i + 1);
         QVector<qint64>* enters = &extraEnters[i];
@@ -258,6 +258,10 @@ void FileLog::splitLines(LongtimeOperation& op)
         mEnters.append(extraEnters[i]);
         QVector<qint64>().swap(extraEnters[i]);//提前释放内存
     }
+
+    delete[] extraEnters;
+    delete[] extraRets;
+    delete[] chBackup;
 }
 
 void FileLog::splitLine(LongtimeOperation& op, QVector<qint64>* enters, char *ptr, bool progress)
