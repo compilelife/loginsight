@@ -2,7 +2,7 @@
 
 loginsight致力于打造一款日志分析的利器
 
-![preview](doc/img/preview.png)
+![preview](https://gitee.com/compilelife/loginsight/raw/master/doc/img/preview.png)
 
 亮点特性：
 
@@ -40,7 +40,7 @@ loginsight致力于打造一款日志分析的利器
 2. 可以在issue里针给TODO列表中标`*`的项提实现方案
 3. 给开发者点杯咖啡，加个油（赞赏时可以在备注提需求，所提需求将被优先实现）：
 
-![support](doc/img/support.png)
+![support](https://gitee.com/compilelife/loginsight/raw/master/doc/img/support.png)
 
 TODO:
 
