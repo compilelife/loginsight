@@ -32,6 +32,11 @@ void SearchEdit::setSearchFoward(bool foward)
     mSearchDirectionStatus->setIcon(QIcon(mFoward ? ":/res/img/enter_down.png" : ":/res/img/enter_up.png"));
 }
 
+bool SearchEdit::isSearchFoward()
+{
+    return mFoward;
+}
+
 void SearchEdit::transferReturnBehavior()
 {
     if (this->text().isEmpty()) {

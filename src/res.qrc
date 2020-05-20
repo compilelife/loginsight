@@ -14,5 +14,8 @@
         <file>img/support.png</file>
         <file>img/enter_down.png</file>
         <file>img/enter_up.png</file>
+        <file>img/logo_64x64.png</file>
+        <file>img/github.png</file>
+        <file>img/zhihu.png</file>
     </qresource>
 </RCC>

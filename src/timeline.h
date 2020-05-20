@@ -9,9 +9,6 @@
 
 #define LINE_X 70
 
-//TODO:设置自定义着色器改变Node的颜色（比如用来区分来自不同进程的消息）
-//TODO:设置自定义的locate提取，比如提取时间，作为locate信息，而非用行号
-//TODO:设置自定义的文本提取器，比如删除一些前缀字符，而显示主要内容，而非全部显示
 class TimeLine: public QGraphicsView
 {
     Q_OBJECT
@@ -23,6 +20,7 @@ public slots:
     void addNode(int lineNum, const QString& text);
     void exportToImage(const QString& path);
     void exportToClipboard();
+    void clear();
 
 signals:
     void nodeSelected(TimeNode* node);

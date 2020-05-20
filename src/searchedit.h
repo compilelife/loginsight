@@ -13,6 +13,7 @@ public:
 
 public:
     void setSearchFoward(bool foward);
+    bool isSearchFoward();
 
 public slots:
     void transferReturnBehavior();

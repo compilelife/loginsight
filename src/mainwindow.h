@@ -5,6 +5,8 @@
 #include <log.h>
 #include "timenode.h"
 #include "logtextedit.h"
+#include "shortcuthelpdlg.h"
+#include "aboutdlg.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,6 +20,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private:
+    void bindActions();
+    void bindLogEditActions();
+    void bindToolbarAction();
+    void bindMenuAction();
 private slots:
     void handleExportTimeLine();
     void handleFilter();
@@ -27,11 +34,12 @@ private slots:
     void handleSearchFoward();
     void handleGotoLine();
     void handleOpenFile();
+    void handleCloseFile();
     void handleHistoryPosChanged();
     void handleNavBackward();
     void handleNavFoward();
     void handleLogEditFocus(LogTextEdit* logEdit);
-    void handleEncodingChanged(const QString& text);
+    void setEncoding(const QString &text);
     void handleLogEditEmphasizeLine(int lineNum);
     void handleSubLogEditEmphasizeLine(int lineNum);
     void handleSubLogMarkLine(int line, const QString& text);
@@ -47,6 +55,7 @@ private:
     FileLog mLog;
     SubLog* mSubLog{nullptr};
     LogTextEdit* mCurLogEdit;
-
+    ShortcutHelpDlg mShortcutHelpDlg;
+    AboutDlg mAboutDlg;
 };
 #endif // MAINWINDOW_H

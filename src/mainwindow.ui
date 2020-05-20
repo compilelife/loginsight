@@ -66,9 +66,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="encodingComboBox"/>
-          </item>
-          <item>
            <widget class="QToolButton" name="gotoLineAction">
             <property name="toolTip">
              <string>定位到行</string>
@@ -314,6 +311,195 @@
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>591</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>文件(&amp;F)</string>
+    </property>
+    <widget class="QMenu" name="menuEncoding">
+     <property name="title">
+      <string>编码(&amp;E)</string>
+     </property>
+     <addaction name="actionGBK"/>
+     <addaction name="actionUTF8"/>
+    </widget>
+    <addaction name="actionopen"/>
+    <addaction name="actionclose"/>
+    <addaction name="menuEncoding"/>
+    <addaction name="separator"/>
+    <addaction name="actionsetting"/>
+    <addaction name="separator"/>
+    <addaction name="actionquit"/>
+   </widget>
+   <widget class="QMenu" name="menuInsight">
+    <property name="title">
+     <string>检视(&amp;I)</string>
+    </property>
+    <addaction name="actionsearch"/>
+    <addaction name="actionreverseSearch"/>
+    <addaction name="actionsearchBack"/>
+    <addaction name="actionsearchFoward"/>
+    <addaction name="separator"/>
+    <addaction name="actionfilter"/>
+    <addaction name="separator"/>
+    <addaction name="actiongoBack"/>
+    <addaction name="actiongoFoward"/>
+    <addaction name="actiongotoLine"/>
+   </widget>
+   <widget class="QMenu" name="menuTimeline">
+    <property name="title">
+     <string>时间线(&amp;T)</string>
+    </property>
+    <addaction name="actiontoClipboard"/>
+    <addaction name="actionexport"/>
+    <addaction name="separator"/>
+    <addaction name="actionclearAll"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>帮助(&amp;H)</string>
+    </property>
+    <addaction name="actionshortcut"/>
+    <addaction name="actiondoc"/>
+    <addaction name="actionabout"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuInsight"/>
+   <addaction name="menuTimeline"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <action name="actionopen">
+   <property name="text">
+    <string>打开...(&amp;O)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionclose">
+   <property name="text">
+    <string>关闭(&amp;C)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionquit">
+   <property name="text">
+    <string>退出(&amp;Q)</string>
+   </property>
+  </action>
+  <action name="actionsearch">
+   <property name="text">
+    <string>查找...(&amp;F)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionsearchBack">
+   <property name="text">
+    <string>查找上一个(&amp;U)</string>
+   </property>
+  </action>
+  <action name="actionsearchFoward">
+   <property name="text">
+    <string>查找下一个(&amp;D)</string>
+   </property>
+  </action>
+  <action name="actionfilter">
+   <property name="text">
+    <string>过滤...(&amp;S)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actiongoBack">
+   <property name="text">
+    <string>后退(&amp;B)</string>
+   </property>
+  </action>
+  <action name="actiongoFoward">
+   <property name="text">
+    <string>前进(&amp;F)</string>
+   </property>
+  </action>
+  <action name="actionsetting">
+   <property name="text">
+    <string>设置...(&amp;S)</string>
+   </property>
+  </action>
+  <action name="actionclearAll">
+   <property name="text">
+    <string>清空(&amp;D)</string>
+   </property>
+  </action>
+  <action name="actionexport">
+   <property name="text">
+    <string>保存为图片...(&amp;S)</string>
+   </property>
+  </action>
+  <action name="actiontoClipboard">
+   <property name="text">
+    <string>复制到剪贴板(&amp;C)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionshortcut">
+   <property name="text">
+    <string>查看快捷键...(&amp;S)</string>
+   </property>
+  </action>
+  <action name="actiondoc">
+   <property name="text">
+    <string>帮助文档...(&amp;T)</string>
+   </property>
+  </action>
+  <action name="actionabout">
+   <property name="text">
+    <string>关于...(&amp;A)</string>
+   </property>
+  </action>
+  <action name="actiongotoLine">
+   <property name="text">
+    <string>跳到行...(&amp;G)</string>
+   </property>
+  </action>
+  <action name="actionGBK">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>GBK</string>
+   </property>
+  </action>
+  <action name="actionUTF8">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>UTF-8</string>
+   </property>
+  </action>
+  <action name="actionreverseSearch">
+   <property name="text">
+    <string>反向查找(&amp;R)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+F</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

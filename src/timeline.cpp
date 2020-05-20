@@ -112,6 +112,16 @@ void TimeLine::exportToClipboard()
     });
 }
 
+void TimeLine::clear()
+{
+    for (auto* node : mNodes) {
+        scene()->removeItem(node);
+    }
+    mNodes.clear();
+
+    showSupport();
+}
+
 void TimeLine::deleteNode(TimeNode *node)
 {
     scene()->removeItem(node);

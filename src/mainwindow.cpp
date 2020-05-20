@@ -20,6 +20,7 @@
 #include "toast.h"
 #include <QMenu>
 #include <QTextCodec>
+#include <QDesktopServices>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -34,54 +35,16 @@ MainWindow::MainWindow(QWidget *parent)
     ui->logSplitter->setStretchFactor(0, 8);
     ui->logSplitter->setStretchFactor(1, 2);
 
-    ui->logEdit->setEnabled(false);
     ui->logEdit->setScrollBar(ui->logEditVBar);
     ui->logEdit->setLog(&mLog);
 
     ui->subLogEdit->setScrollBar(ui->subLogEditVBar);
     ui->subLogEdit->setVisible(false);
 
-    connect(ui->logEdit, SIGNAL(requestMarkLine(int, const QString&)), ui->timeLine, SLOT(addNode(int,const QString&)));
-    connect(ui->subLogEdit, SIGNAL(requestMarkLine(int, const QString&)), this, SLOT(handleSubLogMarkLine(int, const QString&)));
-    connect(ui->timeLine, SIGNAL(nodeSelected(TimeNode*)), this, SLOT(handleNodeSelected(TimeNode*)));
-
-    connect(ui->exportTimeLineAction, SIGNAL(clicked()), this, SLOT(handleExportTimeLine()));
-    connect(ui->filterAction, SIGNAL(clicked()), this, SLOT(handleFilter()));
-
-    connect(ui->searchEdit, SIGNAL(searchFoward()), this, SLOT(handleSearchFoward()));
-    connect(ui->searchEdit, SIGNAL(searchBackward()), this, SLOT(handleSearchBackward()));
-
-    connect(ui->gotoLineAction, SIGNAL(clicked()), this, SLOT(handleGotoLine()));
-    connect(ui->openAction, SIGNAL(clicked()), this, SLOT(handleOpenFile()));
-
-    connect(ui->navBackAction, SIGNAL(clicked()), this, SLOT(handleNavBackward()));
-    connect(ui->navAheadAction, SIGNAL(clicked()), this, SLOT(handleNavFoward()));
-    ui->navBackAction->setEnabled(false);
-    ui->navAheadAction->setEnabled(false);
-
-    connect(ui->clipboardAction, SIGNAL(clicked()), ui->timeLine, SLOT(exportToClipboard()));
-
-    connect(ui->logEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
-    connect(ui->subLogEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
-    connect(ui->logEdit, SIGNAL(returnPressed()), ui->searchEdit, SLOT(transferReturnBehavior()));
-    connect(ui->subLogEdit, SIGNAL(returnPressed()), ui->searchEdit, SLOT(transferReturnBehavior()));
+    bindActions();
 
     mCurLogEdit = ui->logEdit;
     mCurLogEdit->drawFocused();
-    connect(ui->logEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
-    connect(ui->subLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
-    connect(ui->logEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleLogEditEmphasizeLine(int)));
-    connect(ui->subLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleSubLogEditEmphasizeLine(int)));
-
-    connect(ui->logEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
-    connect(ui->subLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
-
-    ui->openAction->setShortcut(QKeySequence::Open);
-    ui->gotoLineAction->setShortcut(QKeySequence("Ctrl+G"));
-    ui->filterAction->setShortcut(QKeySequence("Ctrl+L"));
-    ui->navBackAction->setShortcut(QKeySequence("Ctrl+["));
-    ui->navAheadAction->setShortcut(QKeySequence("Ctrl+]"));
-    ui->clipboardAction->setShortcut(QKeySequence::Save);
 
     //    resize(800,500);
     showMaximized();
@@ -92,6 +55,92 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::bindActions()
+{
+    connect(ui->searchEdit, SIGNAL(searchFoward()), this, SLOT(handleSearchFoward()));
+    connect(ui->searchEdit, SIGNAL(searchBackward()), this, SLOT(handleSearchBackward()));
+
+    connect(ui->timeLine, SIGNAL(nodeSelected(TimeNode*)), this, SLOT(handleNodeSelected(TimeNode*)));
+
+    bindLogEditActions();
+    bindToolbarAction();
+    bindMenuAction();
+}
+
+void MainWindow::bindLogEditActions()
+{
+    connect(ui->logEdit, SIGNAL(requestMarkLine(int, const QString&)), ui->timeLine, SLOT(addNode(int,const QString&)));
+    connect(ui->subLogEdit, SIGNAL(requestMarkLine(int, const QString&)), this, SLOT(handleSubLogMarkLine(int, const QString&)));
+    connect(ui->logEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
+    connect(ui->subLogEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
+    connect(ui->logEdit, SIGNAL(returnPressed()), ui->searchEdit, SLOT(transferReturnBehavior()));
+    connect(ui->subLogEdit, SIGNAL(returnPressed()), ui->searchEdit, SLOT(transferReturnBehavior()));
+    connect(ui->logEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
+    connect(ui->subLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
+    connect(ui->logEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleLogEditEmphasizeLine(int)));
+    connect(ui->subLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleSubLogEditEmphasizeLine(int)));
+    connect(ui->logEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
+    connect(ui->subLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
+}
+
+void MainWindow::bindToolbarAction()
+{
+    connect(ui->filterAction, SIGNAL(clicked()), this, SLOT(handleFilter()));
+    connect(ui->clipboardAction, SIGNAL(clicked()), ui->timeLine, SLOT(exportToClipboard()));
+    connect(ui->navBackAction, SIGNAL(clicked()), this, SLOT(handleNavBackward()));
+    connect(ui->navAheadAction, SIGNAL(clicked()), this, SLOT(handleNavFoward()));
+    ui->navBackAction->setEnabled(false);
+    ui->navAheadAction->setEnabled(false);
+    connect(ui->gotoLineAction, SIGNAL(clicked()), this, SLOT(handleGotoLine()));
+    connect(ui->openAction, SIGNAL(clicked()), this, SLOT(handleOpenFile()));
+    connect(ui->exportTimeLineAction, SIGNAL(clicked()), this, SLOT(handleExportTimeLine()));
+}
+
+void MainWindow::bindMenuAction()
+{
+    //文件
+    auto group = new QActionGroup(this);
+    group->addAction(ui->actionGBK);
+    group->addAction(ui->actionUTF8);
+
+    connect(group, &QActionGroup::triggered, [this](QAction* action){setEncoding(action->text());});
+    connect(ui->actionopen, &QAction::triggered, this, &MainWindow::handleOpenFile);
+    connect(ui->actionclose, &QAction::triggered, this, &MainWindow::handleCloseFile);
+    connect(ui->actionquit, &QAction::triggered, []{QCoreApplication::quit();});
+
+    //检视
+    connect(ui->actionsearch, &QAction::triggered, [this]{
+        ui->searchEdit->setSearchFoward(true);
+        ui->searchEdit->setFocus();
+    });
+    connect(ui->actionreverseSearch, &QAction::triggered, [this]{
+        ui->searchEdit->setSearchFoward(false);
+        ui->searchEdit->setFocus();
+    });
+    connect(ui->actionsearchFoward, &QAction::triggered, this, &MainWindow::handleSearchFoward);
+    connect(ui->actionsearchBack, &QAction::triggered, this, &MainWindow::handleSearchFoward);
+    connect(ui->actionfilter, &QAction::triggered, this, &MainWindow::handleFilter);
+    connect(ui->actiongoBack, &QAction::triggered, this, &MainWindow::handleNavBackward);
+    connect(ui->actiongoFoward, &QAction::triggered, this, &MainWindow::handleNavFoward);
+    connect(ui->actiongotoLine, &QAction::triggered, this, &MainWindow::handleGotoLine);
+
+    //时间线
+    connect(ui->actiontoClipboard, &QAction::triggered, ui->timeLine, &TimeLine::exportToClipboard);
+    connect(ui->actionexport, &QAction::triggered, this, &MainWindow::handleExportTimeLine);
+    connect(ui->actionclearAll, &QAction::triggered, ui->timeLine, &TimeLine::clear);
+
+    //帮助
+    connect(ui->actionshortcut, &QAction::triggered, [this]{
+        mShortcutHelpDlg.show();
+    });
+    connect(ui->actiondoc, &QAction::triggered, []{
+        QDesktopServices::openUrl(QUrl("https://github.com/compilelife/loginsight/wiki"));
+    });
+    connect(ui->actionabout, &QAction::triggered, [this]{
+        mAboutDlg.exec();
+    });
 }
 
 void MainWindow::handleExportTimeLine()
@@ -180,6 +229,19 @@ void MainWindow::handleOpenFile()
     doOpenFile(path);
 }
 
+void MainWindow::handleCloseFile()
+{
+    if (mSubLog) {
+        delete mSubLog;
+        ui->subLogEdit->clear();
+        ui->subLogEdit->setVisible(false);
+    }
+
+    mLog.close();
+    ui->logEdit->clear();
+    ui->timeLine->clear();
+}
+
 void MainWindow::handleHistoryPosChanged()
 {
     ui->navBackAction->setEnabled(mCurLogEdit->history()->availableBackwardCount() > 0);
@@ -207,7 +269,7 @@ void MainWindow::handleLogEditFocus(LogTextEdit *logEdit)
     }
 }
 
-void MainWindow::handleEncodingChanged(const QString& text)
+void MainWindow::setEncoding(const QString& text)
 {
     if (text != mLog.getCodec()->name()) {
         qDebug()<<"change to encoding:"<<text;

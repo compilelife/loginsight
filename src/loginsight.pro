@@ -16,6 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    aboutdlg.cpp \
     backgroundrunner.cpp \
     backgroundtaskcontainer.cpp \
     highlighter.cpp \
@@ -26,6 +27,7 @@ SOURCES += \
     mainwindow.cpp \
     progressdialog.cpp \
     searchedit.cpp \
+    shortcuthelpdlg.cpp \
     timeline.cpp \
     timenode.cpp \
     timenodebody.cpp \
@@ -34,6 +36,7 @@ SOURCES += \
 
 HEADERS += \
     LongtimeOperation.h \
+    aboutdlg.h \
     backgroundrunner.h \
     backgroundtaskcontainer.h \
     highlighter.h \
@@ -43,6 +46,7 @@ HEADERS += \
     mainwindow.h \
     progressdialog.h \
     searchedit.h \
+    shortcuthelpdlg.h \
     timeline.h \
     timenode.h \
     timenodebody.h \
@@ -50,8 +54,10 @@ HEADERS += \
     toast.h
 
 FORMS += \
+    aboutdlg.ui \
     mainwindow.ui \
-    progressdialog.ui
+    progressdialog.ui \
+    shortcuthelpdlg.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
