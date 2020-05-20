@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("loginsight");
 
-    ui->timeLineSplitter->setStretchFactor(0, 10);
+    ui->timeLineSplitter->setStretchFactor(0, 12);
     ui->timeLineSplitter->setStretchFactor(1, 5);
 
     ui->logSplitter->setStretchFactor(0, 8);
@@ -40,11 +40,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->subLogEdit->setScrollBar(ui->subLogEditVBar);
     ui->subLogEdit->setVisible(false);
-
-    ui->encodingComboBox->addItem("UTF-8");
-    ui->encodingComboBox->addItem("GBK");
-
-    connect(ui->encodingComboBox, SIGNAL(currentTextChanged(const QString&)), this, SLOT(handleEncodingChanged(const QString&)));
 
     connect(ui->logEdit, SIGNAL(requestMarkLine(int, const QString&)), ui->timeLine, SLOT(addNode(int,const QString&)));
     connect(ui->subLogEdit, SIGNAL(requestMarkLine(int, const QString&)), this, SLOT(handleSubLogMarkLine(int, const QString&)));
@@ -112,14 +107,18 @@ void MainWindow::handleFilter()
 {
     QDialog inputDlg;
     inputDlg.setWindowTitle("过滤日志");
+
     QVBoxLayout layout(&inputDlg);
     QCheckBox caseSensentiveCheckBox("大小写敏感");
     caseSensentiveCheckBox.setChecked(true);
+    caseSensentiveCheckBox.setFocusPolicy(Qt::NoFocus);
     layout.addWidget(&caseSensentiveCheckBox);
+
     QLineEdit lineEdit;
     lineEdit.setPlaceholderText("请输入要过滤的关键字");
     lineEdit.setFocus();
     layout.addWidget(&lineEdit);
+
     QDialogButtonBox btnBox(QDialogButtonBox::Ok);
     layout.addWidget(&btnBox);
     connect(&btnBox, SIGNAL(accepted()), &inputDlg, SLOT(accept()));
@@ -285,7 +284,6 @@ void MainWindow::doOpenFile(const QString &path)
     }
 
     ui->logEdit->setLog(&mLog);
-    ui->encodingComboBox->setCurrentText(mLog.getCodec()->name());
 
     if (mSubLog){
         delete mSubLog;
