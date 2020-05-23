@@ -25,6 +25,8 @@ private:
     void bindLogEditActions();
     void bindToolbarAction();
     void bindMenuAction();
+    void noDocSetDisable();
+    void hasDocSetEnbale();
 private slots:
     void handleExportTimeLine();
     void handleFilter();

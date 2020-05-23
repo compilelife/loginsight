@@ -50,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent)
     showMaximized();
 
     ui->caseSensitivityCheckBox->setChecked(true);
+
+    noDocSetDisable();
 }
 
 MainWindow::~MainWindow()
@@ -91,8 +93,6 @@ void MainWindow::bindToolbarAction()
     connect(ui->clipboardAction, SIGNAL(clicked()), ui->timeLine, SLOT(exportToClipboard()));
     connect(ui->navBackAction, SIGNAL(clicked()), this, SLOT(handleNavBackward()));
     connect(ui->navAheadAction, SIGNAL(clicked()), this, SLOT(handleNavFoward()));
-    ui->navBackAction->setEnabled(false);
-    ui->navAheadAction->setEnabled(false);
     connect(ui->gotoLineAction, SIGNAL(clicked()), this, SLOT(handleGotoLine()));
     connect(ui->openAction, SIGNAL(clicked()), this, SLOT(handleOpenFile()));
     connect(ui->exportTimeLineAction, SIGNAL(clicked()), this, SLOT(handleExportTimeLine()));
@@ -141,6 +141,30 @@ void MainWindow::bindMenuAction()
     connect(ui->actionabout, &QAction::triggered, [this]{
         mAboutDlg.exec();
     });
+}
+
+void MainWindow::noDocSetDisable()
+{
+    ui->actionclose->setEnabled(false);
+    ui->menuEncoding->setEnabled(false);
+    ui->menuInsight->setEnabled(false);
+
+    ui->actiongoBack->setEnabled(false);
+    ui->actiongoFoward->setEnabled(false);
+    ui->navBackAction->setEnabled(false);
+    ui->navAheadAction->setEnabled(false);
+}
+
+void MainWindow::hasDocSetEnbale()
+{
+    ui->actionclose->setEnabled(true);
+    ui->menuEncoding->setEnabled(true);
+    ui->menuInsight->setEnabled(true);
+
+    ui->actiongoBack->setEnabled(false);
+    ui->actiongoFoward->setEnabled(false);
+    ui->navBackAction->setEnabled(false);
+    ui->navAheadAction->setEnabled(false);
 }
 
 void MainWindow::handleExportTimeLine()
@@ -233,6 +257,7 @@ void MainWindow::handleCloseFile()
 {
     if (mSubLog) {
         delete mSubLog;
+        mSubLog = nullptr;
         ui->subLogEdit->clear();
         ui->subLogEdit->setVisible(false);
     }
@@ -245,7 +270,9 @@ void MainWindow::handleCloseFile()
 void MainWindow::handleHistoryPosChanged()
 {
     ui->navBackAction->setEnabled(mCurLogEdit->history()->availableBackwardCount() > 0);
+    ui->actiongoBack->setEnabled(mCurLogEdit->history()->availableBackwardCount() > 0);
     ui->navAheadAction->setEnabled(mCurLogEdit->history()->availableFowardCount() > 0);
+    ui->actiongoFoward->setEnabled(mCurLogEdit->history()->availableFowardCount() > 0);
 }
 
 void MainWindow::handleNavBackward()
@@ -353,6 +380,8 @@ void MainWindow::doOpenFile(const QString &path)
     }
     ui->subLogEdit->setLog(nullptr);
     ui->subLogEdit->setVisible(false);
+
+    hasDocSetEnbale();
 }
 
 void MainWindow::filter(const QString &text, bool caseSenesitive)

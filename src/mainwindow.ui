@@ -427,10 +427,16 @@
    <property name="text">
     <string>后退(&amp;B)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+[</string>
+   </property>
   </action>
   <action name="actiongoFoward">
    <property name="text">
     <string>前进(&amp;F)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+]</string>
    </property>
   </action>
   <action name="actionsetting">
