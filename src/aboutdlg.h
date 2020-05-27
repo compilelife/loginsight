@@ -2,6 +2,8 @@
 #define ABOUTDLG_H
 
 #include <QDialog>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 namespace Ui {
 class AboutDlg;
@@ -16,7 +18,12 @@ public:
     ~AboutDlg();
 
 private:
+    void checkUpdate();
+    void httpReplied(QNetworkReply* reply);
+
+private:
     Ui::AboutDlg *ui;
+    QNetworkAccessManager mNetwork;
 };
 
 #endif // ABOUTDLG_H

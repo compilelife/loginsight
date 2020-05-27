@@ -7,6 +7,7 @@
 #include <QThread>
 #include "progressdialog.h"
 #include "backgroundtaskcontainer.h"
+#include <QNetworkAccessManager>
 
 class BackgroundRunner:QObject
 {

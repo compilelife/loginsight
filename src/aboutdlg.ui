@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>394</width>
-    <height>238</height>
+    <height>296</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,6 +24,23 @@
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="versionLabel">
+     <property name="text">
+      <string>v0.3</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="updateButton">
+     <property name="text">
+      <string>检查新版本</string>
      </property>
     </widget>
    </item>
