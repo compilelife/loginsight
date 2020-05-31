@@ -8,6 +8,7 @@
 
 //TODO:就地编辑而非弹窗编辑备注
 //FIXME:双击的时候不要滚动到高亮行
+class TimeNodeBody;
 class TimeNode: public QGraphicsObject
 {
     Q_OBJECT
@@ -16,6 +17,7 @@ public:
     TimeNode(int lineNum, const QString& locateText, const QString& detailText);
 
 public:
+    QColor color() {return mColor;}
     int data() {return mLineNum;}
     int lineNumber() {return mLineNum;}
 protected:
@@ -29,10 +31,14 @@ signals:
     void selected(TimeNode* node);
 private slots:
     void handleDelActionTriggered();
+    void setColor(QColor color);
+    void pickColor();
 
 private:
     double mWidth;
     int mLineNum;
+    QColor mColor{Qt::blue};
+    TimeNodeBody* mBody;
 };
 
 #endif // TIMENODE_H

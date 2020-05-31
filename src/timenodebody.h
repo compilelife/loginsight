@@ -5,12 +5,14 @@
 
 #define TIME_NODE_BODY_WIDTH 250
 
+class TimeNode;
 class TimeNodeBody: public QGraphicsItem {
 private:
     QString mText;
     QString mMemo;
+    TimeNode* mNode;
 public:
-    TimeNodeBody(const QString& text);
+    TimeNodeBody(TimeNode* node, const QString& text);
 protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
