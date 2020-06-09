@@ -481,6 +481,9 @@
    <property name="text">
     <string>跳到行...(&amp;G)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
+   </property>
   </action>
   <action name="actionGBK">
    <property name="checkable">
