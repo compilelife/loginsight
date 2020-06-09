@@ -44,6 +44,7 @@ public:
 public:
     bool open(const QString& path, LongtimeOperation& op);
     void close();
+    bool isOpened(){return mFile != nullptr;}
 
 public:
     QString getLine(int from, int to) override;

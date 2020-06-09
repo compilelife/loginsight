@@ -153,6 +153,10 @@ void MainWindow::noDocSetDisable()
     ui->actiongoFoward->setEnabled(false);
     ui->navBackAction->setEnabled(false);
     ui->navAheadAction->setEnabled(false);
+
+    ui->searchEdit->setEnabled(false);
+    ui->gotoLineAction->setEnabled(false);
+    ui->filterAction->setEnabled(false);
 }
 
 void MainWindow::hasDocSetEnbale()
@@ -165,6 +169,10 @@ void MainWindow::hasDocSetEnbale()
     ui->actiongoFoward->setEnabled(false);
     ui->navBackAction->setEnabled(false);
     ui->navAheadAction->setEnabled(false);
+
+    ui->searchEdit->setEnabled(true);
+    ui->gotoLineAction->setEnabled(true);
+    ui->filterAction->setEnabled(true);
 }
 
 void MainWindow::handleExportTimeLine()
@@ -178,6 +186,9 @@ void MainWindow::handleExportTimeLine()
 
 void MainWindow::handleFilter()
 {
+    if (!mLog.isOpened())
+        return;
+
     QDialog inputDlg;
     inputDlg.setWindowTitle("过滤日志");
 
@@ -232,6 +243,9 @@ void MainWindow::handleSearchFoward()
 
 void MainWindow::handleGotoLine()
 {
+    if (!mLog.isOpened())
+        return;
+
     bool ok = false;
     auto log = mCurLogEdit->getLog();
 
