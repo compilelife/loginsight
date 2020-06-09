@@ -360,6 +360,8 @@ void LogTextEdit::keyReleaseEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
         emit returnPressed();
+    } else if (e->key() == Qt::Key_PageDown || e->key() == Qt::Key_PageUp) {
+        handleInternalScroll(0);
     }
     QPlainTextEdit::keyReleaseEvent(e);
 }
