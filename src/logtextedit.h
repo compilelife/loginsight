@@ -110,6 +110,8 @@ protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
     void mouseDoubleClickEvent(QMouseEvent *e) override;
     void keyReleaseEvent(QKeyEvent *e) override;
+private:
+    QTextCursor mMenuCursor;
 public:
     void refresh();
     void setVisible(bool visible) override;

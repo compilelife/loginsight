@@ -314,8 +314,10 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
 {
     QMenu* menu = new QMenu();
 
-    auto cursor = cursorForPosition(e->pos());
-    setTextCursor(cursor);
+    auto cursor = textCursor();
+    mMenuCursor = cursorForPosition(e->pos());
+    mMenuCursor.select(QTextCursor::WordUnderCursor);
+//    auto cursorWord1 = mMenuCursor.selectedText();//TODO: 可以在设置页面切换是光标下单词还是复制的单词
 
     {
         auto action = menu->addAction("添加到时间线");
@@ -323,12 +325,21 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
     }
 
     menu->addSeparator();
-    cursor.select(QTextCursor::WordUnderCursor);
     auto cursorWord = cursor.selectedText();
-    auto action = menu->addAction(QString("高亮\"%1\"").arg(cursorWord));
-    connect(action, SIGNAL(triggered()), this, SLOT(addWordHighlightUnderCursor()));
-    action = menu->addAction(QString("过滤含\"%1\"的行").arg(cursorWord));
-    connect(action, SIGNAL(triggered()), this, SLOT(handleFilterUnderCursor()));
+
+    if (cursorWord.length() > 20) {
+        cursorWord = cursorWord.mid(0, 20) + "...";
+    }
+
+    if (cursorWord.length() > 0 ) {
+        auto action = menu->addAction(QString("高亮\"%1\"").arg(cursorWord));
+        connect(action, SIGNAL(triggered()), this, SLOT(addWordHighlightUnderCursor()));
+        action = menu->addAction(QString("过滤含\"%1\"的行").arg(cursorWord));
+        connect(action, SIGNAL(triggered()), this, SLOT(handleFilterUnderCursor()));
+    }
+    else {
+        menu->addAction("请选择文本来高亮、过滤和搜索")->setEnabled(false);
+    }
 
     if (mHighlighter->isQuickHighlightOn()||mHighlighter->isSearchHighlightOn()){
         menu->addSeparator();
@@ -344,6 +355,10 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
     if (mHighlighter->isSearchHighlightOn()) {
         auto action = menu->addAction(QString("清除\"%1\"的高亮").arg(mHighlighter->getSearchText()));
         connect(action, SIGNAL(triggered()), mHighlighter, SLOT(clearSearchHighlight()));
+    }
+
+    if (cursorWord.length() > 0) {
+        connect(menu->addAction("复制"), SIGNAL(triggered()), this, SLOT(copy()));
     }
 
     menu->exec(e->globalPos());
@@ -415,9 +430,8 @@ void LogTextEdit::scrollToLine(int lineNum, int col, bool recordToHistory)
 
 void LogTextEdit::handleMarkLineAction()
 {
-    auto cursor = textCursor();
-    auto s = cursor.block().text();
-    auto line = fromViewPortToLog(cursor.blockNumber());
+    auto s = mMenuCursor.block().text();
+    auto line = fromViewPortToLog(mMenuCursor.blockNumber());
     emit requestMarkLine(line, s);
 }
 
