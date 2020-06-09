@@ -279,6 +279,8 @@ void MainWindow::handleCloseFile()
     mLog.close();
     ui->logEdit->clear();
     ui->timeLine->clear();
+
+    noDocSetDisable();
 }
 
 void MainWindow::handleHistoryPosChanged()
