@@ -32,6 +32,8 @@ loginsight致力于打造一款日志分析的利器
 
 [使用说明](https://github.com/compilelife/loginsight/wiki/使用说明)
 
+[鸣谢](https://github.com/compilelife/loginsight/wiki/鸣谢)
+
 
 
 如果觉得这个项目对有帮助，请支持我：
