@@ -9,6 +9,7 @@
 #include <QMenu>
 #include "highlighter.h"
 #include "backgroundrunner.h"
+#include <QSettings>
 
 using namespace std;
 
@@ -36,7 +37,13 @@ LogTextEdit::LogTextEdit(QWidget* parent)
     :QPlainTextEdit(parent)
 {
     setLineWrapMode(QPlainTextEdit::NoWrap);
-    setFont(QFont("monospace"));
+
+    QFont font;
+    QSettings setting;
+    font.setFamily(setting.value("editorFont").toString());
+    font.setPointSize(setting.value("editorFontSize", 12).toInt());
+    setFont(font);
+
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(handleInternalScroll(int)));
@@ -52,8 +59,6 @@ LogTextEdit::LogTextEdit(QWidget* parent)
     highlightCurrentLine();
 
     mHighlighter = new Highlighter(document());
-
-    setCursorWidth(fontMetrics().horizontalAdvance('X'));
 }
 
 LogTextEdit::~LogTextEdit()

@@ -27,6 +27,7 @@ SOURCES += \
     mainwindow.cpp \
     progressdialog.cpp \
     searchedit.cpp \
+    settingsdialog.cpp \
     shortcuthelpdlg.cpp \
     timeline.cpp \
     timenode.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     mainwindow.h \
     progressdialog.h \
     searchedit.h \
+    settingsdialog.h \
     shortcuthelpdlg.h \
     timeline.h \
     timenode.h \
@@ -57,6 +59,7 @@ FORMS += \
     aboutdlg.ui \
     mainwindow.ui \
     progressdialog.ui \
+    settingsdialog.ui \
     shortcuthelpdlg.ui
 
 # Default rules for deployment.

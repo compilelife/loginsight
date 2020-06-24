@@ -21,6 +21,8 @@
 #include <QMenu>
 #include <QTextCodec>
 #include <QDesktopServices>
+#include "settingsdialog.h"
+#include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -49,7 +51,8 @@ MainWindow::MainWindow(QWidget *parent)
     //    resize(800,500);
     showMaximized();
 
-    ui->caseSensitivityCheckBox->setChecked(true);
+    QSettings config;
+    ui->caseSensitivityCheckBox->setChecked(config.value("caseSensitive").toBool());
 
     noDocSetDisable();
 }
@@ -109,6 +112,10 @@ void MainWindow::bindMenuAction()
     connect(ui->actionopen, &QAction::triggered, this, &MainWindow::handleOpenFile);
     connect(ui->actionclose, &QAction::triggered, this, &MainWindow::handleCloseFile);
     connect(ui->actionquit, &QAction::triggered, []{QCoreApplication::quit();});
+    connect(ui->actionsetting, &QAction::triggered, []{
+        SettingsDialog dlg;
+        dlg.exec();
+    });
 
     //检视
     connect(ui->actionsearch, &QAction::triggered, [this]{
@@ -194,7 +201,8 @@ void MainWindow::handleFilter()
 
     QVBoxLayout layout(&inputDlg);
     QCheckBox caseSensentiveCheckBox("大小写敏感");
-    caseSensentiveCheckBox.setChecked(true);
+    QSettings config;
+    caseSensentiveCheckBox.setChecked(config.value("caseSensitive").toBool());
     caseSensentiveCheckBox.setFocusPolicy(Qt::NoFocus);
     layout.addWidget(&caseSensentiveCheckBox);
 
@@ -217,7 +225,8 @@ void MainWindow::handleFilter()
 
 void MainWindow::handleFilterRequest(const QString& text)
 {
-    filter(text, true);
+    QSettings config;
+    filter(text, config.value("caseSensitive").toBool());
 }
 
 void MainWindow::handleNodeSelected(TimeNode *node)
@@ -398,6 +407,12 @@ void MainWindow::doOpenFile(const QString &path)
     ui->subLogEdit->setVisible(false);
 
     hasDocSetEnbale();
+
+    QSettings config;
+    if (config.value("gotoEOF").toBool()) {
+        ui->logEdit->scrollToLine(mLog.lineCount());
+        Toast::instance().show(Toast::INFO, "已定位到最后一行");
+    }
 }
 
 void MainWindow::filter(const QString &text, bool caseSenesitive)
