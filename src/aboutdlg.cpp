@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <QNetworkRequest>
 
-#define VERSION "v0.3"
+#define VERSION "v0.5"
 
 AboutDlg::AboutDlg(QWidget *parent) :
     QDialog(parent),
