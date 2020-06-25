@@ -8,11 +8,13 @@
 #include "shortcuthelpdlg.h"
 #include "aboutdlg.h"
 #include "timeline.h"
+#include "searchedit.h"
+#include <QCheckBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
+//TODO: 文档打开、关闭时清空tag；窗口焦点改变时切换tag；taglist事件绑定
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -66,5 +68,11 @@ private:
     LogTextEdit* mLogEdit;
     LogTextEdit* mSubLogEdit;
     TimeLine* mTimeLine;
+    SearchEdit* mSearchEdit;
+    QCheckBox* mCaseSensitiveCheckBox;
+    QAction* mNavBackAction;
+    QAction* mNavAheadAction;
+    QAction* mGotoLineAction;
+    QAction* mFilterAction;
 };
 #endif // MAINWINDOW_H

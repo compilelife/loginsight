@@ -42,8 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     showMaximized();
 
-//    QSettings config;
-//    ui->caseSensitivityCheckBox->setChecked(config.value("caseSensitive").toBool());
+    QSettings config;
+    mCaseSensitiveCheckBox->setChecked(config.value("caseSensitive").toBool());
 
     noDocSetDisable();
 }
@@ -55,8 +55,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::bindActions()
 {
-//    connect(ui->searchEdit, SIGNAL(searchFoward()), this, SLOT(handleSearchFoward()));
-//    connect(ui->searchEdit, SIGNAL(searchBackward()), this, SLOT(handleSearchBackward()));
+    connect(mSearchEdit, SIGNAL(searchFoward()), this, SLOT(handleSearchFoward()));
+    connect(mSearchEdit, SIGNAL(searchBackward()), this, SLOT(handleSearchBackward()));
 
     connect(mTimeLine, SIGNAL(nodeSelected(TimeNode*)), this, SLOT(handleNodeSelected(TimeNode*)));
 
@@ -70,8 +70,8 @@ void MainWindow::bindLogEditActions()
     connect(mSubLogEdit, SIGNAL(requestMarkLine(int, const QString&)), this, SLOT(handleSubLogMarkLine(int, const QString&)));
     connect(mLogEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
     connect(mSubLogEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
-//    connect(mLogEdit, SIGNAL(returnPressed()), ui->searchEdit, SLOT(transferReturnBehavior()));
-//    connect(mSubLogEdit, SIGNAL(returnPressed()), ui->searchEdit, SLOT(transferReturnBehavior()));
+    connect(mLogEdit, SIGNAL(returnPressed()), mSearchEdit, SLOT(transferReturnBehavior()));
+    connect(mSubLogEdit, SIGNAL(returnPressed()), mSearchEdit, SLOT(transferReturnBehavior()));
     connect(mLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
     connect(mSubLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
     connect(mLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleLogEditEmphasizeLine(int)));
@@ -96,15 +96,15 @@ void MainWindow::bindMenuAction()
         dlg.exec();
     });
 
-//    //检视
-//    connect(ui->actionsearch, &QAction::triggered, [this]{
-//        ui->searchEdit->setSearchFoward(true);
-//        ui->searchEdit->setFocus();
-//    });
-//    connect(ui->actionreverseSearch, &QAction::triggered, [this]{
-//        ui->searchEdit->setSearchFoward(false);
-//        ui->searchEdit->setFocus();
-//    });
+    //检视
+    connect(ui->actionsearch, &QAction::triggered, [this]{
+        mSearchEdit->setSearchFoward(true);
+        mSearchEdit->setFocus();
+    });
+    connect(ui->actionreverseSearch, &QAction::triggered, [this]{
+        mSearchEdit->setSearchFoward(false);
+        mSearchEdit->setFocus();
+    });
     connect(ui->actionsearchFoward, &QAction::triggered, this, &MainWindow::handleSearchFoward);
     connect(ui->actionsearchBack, &QAction::triggered, this, &MainWindow::handleSearchFoward);
     connect(ui->actionfilter, &QAction::triggered, this, &MainWindow::handleFilter);
@@ -137,12 +137,12 @@ void MainWindow::noDocSetDisable()
 
     ui->actiongoBack->setEnabled(false);
     ui->actiongoFoward->setEnabled(false);
-//    ui->navBackAction->setEnabled(false);
-//    ui->navAheadAction->setEnabled(false);
+    mNavBackAction->setEnabled(false);
+    mNavAheadAction->setEnabled(false);
 
-//    ui->searchEdit->setEnabled(false);
-//    ui->gotoLineAction->setEnabled(false);
-//    ui->filterAction->setEnabled(false);
+    mSearchEdit->setEnabled(false);
+    mGotoLineAction->setEnabled(false);
+    mFilterAction->setEnabled(false);
 }
 
 void MainWindow::hasDocSetEnbale()
@@ -153,12 +153,12 @@ void MainWindow::hasDocSetEnbale()
 
     ui->actiongoBack->setEnabled(false);
     ui->actiongoFoward->setEnabled(false);
-//    ui->navBackAction->setEnabled(false);
-//    ui->navAheadAction->setEnabled(false);
+    mNavBackAction->setEnabled(false);
+    mNavAheadAction->setEnabled(false);
 
-//    ui->searchEdit->setEnabled(true);
-//    ui->gotoLineAction->setEnabled(true);
-//    ui->filterAction->setEnabled(true);
+    mSearchEdit->setEnabled(true);
+    mGotoLineAction->setEnabled(true);
+    mFilterAction->setEnabled(true);
 }
 
 void MainWindow::handleExportTimeLine()
@@ -273,9 +273,9 @@ void MainWindow::handleCloseFile()
 
 void MainWindow::handleHistoryPosChanged()
 {
-//    ui->navBackAction->setEnabled(mCurLogEdit->history()->availableBackwardCount() > 0);
+    mNavBackAction->setEnabled(mCurLogEdit->history()->availableBackwardCount() > 0);
     ui->actiongoBack->setEnabled(mCurLogEdit->history()->availableBackwardCount() > 0);
-//    ui->navAheadAction->setEnabled(mCurLogEdit->history()->availableFowardCount() > 0);
+    mNavAheadAction->setEnabled(mCurLogEdit->history()->availableFowardCount() > 0);
     ui->actiongoFoward->setEnabled(mCurLogEdit->history()->availableFowardCount() > 0);
 }
 
@@ -338,26 +338,26 @@ void MainWindow::handleSubLogMarkLine(int line, const QString &text)
 
 void MainWindow::search(bool foward)
 {
-//    auto keyword = ui->searchEdit->text();
-//    if (keyword.isEmpty())
-//        return;
+    auto keyword = mSearchEdit->text();
+    if (keyword.isEmpty())
+        return;
 
-//    QTextDocument::FindFlags flag = QTextDocument::FindFlags();
-//    if (!foward) {
-//        flag.setFlag(QTextDocument::FindBackward);
-//    }
+    QTextDocument::FindFlags flag = QTextDocument::FindFlags();
+    if (!foward) {
+        flag.setFlag(QTextDocument::FindBackward);
+    }
 
-//    if (ui->caseSensitivityCheckBox->isChecked()) {
-//        flag.setFlag(QTextDocument::FindCaseSensitively);
-//    }
+    if (mCaseSensitiveCheckBox->isChecked()) {
+        flag.setFlag(QTextDocument::FindCaseSensitively);
+    }
 
-//    if (!mCurLogEdit->search(keyword, flag)) {
-//        if (flag.testFlag(QTextDocument::FindBackward)) {
-//            Toast::instance().show(Toast::INFO, "到达顶部，没有找到匹配项");
-//        } else {
-//            Toast::instance().show(Toast::INFO, "到达底部，没有找到匹配项");
-//        }
-//    }
+    if (!mCurLogEdit->search(keyword, flag)) {
+        if (flag.testFlag(QTextDocument::FindBackward)) {
+            Toast::instance().show(Toast::INFO, "到达顶部，没有找到匹配项");
+        } else {
+            Toast::instance().show(Toast::INFO, "到达底部，没有找到匹配项");
+        }
+    }
 }
 
 void MainWindow::doOpenFile(const QString &path)
@@ -420,20 +420,18 @@ void MainWindow::filter(const QString &text, bool caseSenesitive)
 
 void MainWindow::keyReleaseEvent(QKeyEvent *ev)
 {
-//    if ((ev->modifiers() & Qt::CTRL) && (ev->key() == Qt::Key_F)) {
-//        if (ev->modifiers() & Qt::SHIFT)
-//            ui->searchEdit->setSearchFoward(false);
-//        else
-//            ui->searchEdit->setSearchFoward(true);
-//        ui->searchEdit->setFocus();
-//        ui->searchEdit->selectAll();
-//    }
+    if ((ev->modifiers() & Qt::CTRL) && (ev->key() == Qt::Key_F)) {
+        if (ev->modifiers() & Qt::SHIFT)
+            mSearchEdit->setSearchFoward(false);
+        else
+            mSearchEdit->setSearchFoward(true);
+        mSearchEdit->setFocus();
+        mSearchEdit->selectAll();
+    }
 }
 
 void MainWindow::createCenterWidget()
 {
-
-
     //log edit
     auto* logSplitter = new QSplitter(Qt::Vertical);
 
@@ -488,20 +486,26 @@ void MainWindow::createCenterWidget()
     //tag
     auto rootLayout = new QVBoxLayout();
     {
+        auto tagWidget = new QWidget;
+        auto box = new QHBoxLayout();
+
+        mSearchEdit = new SearchEdit();
+        mSearchEdit->setMinimumHeight(26);
+        mSearchEdit->setMinimumWidth(150);
+        mSearchEdit->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
+        box->addWidget(mSearchEdit);
+
+        mCaseSensitiveCheckBox = new QCheckBox();
+        mCaseSensitiveCheckBox->setText("大小写敏感");
+        box->addWidget(mCaseSensitiveCheckBox);
+
         TagListWidget* tagList = new TagListWidget;
         tagList->setMinimumHeight(26);
         tagList->setMaximumHeight(26);
         tagList->addTag("abc", Qt::red);
         tagList->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-
-        auto tagWidget = new QWidget;
-        auto box = new QHBoxLayout();
-        auto edit = new SearchEdit();
-        edit->setMinimumHeight(26);
-        edit->setMinimumWidth(150);
-        edit->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
-        box->addWidget(edit);
         box->addWidget(tagList);
+
         box->setMargin(5);
         box->setSpacing(10);
         tagWidget->setLayout(box);
@@ -534,14 +538,29 @@ void MainWindow::createCenterWidget()
         action->setToolTip("过滤关键字");
         connect(action, SIGNAL(triggered()), this, SLOT(handleFilter()));
         toolbar->addAction(action);
+        mFilterAction = action;
     }
     {
         auto action = new QAction(QIcon(":/res/img/locate.png"), "");
         action->setToolTip("跳转到行");
         connect(action, SIGNAL(triggered()), this, SLOT(handleGotoLine()));
         toolbar->addAction(action);
+        mGotoLineAction = action;
     }
-    //TODO 前进后退
+    {
+        auto action = new QAction(QIcon(":/res/img/left.png"), "");
+        action->setToolTip("后退");
+        connect(action, SIGNAL(triggered()), this, SLOT(handleNavBackward()));
+        toolbar->addAction(action);
+        mNavBackAction = action;
+    }
+    {
+        auto action = new QAction(QIcon(":/res/img/right.png"), "");
+        action->setToolTip("前进");
+        connect(action, SIGNAL(triggered()), this, SLOT(handleNavFoward()));
+        toolbar->addAction(action);
+        mNavAheadAction = action;
+    }
     toolbar->addSeparator();
     {
         auto action = new QAction(QIcon(":/res/img/clipboard.png"), "");
