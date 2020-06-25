@@ -32,7 +32,6 @@ signals:
 private slots:
     void handleDelActionTriggered();
     void setColor(QColor color);
-    void pickColor();
 
 private:
     double mWidth;

@@ -11,6 +11,7 @@
 #include "timenodebody.h"
 #include "timenodehead.h"
 #include <QColorDialog>
+#include "choosecolormenu.h"
 
 TimeNode::TimeNode(int lineNum, const QString &locateText, const QString &detailText)
     :mLineNum(lineNum) {
@@ -56,22 +57,17 @@ void TimeNode::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
     menu->addSeparator();
 
-    //红色、蓝色、绿色、橘色、黄色、更多（从调色板选择颜色）
-    auto colorMenu = menu->addMenu("设置颜色");
-    QString names[] = {"红色", "绿色", "蓝色", "黄色", "黑色"};
-    QColor colors[] = {Qt::red, Qt::green, Qt::blue, Qt::darkYellow, Qt::black};
-    auto count = sizeof (names) / sizeof (QString);
-    for (unsigned i = 0; i < count; i++) {
-        QPixmap redPixmap(10,10);
-        auto color = colors[i];
-        redPixmap.fill(colors[i]);
-        action = colorMenu->addAction(QIcon(redPixmap), names[i]);
-        connect(action, &QAction::triggered, [this, color]{
-           this->setColor(color);
-        });
-    }
-    action =  colorMenu->addAction("更多...");
-    connect(action, &QAction::triggered, this, &TimeNode::pickColor);
+    auto chooseColorMenu = new ChooseColorMenu({
+                {"红色", Qt::red},
+                {"绿色", Qt::green},
+                {"蓝色", Qt::blue},
+                {"黄色", Qt::yellow},
+                {"黑色", Qt::black},
+            });
+    connect(chooseColorMenu, &ChooseColorMenu::chooseColor, [this](QColor color){
+        setColor(color);
+    });
+    menu->addMenu(chooseColorMenu);
 
     menu->exec(event->screenPos());
     delete menu;
@@ -95,10 +91,3 @@ void TimeNode::setColor(QColor color)
     update();
 }
 
-void TimeNode::pickColor()
-{
-    auto color = QColorDialog::getColor();
-    if (color.isValid()) {
-        setColor(color);
-    }
-}

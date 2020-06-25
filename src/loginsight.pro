@@ -19,6 +19,7 @@ SOURCES += \
     aboutdlg.cpp \
     backgroundrunner.cpp \
     backgroundtaskcontainer.cpp \
+    choosecolormenu.cpp \
     highlighter.cpp \
     history.cpp \
     log.cpp \
@@ -29,6 +30,7 @@ SOURCES += \
     searchedit.cpp \
     settingsdialog.cpp \
     shortcuthelpdlg.cpp \
+    taglistwidget.cpp \
     timeline.cpp \
     timenode.cpp \
     timenodebody.cpp \
@@ -40,6 +42,7 @@ HEADERS += \
     aboutdlg.h \
     backgroundrunner.h \
     backgroundtaskcontainer.h \
+    choosecolormenu.h \
     highlighter.h \
     history.h \
     log.h \
@@ -47,8 +50,10 @@ HEADERS += \
     mainwindow.h \
     progressdialog.h \
     searchedit.h \
+    searchwidget_copy.h \
     settingsdialog.h \
     shortcuthelpdlg.h \
+    taglistwidget.h \
     timeline.h \
     timenode.h \
     timenodebody.h \
