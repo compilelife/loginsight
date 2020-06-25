@@ -16,7 +16,7 @@ class LogTextEdit: public QPlainTextEdit, public AbstractNavPosReplayer
     Q_OBJECT
 
 public:
-    LogTextEdit(QWidget* parent);
+    LogTextEdit(QWidget* parent = nullptr);
     ~LogTextEdit() override;
 
 //===实现大文件的显示===>

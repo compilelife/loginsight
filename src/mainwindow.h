@@ -7,6 +7,7 @@
 #include "logtextedit.h"
 #include "shortcuthelpdlg.h"
 #include "aboutdlg.h"
+#include "timeline.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,7 +24,6 @@ public:
 private:
     void bindActions();
     void bindLogEditActions();
-    void bindToolbarAction();
     void bindMenuAction();
     void noDocSetDisable();
     void hasDocSetEnbale();
@@ -59,5 +59,12 @@ private:
     LogTextEdit* mCurLogEdit;
     ShortcutHelpDlg mShortcutHelpDlg;
     AboutDlg mAboutDlg;
+
+private:
+    void createCenterWidget();
+private:
+    LogTextEdit* mLogEdit;
+    LogTextEdit* mSubLogEdit;
+    TimeLine* mTimeLine;
 };
 #endif // MAINWINDOW_H

@@ -13,7 +13,7 @@ class TimeLine: public QGraphicsView
 {
     Q_OBJECT
 public:
-    TimeLine(QWidget* parent);
+    TimeLine(QWidget* parent = nullptr);
     void highlightNode(int lineNum);
 
 public slots:

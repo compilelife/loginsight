@@ -23,6 +23,10 @@
 #include <QDesktopServices>
 #include "settingsdialog.h"
 #include <QSettings>
+#include <QToolButton>
+#include <QCheckBox>
+#include <QListWidget>
+#include "searchedit.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -30,29 +34,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle("loginsight");
+    setContextMenuPolicy(Qt::NoContextMenu);
 
-    ui->timeLineSplitter->setStretchFactor(0, 12);
-    ui->timeLineSplitter->setStretchFactor(1, 5);
-
-    ui->logSplitter->setStretchFactor(0, 8);
-    ui->logSplitter->setStretchFactor(1, 2);
-
-    ui->logEdit->setScrollBar(ui->logEditVBar);
-    ui->logEdit->setLog(&mLog);
-
-    ui->subLogEdit->setScrollBar(ui->subLogEditVBar);
-    ui->subLogEdit->setVisible(false);
-
+    createCenterWidget();
     bindActions();
 
-    mCurLogEdit = ui->logEdit;
-    mCurLogEdit->drawFocused();
-
-    //    resize(800,500);
     showMaximized();
 
-    QSettings config;
-    ui->caseSensitivityCheckBox->setChecked(config.value("caseSensitive").toBool());
+//    QSettings config;
+//    ui->caseSensitivityCheckBox->setChecked(config.value("caseSensitive").toBool());
 
     noDocSetDisable();
 }
@@ -64,41 +54,29 @@ MainWindow::~MainWindow()
 
 void MainWindow::bindActions()
 {
-    connect(ui->searchEdit, SIGNAL(searchFoward()), this, SLOT(handleSearchFoward()));
-    connect(ui->searchEdit, SIGNAL(searchBackward()), this, SLOT(handleSearchBackward()));
+//    connect(ui->searchEdit, SIGNAL(searchFoward()), this, SLOT(handleSearchFoward()));
+//    connect(ui->searchEdit, SIGNAL(searchBackward()), this, SLOT(handleSearchBackward()));
 
-    connect(ui->timeLine, SIGNAL(nodeSelected(TimeNode*)), this, SLOT(handleNodeSelected(TimeNode*)));
+    connect(mTimeLine, SIGNAL(nodeSelected(TimeNode*)), this, SLOT(handleNodeSelected(TimeNode*)));
 
     bindLogEditActions();
-    bindToolbarAction();
     bindMenuAction();
 }
 
 void MainWindow::bindLogEditActions()
 {
-    connect(ui->logEdit, SIGNAL(requestMarkLine(int, const QString&)), ui->timeLine, SLOT(addNode(int,const QString&)));
-    connect(ui->subLogEdit, SIGNAL(requestMarkLine(int, const QString&)), this, SLOT(handleSubLogMarkLine(int, const QString&)));
-    connect(ui->logEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
-    connect(ui->subLogEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
-    connect(ui->logEdit, SIGNAL(returnPressed()), ui->searchEdit, SLOT(transferReturnBehavior()));
-    connect(ui->subLogEdit, SIGNAL(returnPressed()), ui->searchEdit, SLOT(transferReturnBehavior()));
-    connect(ui->logEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
-    connect(ui->subLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
-    connect(ui->logEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleLogEditEmphasizeLine(int)));
-    connect(ui->subLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleSubLogEditEmphasizeLine(int)));
-    connect(ui->logEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
-    connect(ui->subLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
-}
-
-void MainWindow::bindToolbarAction()
-{
-    connect(ui->filterAction, SIGNAL(clicked()), this, SLOT(handleFilter()));
-    connect(ui->clipboardAction, SIGNAL(clicked()), ui->timeLine, SLOT(exportToClipboard()));
-    connect(ui->navBackAction, SIGNAL(clicked()), this, SLOT(handleNavBackward()));
-    connect(ui->navAheadAction, SIGNAL(clicked()), this, SLOT(handleNavFoward()));
-    connect(ui->gotoLineAction, SIGNAL(clicked()), this, SLOT(handleGotoLine()));
-    connect(ui->openAction, SIGNAL(clicked()), this, SLOT(handleOpenFile()));
-    connect(ui->exportTimeLineAction, SIGNAL(clicked()), this, SLOT(handleExportTimeLine()));
+    connect(mLogEdit, SIGNAL(requestMarkLine(int, const QString&)), mTimeLine, SLOT(addNode(int,const QString&)));
+    connect(mSubLogEdit, SIGNAL(requestMarkLine(int, const QString&)), this, SLOT(handleSubLogMarkLine(int, const QString&)));
+    connect(mLogEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
+    connect(mSubLogEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
+//    connect(mLogEdit, SIGNAL(returnPressed()), ui->searchEdit, SLOT(transferReturnBehavior()));
+//    connect(mSubLogEdit, SIGNAL(returnPressed()), ui->searchEdit, SLOT(transferReturnBehavior()));
+    connect(mLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
+    connect(mSubLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
+    connect(mLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleLogEditEmphasizeLine(int)));
+    connect(mSubLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleSubLogEditEmphasizeLine(int)));
+    connect(mLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
+    connect(mSubLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
 }
 
 void MainWindow::bindMenuAction()
@@ -117,15 +95,15 @@ void MainWindow::bindMenuAction()
         dlg.exec();
     });
 
-    //检视
-    connect(ui->actionsearch, &QAction::triggered, [this]{
-        ui->searchEdit->setSearchFoward(true);
-        ui->searchEdit->setFocus();
-    });
-    connect(ui->actionreverseSearch, &QAction::triggered, [this]{
-        ui->searchEdit->setSearchFoward(false);
-        ui->searchEdit->setFocus();
-    });
+//    //检视
+//    connect(ui->actionsearch, &QAction::triggered, [this]{
+//        ui->searchEdit->setSearchFoward(true);
+//        ui->searchEdit->setFocus();
+//    });
+//    connect(ui->actionreverseSearch, &QAction::triggered, [this]{
+//        ui->searchEdit->setSearchFoward(false);
+//        ui->searchEdit->setFocus();
+//    });
     connect(ui->actionsearchFoward, &QAction::triggered, this, &MainWindow::handleSearchFoward);
     connect(ui->actionsearchBack, &QAction::triggered, this, &MainWindow::handleSearchFoward);
     connect(ui->actionfilter, &QAction::triggered, this, &MainWindow::handleFilter);
@@ -134,9 +112,9 @@ void MainWindow::bindMenuAction()
     connect(ui->actiongotoLine, &QAction::triggered, this, &MainWindow::handleGotoLine);
 
     //时间线
-    connect(ui->actiontoClipboard, &QAction::triggered, ui->timeLine, &TimeLine::exportToClipboard);
+    connect(ui->actiontoClipboard, &QAction::triggered, mTimeLine, &TimeLine::exportToClipboard);
     connect(ui->actionexport, &QAction::triggered, this, &MainWindow::handleExportTimeLine);
-    connect(ui->actionclearAll, &QAction::triggered, ui->timeLine, &TimeLine::clear);
+    connect(ui->actionclearAll, &QAction::triggered, mTimeLine, &TimeLine::clear);
 
     //帮助
     connect(ui->actionshortcut, &QAction::triggered, [this]{
@@ -158,12 +136,12 @@ void MainWindow::noDocSetDisable()
 
     ui->actiongoBack->setEnabled(false);
     ui->actiongoFoward->setEnabled(false);
-    ui->navBackAction->setEnabled(false);
-    ui->navAheadAction->setEnabled(false);
+//    ui->navBackAction->setEnabled(false);
+//    ui->navAheadAction->setEnabled(false);
 
-    ui->searchEdit->setEnabled(false);
-    ui->gotoLineAction->setEnabled(false);
-    ui->filterAction->setEnabled(false);
+//    ui->searchEdit->setEnabled(false);
+//    ui->gotoLineAction->setEnabled(false);
+//    ui->filterAction->setEnabled(false);
 }
 
 void MainWindow::hasDocSetEnbale()
@@ -174,12 +152,12 @@ void MainWindow::hasDocSetEnbale()
 
     ui->actiongoBack->setEnabled(false);
     ui->actiongoFoward->setEnabled(false);
-    ui->navBackAction->setEnabled(false);
-    ui->navAheadAction->setEnabled(false);
+//    ui->navBackAction->setEnabled(false);
+//    ui->navAheadAction->setEnabled(false);
 
-    ui->searchEdit->setEnabled(true);
-    ui->gotoLineAction->setEnabled(true);
-    ui->filterAction->setEnabled(true);
+//    ui->searchEdit->setEnabled(true);
+//    ui->gotoLineAction->setEnabled(true);
+//    ui->filterAction->setEnabled(true);
 }
 
 void MainWindow::handleExportTimeLine()
@@ -188,7 +166,7 @@ void MainWindow::handleExportTimeLine()
     if (!filename.contains('.')) {
         filename += ".png";
     }
-    ui->timeLine->exportToImage(filename);
+    mTimeLine->exportToImage(filename);
 }
 
 void MainWindow::handleFilter()
@@ -232,11 +210,11 @@ void MainWindow::handleFilterRequest(const QString& text)
 void MainWindow::handleNodeSelected(TimeNode *node)
 {
     auto lineNum = node->data();
-    ui->logEdit->scrollToLine(lineNum);
+    mLogEdit->scrollToLine(lineNum);
     if (mSubLog) {
         auto subLogLine = mSubLog->fromParentLine(lineNum);
         if (subLogLine > 0)
-            ui->subLogEdit->scrollToLine(subLogLine);
+            mSubLogEdit->scrollToLine(subLogLine);
     }
 }
 
@@ -281,22 +259,22 @@ void MainWindow::handleCloseFile()
     if (mSubLog) {
         delete mSubLog;
         mSubLog = nullptr;
-        ui->subLogEdit->clear();
-        ui->subLogEdit->setVisible(false);
+        mSubLogEdit->clear();
+        mSubLogEdit->setVisible(false);
     }
 
     mLog.close();
-    ui->logEdit->clear();
-    ui->timeLine->clear();
+    mLogEdit->clear();
+    mTimeLine->clear();
 
     noDocSetDisable();
 }
 
 void MainWindow::handleHistoryPosChanged()
 {
-    ui->navBackAction->setEnabled(mCurLogEdit->history()->availableBackwardCount() > 0);
+//    ui->navBackAction->setEnabled(mCurLogEdit->history()->availableBackwardCount() > 0);
     ui->actiongoBack->setEnabled(mCurLogEdit->history()->availableBackwardCount() > 0);
-    ui->navAheadAction->setEnabled(mCurLogEdit->history()->availableFowardCount() > 0);
+//    ui->navAheadAction->setEnabled(mCurLogEdit->history()->availableFowardCount() > 0);
     ui->actiongoFoward->setEnabled(mCurLogEdit->history()->availableFowardCount() > 0);
 }
 
@@ -326,9 +304,9 @@ void MainWindow::setEncoding(const QString& text)
     if (text != mLog.getCodec()->name()) {
         qDebug()<<"change to encoding:"<<text;
         mLog.setCodec(QTextCodec::codecForName(text.toStdString().c_str()));
-        ui->logEdit->refresh();
-        if (ui->subLogEdit->isVisible()) {
-            ui->subLogEdit->refresh();
+        mLogEdit->refresh();
+        if (mSubLogEdit->isVisible()) {
+            mSubLogEdit->refresh();
         }
     }
 }
@@ -338,47 +316,47 @@ void MainWindow::handleLogEditEmphasizeLine(int lineNum)
     if (mSubLog) {
         auto subLogLine = mSubLog->fromParentLine(lineNum);
         if (subLogLine > 0)
-            ui->subLogEdit->scrollToLine(subLogLine);
+            mSubLogEdit->scrollToLine(subLogLine);
     }
 
-    ui->timeLine->highlightNode(lineNum);
+    mTimeLine->highlightNode(lineNum);
 }
 
 void MainWindow::handleSubLogEditEmphasizeLine(int lineNum)
 {
     auto logLine = mSubLog->toParentLine(lineNum);
-    ui->logEdit->scrollToLine(logLine);
+    mLogEdit->scrollToLine(logLine);
 
-    ui->timeLine->highlightNode(logLine);
+    mTimeLine->highlightNode(logLine);
 }
 
 void MainWindow::handleSubLogMarkLine(int line, const QString &text)
 {
-    ui->timeLine->addNode(mSubLog->toParentLine(line), text);
+    mTimeLine->addNode(mSubLog->toParentLine(line), text);
 }
 
 void MainWindow::search(bool foward)
 {
-    auto keyword = ui->searchEdit->text();
-    if (keyword.isEmpty())
-        return;
+//    auto keyword = ui->searchEdit->text();
+//    if (keyword.isEmpty())
+//        return;
 
-    QTextDocument::FindFlags flag = QTextDocument::FindFlags();
-    if (!foward) {
-        flag.setFlag(QTextDocument::FindBackward);
-    }
+//    QTextDocument::FindFlags flag = QTextDocument::FindFlags();
+//    if (!foward) {
+//        flag.setFlag(QTextDocument::FindBackward);
+//    }
 
-    if (ui->caseSensitivityCheckBox->isChecked()) {
-        flag.setFlag(QTextDocument::FindCaseSensitively);
-    }
+//    if (ui->caseSensitivityCheckBox->isChecked()) {
+//        flag.setFlag(QTextDocument::FindCaseSensitively);
+//    }
 
-    if (!mCurLogEdit->search(keyword, flag)) {
-        if (flag.testFlag(QTextDocument::FindBackward)) {
-            Toast::instance().show(Toast::INFO, "到达顶部，没有找到匹配项");
-        } else {
-            Toast::instance().show(Toast::INFO, "到达底部，没有找到匹配项");
-        }
-    }
+//    if (!mCurLogEdit->search(keyword, flag)) {
+//        if (flag.testFlag(QTextDocument::FindBackward)) {
+//            Toast::instance().show(Toast::INFO, "到达顶部，没有找到匹配项");
+//        } else {
+//            Toast::instance().show(Toast::INFO, "到达底部，没有找到匹配项");
+//        }
+//    }
 }
 
 void MainWindow::doOpenFile(const QString &path)
@@ -397,20 +375,20 @@ void MainWindow::doOpenFile(const QString &path)
         return;
     }
 
-    ui->logEdit->setLog(&mLog);
+    mLogEdit->setLog(&mLog);
 
     if (mSubLog){
         delete mSubLog;
         mSubLog = nullptr;
     }
-    ui->subLogEdit->setLog(nullptr);
-    ui->subLogEdit->setVisible(false);
+    mSubLogEdit->setLog(nullptr);
+    mSubLogEdit->setVisible(false);
 
     hasDocSetEnbale();
 
     QSettings config;
     if (config.value("gotoEOF").toBool()) {
-        ui->logEdit->scrollToLine(mLog.lineCount());
+        mLogEdit->scrollToLine(mLog.lineCount());
         Toast::instance().show(Toast::INFO, "已定位到最后一行");
     }
 }
@@ -429,24 +407,130 @@ void MainWindow::filter(const QString &text, bool caseSenesitive)
         return;
 
     if (mSubLog->lineCount() > 0) {
-        ui->subLogEdit->setLog(mSubLog);
-        ui->subLogEdit->setVisible(true);
+        mSubLogEdit->setLog(mSubLog);
+        mSubLogEdit->setVisible(true);
         Toast::instance().show(Toast::INFO, QString("一共过滤到%1行").arg(mSubLog->lineCount()));
     } else {
         Toast::instance().show(Toast::INFO, "没有找到匹配项");
-        ui->subLogEdit->setLog(nullptr);
-        ui->subLogEdit->setVisible(false);
+        mSubLogEdit->setLog(nullptr);
+        mSubLogEdit->setVisible(false);
     }
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *ev)
 {
-    if ((ev->modifiers() & Qt::CTRL) && (ev->key() == Qt::Key_F)) {
-        if (ev->modifiers() & Qt::SHIFT)
-            ui->searchEdit->setSearchFoward(false);
-        else
-            ui->searchEdit->setSearchFoward(true);
-        ui->searchEdit->setFocus();
-        ui->searchEdit->selectAll();
+//    if ((ev->modifiers() & Qt::CTRL) && (ev->key() == Qt::Key_F)) {
+//        if (ev->modifiers() & Qt::SHIFT)
+//            ui->searchEdit->setSearchFoward(false);
+//        else
+//            ui->searchEdit->setSearchFoward(true);
+//        ui->searchEdit->setFocus();
+//        ui->searchEdit->selectAll();
+//    }
+}
+
+void MainWindow::createCenterWidget()
+{
+    auto* timeLineSplitter = new QSplitter(Qt::Horizontal);
+
+    //log edit
+    auto* logSplitter = new QSplitter(Qt::Vertical);
+
+    {
+        mLogEdit = new LogTextEdit();
+        auto logEditBar = new QScrollBar(Qt::Vertical);
+        mLogEdit->setScrollBar(logEditBar);
+
+        auto container = new QHBoxLayout();
+        container->addWidget(mLogEdit, 1);
+        container->addWidget(logEditBar);
+        container->setMargin(0);
+        container->setSpacing(0);
+
+        auto w = new QWidget();
+        w->setLayout(container);
+        logSplitter->addWidget(w);
     }
+
+    {
+        mSubLogEdit = new LogTextEdit();
+        auto logEditBar = new QScrollBar(Qt::Vertical);
+        mSubLogEdit->setScrollBar(logEditBar);
+
+        auto container = new QHBoxLayout();
+        container->addWidget(mSubLogEdit, 1);
+        container->addWidget(logEditBar);
+        mSubLogEdit->setVisible(false);
+        container->setMargin(0);
+        container->setSpacing(0);
+
+        auto w = new QWidget();
+        w->setLayout(container);
+        logSplitter->addWidget(w);
+    }
+
+    logSplitter->setStretchFactor(0, 8);
+    logSplitter->setStretchFactor(1, 2);
+
+    mCurLogEdit = mLogEdit;
+    mCurLogEdit->drawFocused();
+
+    //timeline
+    timeLineSplitter->addWidget(logSplitter);
+    mTimeLine = new TimeLine();
+    timeLineSplitter->addWidget(mTimeLine);
+
+    timeLineSplitter->setStretchFactor(0,12);
+    timeLineSplitter->setStretchFactor(0,5);
+
+    //关键词
+    auto centerLayout = new QVBoxLayout();
+    auto list = new QListWidget();
+    list->setMinimumHeight(20);
+    list->setMaximumHeight(20);
+    centerLayout->addWidget(list);
+    centerLayout->addWidget(timeLineSplitter);
+    centerLayout->setMargin(3);
+    centerLayout->setSpacing(0);
+    auto w = new QWidget();
+    w->setLayout(centerLayout);
+    setCentralWidget(w);
+
+    //toolbar
+    auto toolbar = new QToolBar("主工具栏");
+    toolbar->setMovable(false);
+    toolbar->setIconSize(QSize(16,16));
+    toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    {
+        auto action = new QAction(QIcon(":/res/img/open.png"), "");
+        action->setToolTip("打开文件");
+        connect(action, SIGNAL(triggered()), this, SLOT(handleOpenFile()));
+        toolbar->addAction(action);
+    }
+    {
+        auto action = new QAction(QIcon(":/res/img/filter.png"), "");
+        action->setToolTip("过滤关键字");
+        connect(action, SIGNAL(triggered()), this, SLOT(handleFilter()));
+        toolbar->addAction(action);
+    }
+    {
+        auto action = new QAction(QIcon(":/res/img/locate.png"), "");
+        action->setToolTip("调整到行");
+        connect(action, SIGNAL(triggered()), this, SLOT(handleGotoLine()));
+        toolbar->addAction(action);
+    }
+    toolbar->addSeparator();
+    {
+        auto action = new QAction(QIcon(":/res/img/clipboard.png"), "");
+        action->setToolTip("复制时间线到粘贴板");
+        connect(action, SIGNAL(triggered()), mTimeLine, SLOT(exportToClipboard()));
+        toolbar->addAction(action);
+    }
+    {
+        auto action = new QAction(QIcon(":/res/img/export.png"), "");
+        action->setToolTip("导出时间线到图片");
+        connect(action, SIGNAL(triggered()), this, SLOT(handleExportTimeLine()));
+        toolbar->addAction(action);
+    }
+    addToolBar(toolbar);
 }
