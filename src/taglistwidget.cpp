@@ -55,7 +55,7 @@ void TagListWidget::addTag(QString keyword, QColor color)
 {
     auto w = new QWidget;
     auto box = new QHBoxLayout();
-    box->setMargin(5);
+    box->setMargin(2);
 
     auto label = new QLabel(QString("%1").arg(keyword));
     label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);

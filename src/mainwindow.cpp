@@ -27,6 +27,7 @@
 #include <QCheckBox>
 #include <QListWidget>
 #include "searchedit.h"
+#include "taglistwidget.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -431,7 +432,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent *ev)
 
 void MainWindow::createCenterWidget()
 {
-    auto* timeLineSplitter = new QSplitter(Qt::Horizontal);
+
 
     //log edit
     auto* logSplitter = new QSplitter(Qt::Vertical);
@@ -476,6 +477,7 @@ void MainWindow::createCenterWidget()
     mCurLogEdit->drawFocused();
 
     //timeline
+    auto* timeLineSplitter = new QSplitter(Qt::Horizontal);
     timeLineSplitter->addWidget(logSplitter);
     mTimeLine = new TimeLine();
     timeLineSplitter->addWidget(mTimeLine);
@@ -483,22 +485,42 @@ void MainWindow::createCenterWidget()
     timeLineSplitter->setStretchFactor(0,12);
     timeLineSplitter->setStretchFactor(0,5);
 
-    //关键词
-    auto centerLayout = new QVBoxLayout();
-    auto list = new QListWidget();
-    list->setMinimumHeight(20);
-    list->setMaximumHeight(20);
-    centerLayout->addWidget(list);
-    centerLayout->addWidget(timeLineSplitter);
-    centerLayout->setMargin(3);
-    centerLayout->setSpacing(0);
-    auto w = new QWidget();
-    w->setLayout(centerLayout);
-    setCentralWidget(w);
+    //tag
+    auto rootLayout = new QVBoxLayout();
+    {
+        TagListWidget* tagList = new TagListWidget;
+        tagList->setMinimumHeight(26);
+        tagList->setMaximumHeight(26);
+        tagList->addTag("abc", Qt::red);
+        tagList->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+
+        auto tagWidget = new QWidget;
+        auto box = new QHBoxLayout();
+        auto edit = new SearchEdit();
+        edit->setMinimumHeight(26);
+        edit->setMinimumWidth(150);
+        edit->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
+        box->addWidget(edit);
+        box->addWidget(tagList);
+        box->setMargin(5);
+        box->setSpacing(10);
+        tagWidget->setLayout(box);
+        tagWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+        rootLayout->addWidget(tagWidget);
+    }
+
+    //set central widget
+    rootLayout->addWidget(timeLineSplitter);
+    {
+        rootLayout->setSpacing(0);
+        rootLayout->setMargin(0);
+        auto w = new QWidget;
+        w->setLayout(rootLayout);
+        setCentralWidget(w);
+    }
 
     //toolbar
     auto toolbar = new QToolBar("主工具栏");
-    toolbar->setMovable(false);
     toolbar->setIconSize(QSize(16,16));
     toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     {
@@ -515,10 +537,11 @@ void MainWindow::createCenterWidget()
     }
     {
         auto action = new QAction(QIcon(":/res/img/locate.png"), "");
-        action->setToolTip("调整到行");
+        action->setToolTip("跳转到行");
         connect(action, SIGNAL(triggered()), this, SLOT(handleGotoLine()));
         toolbar->addAction(action);
     }
+    //TODO 前进后退
     toolbar->addSeparator();
     {
         auto action = new QAction(QIcon(":/res/img/clipboard.png"), "");
