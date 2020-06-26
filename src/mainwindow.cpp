@@ -494,6 +494,9 @@ void MainWindow::createCenterWidget()
 
     mCurLogEdit = mLogEdit;
     mCurLogEdit->drawFocused();
+    mAddTagConnection = connect(mCurLogEdit->getHighlighter(), &Highlighter::onPatternAdded, [this](HighlightPattern p){
+        mTagList->addTag(p.key, p.color);
+    });
 
     //timeline
     auto* timeLineSplitter = new QSplitter(Qt::Horizontal);

@@ -44,6 +44,7 @@ void Highlighter::quickHighlight(const QString &text, QColor color) {
         if (mQuickHls[text].color != color) {
             mQuickHls[text].color = color;
             rehighlight();
+            return;
         }
     }
 
@@ -56,7 +57,7 @@ void Highlighter::quickHighlight(const QString &text, QColor color) {
 
     rehighlight();
 
-    onPatternAdded(pattern);
+    emit onPatternAdded(pattern);
 }
 
 void Highlighter::searchHighlight(const QString &text, bool caseSensitive)
@@ -83,5 +84,6 @@ void Highlighter::clearHighlight()
 void Highlighter::clearQuickHighlight(const QString& text)
 {
     mQuickHls.remove(text);
+    rehighlight();
 }
 
