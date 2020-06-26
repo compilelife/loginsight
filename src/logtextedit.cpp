@@ -312,7 +312,6 @@ bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options)
         cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor, text.length());
     }
     setTextCursor(cursor);
-//    cursor.select(QTextCursor::WordUnderCursor);
 
     mHighlighter->searchHighlight(text, options.testFlag(QTextDocument::FindCaseSensitively));
     repaint();
@@ -357,6 +356,9 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
         connect(action, SIGNAL(triggered()), this, SLOT(addWordHighlightUnderCursor()));
         action = menu->addAction(QString("过滤含\"%1\"的行").arg(cursorWord));
         connect(action, SIGNAL(triggered()), this, SLOT(handleFilterUnderCursor()));
+
+        action = menu->addAction("清除搜索高亮");
+        connect(action, SIGNAL(triggered()), mHighlighter, SLOT(clearSearchHighlight()));
     }
     else {
         menu->addAction("请选择文本来高亮、过滤和搜索")->setEnabled(false);
