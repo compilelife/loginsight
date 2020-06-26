@@ -2,7 +2,7 @@
 
 loginsight致力于打造一款日志分析的利器
 
-![preview](https://gitee.com/compilelife/loginsight/raw/master/doc/img/preview.png)
+![preview](https://s1.ax1x.com/2020/06/26/Ns3XGQ.png)
 
 亮点特性：
 
@@ -42,7 +42,7 @@ loginsight致力于打造一款日志分析的利器
 3. 点击右上方的"Star"，让更多人知道这个项目
 4. 扫码赞赏，给作者加油（赞赏时可以在备注提需求，所提需求将被优先实现）：
 
-![support](https://gitee.com/compilelife/loginsight/raw/master/doc/img/support.png)
+![support](https://s1.ax1x.com/2020/06/26/Ns3OPg.png)
 
 
 
