@@ -111,7 +111,12 @@ void MainWindow::bindMenuAction()
     connect(ui->actiongoBack, &QAction::triggered, this, &MainWindow::handleNavBackward);
     connect(ui->actiongoFoward, &QAction::triggered, this, &MainWindow::handleNavFoward);
     connect(ui->actiongotoLine, &QAction::triggered, this, &MainWindow::handleGotoLine);
-
+    connect(ui->actionhighlight, &QAction::triggered, [this]{
+        auto text = QInputDialog::getText(this, "高亮", "输入要高亮的单词(大小写敏感)");
+        if (text.length() > 0) {
+            mCurLogEdit->getHighlighter()->quickHighlight(text);
+        }
+    });
 
     //时间线
     connect(ui->actiontoClipboard, &QAction::triggered, mTimeLine, &TimeLine::exportToClipboard);
