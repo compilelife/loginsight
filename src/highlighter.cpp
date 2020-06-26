@@ -4,6 +4,8 @@ Highlighter::Highlighter(QTextDocument* doc): QSyntaxHighlighter(doc) {
 }
 
 void Highlighter::highlightBlock(const QString &text) {
+    bool searchHlApplied = false;
+
     //选词高亮
     for (auto p : mQuickHls) {
         int i = 0;
@@ -12,6 +14,11 @@ void Highlighter::highlightBlock(const QString &text) {
         fmt.setForeground(Qt::white);
         fmt.setBackground(p.color);
 
+        if (!searchHlApplied && p.key == mSearchHl.key) {
+            fmt.setFontUnderline(true);
+            searchHlApplied=true;
+        }
+
         while ((i = text.indexOf(p.key, i, p.caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive)) >= 0) {
             setFormat(i, len, fmt);
             i+=len;
@@ -19,7 +26,7 @@ void Highlighter::highlightBlock(const QString &text) {
     }
 
    //搜索高亮
-    if (mSearchHl.key.length() == 0)
+    if (mSearchHl.key.length() == 0 || searchHlApplied)
         return;
 
     auto len = mSearchHl.key.length();
