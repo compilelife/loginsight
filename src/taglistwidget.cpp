@@ -15,10 +15,6 @@ TagListWidget::TagListWidget()
     setStyleSheet("background-color: transparent");
 
     setContextMenuPolicy(Qt::DefaultContextMenu);
-
-    connect(this, &QListWidget::itemClicked, [this](QListWidgetItem* item){
-        emit onTagSelected(row(item));
-    });
 }
 
 void TagListWidget::setBgColor(QWidget *w, QColor color)
@@ -34,19 +30,29 @@ void TagListWidget::contextMenuEvent(QContextMenuEvent *event)
     if (!item)
         return;
 
-    auto index = row(item);
+    auto keyword = item->data(Qt::DisplayRole).toString();
+
     QMenu menu;
     connect(menu.addAction("删除"), &QAction::triggered, [&]{
-        takeItem(index);
-        emit onTagDeleted(index);
+        takeItem(row(item));
+        emit onTagDeleted(keyword);
     });
 
     auto chooseColorMenu = new ChooseColorMenu({{"红色",Qt::red},{"绿色",Qt::green},{"蓝色",Qt::blue}});
     connect(chooseColorMenu, &ChooseColorMenu::chooseColor, [&](QColor color){
         setBgColor(itemWidget(item), color);
-        emit onTagColorChanged(index, color);
+        emit onTagColorChanged(keyword, color);
     });
     menu.addMenu(chooseColorMenu);
+
+    connect(menu.addAction("在小窗过滤"), &QAction::triggered, [&]{
+        emit requestFilterTag(keyword);
+    });
+
+    connect(menu.addAction("搜索"), &QAction::triggered, [&]{
+        emit requestSearchTag(keyword);
+    });
+
 
     menu.exec(event->globalPos());
 }
@@ -68,6 +74,7 @@ void TagListWidget::addTag(QString keyword, QColor color)
 
     auto item = new QListWidgetItem();
     item->setSizeHint(size);
+    item->setData(Qt::DisplayRole, keyword);
     addItem(item);
     setItemWidget(item, w);
 }

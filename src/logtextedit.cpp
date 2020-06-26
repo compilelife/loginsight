@@ -251,10 +251,7 @@ void LogTextEdit::highlightCurrentLine()
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
-        QColor lineColor = QColor(Qt::blue);
-
-//        selection.format.setBackground(lineColor);
-        selection.format.setForeground(lineColor);
+        selection.format.setTextOutline(QPen(Qt::black));
         selection.format.setProperty(QTextFormat::FullWidthSelection, true);
         selection.cursor = textCursor();
         selection.cursor.clearSelection();
@@ -280,6 +277,15 @@ bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options)
     auto cursor = textCursor();
     auto line = fromViewPortToLog(cursor.blockNumber());
 
+    //清除选区以保证连续search的正确
+    if (cursor.hasSelection()) {
+        auto len = cursor.selectionEnd() - cursor.selectionStart();
+        if (options.testFlag(QTextDocument::FindBackward)) {
+            cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::MoveAnchor, len);
+        } else {
+            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, len);
+        }
+    }
 
     SearchResult target;
     bool canceled = BackgroundRunner::instance().exec(QString("查找%1").arg(text), [&](LongtimeOperation& op){
@@ -297,6 +303,16 @@ bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options)
     mHighlighter->clearSearchHighlight();
 
     scrollToLine(target.line, target.pos);//将target行滚动到窗口中间
+
+    //利用select选择search词
+    cursor = textCursor();
+    if (options.testFlag(QTextDocument::FindBackward)) {
+        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, text.length());
+    } else {
+        cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor, text.length());
+    }
+    setTextCursor(cursor);
+//    cursor.select(QTextCursor::WordUnderCursor);
 
     mHighlighter->searchHighlight(text, options.testFlag(QTextDocument::FindCaseSensitively));
     repaint();
@@ -346,23 +362,8 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
         menu->addAction("请选择文本来高亮、过滤和搜索")->setEnabled(false);
     }
 
-    if (mHighlighter->isQuickHighlightOn()||mHighlighter->isSearchHighlightOn()){
-        menu->addSeparator();
-        auto action = menu->addAction("清除所有高亮");
-        connect(action, SIGNAL(triggered()), mHighlighter, SLOT(clearHighlight()));
-    }
-
-    if (mHighlighter->isQuickHighlightOn()) {
-        auto action = menu->addAction(QString("清除\"%1\"的高亮").arg(mHighlighter->getQuickText()));
-        connect(action, SIGNAL(triggered()), mHighlighter, SLOT(clearQuickHighlight()));
-    }
-
-    if (mHighlighter->isSearchHighlightOn()) {
-        auto action = menu->addAction(QString("清除\"%1\"的高亮").arg(mHighlighter->getSearchText()));
-        connect(action, SIGNAL(triggered()), mHighlighter, SLOT(clearSearchHighlight()));
-    }
-
     if (cursorWord.length() > 0) {
+        menu->addSeparator();
         connect(menu->addAction("复制"), SIGNAL(triggered()), this, SLOT(copy()));
     }
 

@@ -112,6 +112,7 @@ void MainWindow::bindMenuAction()
     connect(ui->actiongoFoward, &QAction::triggered, this, &MainWindow::handleNavFoward);
     connect(ui->actiongotoLine, &QAction::triggered, this, &MainWindow::handleGotoLine);
 
+
     //时间线
     connect(ui->actiontoClipboard, &QAction::triggered, mTimeLine, &TimeLine::exportToClipboard);
     connect(ui->actionexport, &QAction::triggered, this, &MainWindow::handleExportTimeLine);
@@ -143,6 +144,8 @@ void MainWindow::noDocSetDisable()
     mSearchEdit->setEnabled(false);
     mGotoLineAction->setEnabled(false);
     mFilterAction->setEnabled(false);
+
+    mTagList->clear();
 }
 
 void MainWindow::hasDocSetEnbale()
@@ -159,6 +162,8 @@ void MainWindow::hasDocSetEnbale()
     mSearchEdit->setEnabled(true);
     mGotoLineAction->setEnabled(true);
     mFilterAction->setEnabled(true);
+
+    mTagList->clear();
 }
 
 void MainWindow::handleExportTimeLine()
@@ -297,6 +302,20 @@ void MainWindow::handleLogEditFocus(LogTextEdit *logEdit)
         mCurLogEdit = logEdit;
 
         handleHistoryPosChanged();
+
+        mTagList->clear();
+        auto highlighter = mCurLogEdit->getHighlighter();
+        for (auto& p : highlighter->allQuickHighlights()) {
+            mTagList->addTag(p.key, p.color);
+        }
+
+        if (mAddTagConnection) {
+            disconnect(mAddTagConnection);
+        }
+
+        mAddTagConnection = connect(highlighter, &Highlighter::onPatternAdded, [this](HighlightPattern p){
+            mTagList->addTag(p.key, p.color);
+        });
     }
 }
 
@@ -430,6 +449,8 @@ void MainWindow::keyReleaseEvent(QKeyEvent *ev)
     }
 }
 
+//TODO: 使用docker widget?
+//TODO：抽离出部分组件
 void MainWindow::createCenterWidget()
 {
     //log edit
@@ -499,12 +520,26 @@ void MainWindow::createCenterWidget()
         mCaseSensitiveCheckBox->setText("大小写敏感");
         box->addWidget(mCaseSensitiveCheckBox);
 
-        TagListWidget* tagList = new TagListWidget;
-        tagList->setMinimumHeight(26);
-        tagList->setMaximumHeight(26);
-        tagList->addTag("abc", Qt::red);
-        tagList->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-        box->addWidget(tagList);
+        mTagList = new TagListWidget;
+        mTagList->setMinimumHeight(26);
+        mTagList->setMaximumHeight(26);
+        mTagList->addTag("abc", Qt::red);
+        mTagList->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+        connect(mTagList, &TagListWidget::onTagDeleted, [this](const QString& keyword){
+            mCurLogEdit->getHighlighter()->clearQuickHighlight(keyword);
+        });
+        connect(mTagList, &TagListWidget::onTagColorChanged, [this](const QString& keyword, QColor color){
+            mCurLogEdit->getHighlighter()->quickHighlight(keyword, color);
+        });
+        connect(mTagList, &TagListWidget::requestSearchTag, [this](const QString& keyword){
+            mSearchEdit->setText(keyword);
+            mCaseSensitiveCheckBox->setChecked(true);
+            search(true);
+        });
+        connect(mTagList, &TagListWidget::requestFilterTag, [this](const QString& keyword){
+            filter(keyword, true);
+        });
+        box->addWidget(mTagList);
 
         box->setMargin(5);
         box->setSpacing(10);

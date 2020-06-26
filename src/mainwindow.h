@@ -10,11 +10,12 @@
 #include "timeline.h"
 #include "searchedit.h"
 #include <QCheckBox>
+#include "taglistwidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-//TODO: 文档打开、关闭时清空tag；窗口焦点改变时切换tag；taglist事件绑定
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -61,6 +62,7 @@ private:
     LogTextEdit* mCurLogEdit;
     ShortcutHelpDlg mShortcutHelpDlg;
     AboutDlg mAboutDlg;
+    QMetaObject::Connection mAddTagConnection;
 
 private:
     void createCenterWidget();
@@ -74,5 +76,6 @@ private:
     QAction* mNavAheadAction;
     QAction* mGotoLineAction;
     QAction* mFilterAction;
+    TagListWidget* mTagList;
 };
 #endif // MAINWINDOW_H

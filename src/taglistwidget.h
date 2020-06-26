@@ -12,9 +12,11 @@ public:
     TagListWidget();
 
 signals:
-    void onTagDeleted(int index);
-    void onTagSelected(int index);
-    void onTagColorChanged(int index, QColor color);
+    void onTagDeleted(const QString& keyword);
+    void requestSearchTag(const QString& keyword);
+    void onTagColorChanged(const QString& keyword, QColor color);
+    void requestFilterTag(const QString& keyword);
+
 private:
     void setBgColor(QWidget* w, QColor color);
 protected:

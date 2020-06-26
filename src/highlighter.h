@@ -18,24 +18,22 @@ protected:
     void highlightBlock(const QString &text) override;
 
 public:
-    void quickHighlight(const QString& text);
-    bool isQuickHighlightOn();
-
+    void quickHighlight(const QString& text, QColor color = Qt::blue);
     void searchHighlight(const QString& text, bool caseSensitive);
-    bool isSearchHighlightOn();
 
-    QString getQuickText();
-    QString getSearchText();
+    const QList<HighlightPattern> allQuickHighlights(){return mQuickHls.values();}
+
+signals:
+    void onPatternAdded(HighlightPattern pattern);
 
 public slots:
-    void clearQuickHighlight();
+    void clearQuickHighlight(const QString& text);
     void clearSearchHighlight();
     void clearHighlight();
 
 private:
-    HighlightPattern mQuickHl;
+    QMap<QString, HighlightPattern> mQuickHls;
     HighlightPattern mSearchHl;
-    QSet<HighlightPattern*> mPatterns;
 };
 
 #endif // HIGHLIGHTER_H

@@ -63,6 +63,8 @@ private:
 private slots:
     void highlightCurrentLine();
     void addWordHighlightUnderCursor();
+public:
+    Highlighter* getHighlighter(){return mHighlighter;}
 private:
     Highlighter* mHighlighter;
 //<===实现高亮===
