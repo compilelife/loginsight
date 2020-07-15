@@ -28,6 +28,7 @@
 #include <QListWidget>
 #include "searchedit.h"
 #include "taglistwidget.h"
+#include <QMimeData>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -78,6 +79,10 @@ void MainWindow::bindLogEditActions()
     connect(mSubLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleSubLogEditEmphasizeLine(int)));
     connect(mLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
     connect(mSubLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
+
+    connect(mLogEdit, &LogTextEdit::userDropFile, [this](const QString& path){
+        doOpenFile(path);
+    });
 }
 
 void MainWindow::bindMenuAction()
@@ -483,6 +488,7 @@ void MainWindow::createCenterWidget()
 
     {
         mSubLogEdit = new LogTextEdit();
+        mSubLogEdit->setAcceptDrops(false);
         auto logEditBar = new QScrollBar(Qt::Vertical);
         mSubLogEdit->setScrollBar(logEditBar);
 

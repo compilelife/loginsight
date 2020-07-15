@@ -26,6 +26,9 @@ public:
     void setScrollBar(QScrollBar* scrollbar);
 protected:
     void resizeEvent(QResizeEvent *e) override;
+    void dropEvent(QDropEvent *e) override;
+signals:
+    void userDropFile(const QString& path);
 private:
     void load(int topLine);
     int fromViewPortToLog(int index);

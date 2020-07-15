@@ -10,6 +10,9 @@
 #include "highlighter.h"
 #include "backgroundrunner.h"
 #include <QSettings>
+#include <QDropEvent>
+#include <QMimeData>
+
 
 using namespace std;
 
@@ -99,6 +102,15 @@ void LogTextEdit::resizeEvent(QResizeEvent *e)
 
     QRect cr = contentsRect();
     mLineNumArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+}
+
+void LogTextEdit::dropEvent(QDropEvent *e)
+{
+    if (!e->mimeData()->hasUrls()) {
+        return;
+    }
+
+    emit userDropFile(e->mimeData()->urls()[0].path());
 }
 
 void LogTextEdit::load(int topLine)
