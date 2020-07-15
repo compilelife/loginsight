@@ -279,6 +279,8 @@ void MainWindow::handleCloseFile()
     mTimeLine->clear();
 
     noDocSetDisable();
+
+    setWindowTitle("loginsight");
 }
 
 void MainWindow::handleHistoryPosChanged()
@@ -416,6 +418,8 @@ void MainWindow::doOpenFile(const QString &path)
         mLogEdit->scrollToLine(mLog.lineCount());
         Toast::instance().show(Toast::INFO, "已定位到最后一行");
     }
+
+    setWindowTitle("loginsight - " + path);
 }
 
 void MainWindow::filter(const QString &text, bool caseSenesitive)
