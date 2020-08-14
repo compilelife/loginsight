@@ -31,10 +31,10 @@ TimeNode::TimeNode(int lineNum, const QString &locateText, const QString &detail
 
     mWidth += (8 + TIME_NODE_BODY_WIDTH);
 
-    auto shadow = new QGraphicsDropShadowEffect(this);
-    shadow->setOffset(2,2);
-    shadow->setBlurRadius(10);
-    mBody->setGraphicsEffect(shadow);
+//    auto shadow = new QGraphicsDropShadowEffect(this);
+//    shadow->setOffset(2,2);
+//    shadow->setBlurRadius(10);
+//    mBody->setGraphicsEffect(shadow);
 
     mWidth += 2;
 }
@@ -73,7 +73,7 @@ void TimeNode::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     delete menu;
 }
 
-void TimeNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void TimeNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     emit selected(this);
     QGraphicsItem::mousePressEvent(event);

@@ -3,11 +3,9 @@
 
 #include <QGraphicsItem>
 
-#define TIME_NODE_HEIGHT 80
+#define TIME_NODE_HEIGHT 100
 #define TIME_NODE_DOT_R 4
 
-//TODO:就地编辑而非弹窗编辑备注
-//FIXME:双击的时候不要滚动到高亮行
 class TimeNodeBody;
 class TimeNode: public QGraphicsObject
 {
@@ -24,7 +22,7 @@ protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
-    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
 signals:
     void requestDel(TimeNode* node);

@@ -6,9 +6,61 @@
 #include <QInputDialog>
 #include <QStyleOptionGraphicsItem>
 #include <QDebug>
+#include <QGraphicsTextItem>
+#include <QGraphicsSimpleTextItem>
+#include <QGraphicsDropShadowEffect>
+#include <QTextDocument>
+
+#define MARGIN (2)
+#define COLOR_RECT_WIDTH (2)
+#define MEMO_HEIGHT (40)
+#define CONTENT_WIDTH (TIME_NODE_BODY_WIDTH-MARGIN*2-COLOR_RECT_WIDTH)
+//FIXME：没法直接用QGraphicsTextItem，因为高度不可控
+class TextItem: public QGraphicsItem
+{
+private:
+    QString mText;
+public:
+    TextItem(const QString& text, QGraphicsItem* parent):mText(text), QGraphicsItem(parent){}
+protected:
+    QRectF boundingRect() const override {
+        return QRectF(0,0, CONTENT_WIDTH, TIME_NODE_HEIGHT-MEMO_HEIGHT-2*MARGIN);
+    }
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override {
+            QTextOption op(Qt::AlignLeft);
+            op.setWrapMode(QTextOption::WrapAnywhere);
+            painter->setPen(QColor(100,100,100));
+            painter->drawText(boundingRect(), mText, op);
+    }
+};
 
 TimeNodeBody::TimeNodeBody(TimeNode* node, const QString &text)
-    :mText(text), mNode(node){
+    :mNode(node){
+    auto rect = new QGraphicsRectItem(0,0,TIME_NODE_BODY_WIDTH, TIME_NODE_HEIGHT, this);
+    rect->setBrush(Qt::white);
+    rect->setPen(Qt::NoPen);
+    auto shadow = new QGraphicsDropShadowEffect(this);
+    shadow->setOffset(2,2);
+    shadow->setBlurRadius(10);
+    rect->setGraphicsEffect(shadow);
+
+    mColorRect = new QGraphicsRectItem(0,0,COLOR_RECT_WIDTH,TIME_NODE_HEIGHT, this);
+    mColorRect->setBrush(mNode->color());
+    mColorRect->setPen(Qt::NoPen);
+
+    auto content = new TextItem(text, this);
+    content->setX(MARGIN+COLOR_RECT_WIDTH);
+    content->setY(MARGIN);
+
+    mMemo = new QGraphicsTextItem("备注: ", this);
+    mMemo->setTextInteractionFlags(Qt::TextEditorInteraction);
+    mMemo->setTextWidth(CONTENT_WIDTH);
+    mMemo->setX(MARGIN+COLOR_RECT_WIDTH);
+    mMemo->setDefaultTextColor(mNode->color());
+    QTextOption op;
+    op.setWrapMode(QTextOption::WrapAnywhere);
+    mMemo->document()->setDefaultTextOption(op);
+    mMemo->setY(MARGIN+TIME_NODE_HEIGHT-MEMO_HEIGHT);
 }
 
 QRectF TimeNodeBody::boundingRect() const {
@@ -16,40 +68,6 @@ QRectF TimeNodeBody::boundingRect() const {
 }
 
 void TimeNodeBody::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *) {
-    auto r = boundingRect();
-    painter->fillRect(r, Qt::white);
-
-    QRectF colorRect(r.x(), r.y(), 2, r.height());
-    painter->fillRect(colorRect, mNode->color());
-
-    const int margin = 4;
-    QRectF textRect(r.x() + margin + colorRect.width(),
-                    r.y() + margin,
-                    r.width() - 2 * margin - colorRect.width(),
-                    r.height() - 2* margin);
-
-    auto fontHeight = option->fontMetrics.height();
-    auto memoHeight = fontHeight * 1.2;
-    QRectF contentRect(textRect.x(), textRect.y(), textRect.width(), textRect.height() - memoHeight);
-    QRectF memoRect(textRect.x(), contentRect.bottom(), textRect.width(), memoHeight);
-
-    QTextOption op(Qt::AlignLeft);
-    op.setWrapMode(QTextOption::WrapAnywhere);
-    painter->setPen(QColor(100,100,100));
-    painter->drawText(contentRect, mText, op);
-
-    op.setWrapMode(QTextOption::NoWrap);
-    op.setAlignment(Qt::AlignVCenter);
-    painter->setPen(mNode->color());
-    painter->drawText(memoRect, "备注："+mMemo, op);
-}
-
-void TimeNodeBody::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-{
-    auto memo = QInputDialog::getText(nullptr, "设置备注", "请输入备注:", QLineEdit::Normal, mMemo);
-    if (!memo.isNull()) {
-        mMemo = memo;
-        update();
-    }
-    QGraphicsItem::mouseDoubleClickEvent(event);
+    mColorRect->setBrush(mNode->color());
+    mMemo->setDefaultTextColor(mNode->color());
 }

@@ -6,17 +6,19 @@
 #define TIME_NODE_BODY_WIDTH 250
 
 class TimeNode;
-class TimeNodeBody: public QGraphicsItem {
+class TimeNodeBody: public QGraphicsObject
+{
+    Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 private:
-    QString mText;
-    QString mMemo;
     TimeNode* mNode;
+    QGraphicsRectItem* mColorRect;
+    QGraphicsTextItem* mMemo;
 public:
     TimeNodeBody(TimeNode* node, const QString& text);
 protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
 #endif // TIMENODEBODY_H
