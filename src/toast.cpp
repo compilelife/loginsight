@@ -51,6 +51,7 @@ public:
         setPalette(p);
 
         mLabel->setText(text);
+        setWindowFlag(Qt::WindowStaysOnTopHint);
         QDialog::show();
     }
 };
