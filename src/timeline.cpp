@@ -20,7 +20,7 @@ TimeLine::TimeLine(QWidget* parent)
     scene->setSceneRect(0,0,mWidth,mHeight);
     setScene(scene);
 
-    mLineX = LINE_X;
+    mLineX = LINE_X+MARGIN_LEFT;
     mLineY = 8;
     const double d = 4;
     mLineHead = scene->addEllipse({(double)mLineX-d/2, 4, d, d}, Qt::NoPen, QColor(180,180,180));
@@ -85,7 +85,7 @@ void TimeLine::addNode(int lineNum, const QString &text) {
 
     fitLine();
 
-    node->setX(0);
+    node->setX(MARGIN_LEFT);
     node->setY(calNodeY(pos));
 
     scene()->addItem(node);

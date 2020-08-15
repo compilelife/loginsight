@@ -8,6 +8,7 @@
 #include <QTimeLine>
 
 #define LINE_X 70
+#define MARGIN_LEFT 10
 
 class TimeLine: public QGraphicsView
 {

@@ -3,7 +3,7 @@
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsScene>
-#include <QGraphicsDropShadowEffect>
+#include <QGraphicsBlurEffect>
 #include <QDebug>
 #include <QMenu>
 #include <QGraphicsSceneContextMenuEvent>
@@ -33,9 +33,14 @@ TimeNode::TimeNode(int lineNum, const QString &locateText, const QString &detail
 
     mWidth += 2;
 
-    mHlRect = new QGraphicsRectItem(0,0,mWidth, TIME_NODE_HEIGHT, this);
-    mHlRect->setPen(QPen(Qt::red));
+    mHlRect = new QGraphicsRectItem(-6,-6,mWidth+12, TIME_NODE_HEIGHT+12, this);
+    QPen pen(Qt::red);
+    pen.setWidth(2);
+    mHlRect->setPen(pen);
     mHlRect->setVisible(false);
+    auto blur = new QGraphicsBlurEffect(this);
+    blur->setBlurRadius(4);
+    mHlRect->setGraphicsEffect(blur);
 }
 
 QRectF TimeNode::boundingRect() const
@@ -49,6 +54,7 @@ void TimeNode::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
 
 void TimeNode::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
+    setSelected(true);
     auto menu = new QMenu();
 
     auto action = menu->addAction("删除");
