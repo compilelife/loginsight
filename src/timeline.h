@@ -46,7 +46,7 @@ private:
     int mWidth;
     int mHeight;
     int mNodeTop;
-    int mNodeStep{120};
+    int mNodeStep{TIME_NODE_HEIGHT+20};
     int mLineX;
     int mLineY;
     QList<TimeNode*> mNodes;

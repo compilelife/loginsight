@@ -3,7 +3,7 @@
 
 #include <QGraphicsItem>
 
-#define TIME_NODE_HEIGHT 100
+#define TIME_NODE_HEIGHT 110
 #define TIME_NODE_DOT_R 4
 
 class TimeNodeBody;
