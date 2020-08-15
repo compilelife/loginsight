@@ -15,7 +15,7 @@
 
 TimeNode::TimeNode(int lineNum, const QString &locateText, const QString &detailText)
     :mLineNum(lineNum) {
-//    setFlag(GraphicsItemFlag::ItemIsSelectable);
+    setFlag(GraphicsItemFlag::ItemIsSelectable);
 
     auto head = new TimeNodeHead(this, locateText);
     head->setX(0);
@@ -31,12 +31,11 @@ TimeNode::TimeNode(int lineNum, const QString &locateText, const QString &detail
 
     mWidth += (8 + TIME_NODE_BODY_WIDTH);
 
-//    auto shadow = new QGraphicsDropShadowEffect(this);
-//    shadow->setOffset(2,2);
-//    shadow->setBlurRadius(10);
-//    mBody->setGraphicsEffect(shadow);
-
     mWidth += 2;
+
+    mHlRect = new QGraphicsRectItem(0,0,mWidth, TIME_NODE_HEIGHT, this);
+    mHlRect->setPen(QPen(Qt::red));
+    mHlRect->setVisible(false);
 }
 
 QRectF TimeNode::boundingRect() const
@@ -77,6 +76,15 @@ void TimeNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     emit selected(this);
     QGraphicsItem::mousePressEvent(event);
+}
+
+QVariant TimeNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemSelectedHasChanged) {
+        auto selected = value.toBool();
+        mHlRect->setVisible(selected);
+    }
+    return value;
 }
 
 void TimeNode::handleDelActionTriggered()

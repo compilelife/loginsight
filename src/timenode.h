@@ -23,6 +23,7 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
 signals:
     void requestDel(TimeNode* node);
@@ -32,6 +33,7 @@ private slots:
     void setColor(QColor color);
 
 private:
+    QGraphicsRectItem* mHlRect;
     double mWidth;
     int mLineNum;
     QColor mColor{Qt::blue};

@@ -219,4 +219,7 @@ void TimeLine::highlightItem(QGraphicsObject *item)
     anim->setKeyValueAt(0.5, 1.2);
     anim->setKeyValueAt(1, 1.0);
     anim->start(QAbstractAnimation::DeleteWhenStopped);
+
+    scene()->clearSelection();
+    item->setSelected(true);
 }
