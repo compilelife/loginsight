@@ -6,7 +6,6 @@
 #include "timenode.h"
 #include "logtextedit.h"
 #include "shortcuthelpdlg.h"
-#include "aboutdlg.h"
 #include "timeline.h"
 #include "searchedit.h"
 #include <QCheckBox>
@@ -62,7 +61,6 @@ private:
     QDockWidget* mSubLogDWidget;
     LogTextEdit* mCurLogEdit;
     ShortcutHelpDlg mShortcutHelpDlg;
-    AboutDlg mAboutDlg;
     QMetaObject::Connection mAddTagConnection;
 
 private:

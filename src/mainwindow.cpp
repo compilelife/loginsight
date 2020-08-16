@@ -30,6 +30,9 @@
 #include "taglistwidget.h"
 #include <QMimeData>
 #include <QDockWidget>
+#include "updater.h"
+#include "aboutdlg.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -38,6 +41,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("loginsight");
     setContextMenuPolicy(Qt::NoContextMenu);
+
+    connect(&Updater::instance(), &Updater::newVersionFound, [](const QString& v){
+        QMessageBox mbox;
+        mbox.setTextFormat(Qt::RichText);
+        mbox.setWindowTitle("软件更新");
+        mbox.setText("<p>找到新版本: "+v+"</p><a href='https://github.com/compilelife/loginsight/releases/latest'>前往下载</a>");
+        mbox.exec();
+    });
+    Updater::instance().checkNewVersion();
 
     createCenterWidget();
     createSubLogDockWidget();
@@ -140,8 +152,9 @@ void MainWindow::bindMenuAction()
     connect(ui->actiondoc, &QAction::triggered, []{
         QDesktopServices::openUrl(QUrl("https://github.com/compilelife/loginsight/wiki"));
     });
-    connect(ui->actionabout, &QAction::triggered, [this]{
-        mAboutDlg.exec();
+    connect(ui->actionabout, &QAction::triggered, []{
+        AboutDlg dlg;
+        dlg.exec();
     });
 }
 

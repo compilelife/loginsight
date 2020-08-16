@@ -22,7 +22,7 @@ class TextItem: public QGraphicsItem
 private:
     QString mText;
 public:
-    TextItem(const QString& text, QGraphicsItem* parent):mText(text), QGraphicsItem(parent){}
+    TextItem(const QString& text, QGraphicsItem* parent):QGraphicsItem(parent),mText(text){}
 protected:
     QRectF boundingRect() const override {
         return QRectF(0,0, CONTENT_WIDTH, CONTENT_HEIGHT);

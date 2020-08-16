@@ -1,10 +1,8 @@
 #include "aboutdlg.h"
 #include "ui_aboutdlg.h"
-
+#include "updater.h"
+#include <QMessageBox>
 #include <QDebug>
-#include <QNetworkRequest>
-
-#define VERSION "v0.7"
 
 AboutDlg::AboutDlg(QWidget *parent) :
     QDialog(parent),
@@ -12,47 +10,26 @@ AboutDlg::AboutDlg(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowTitle("关于");
-    ui->versionLabel->setText(QString("当前版本: %1").arg(VERSION));
 
-    connect(ui->updateButton, &QAbstractButton::clicked, this, &AboutDlg::checkUpdate);
-    connect(&mNetwork, &QNetworkAccessManager::finished, this, &AboutDlg::httpReplied);
+#define HINT_TPL ("发现新版本：%1, 下载地址: https://github.com/compilelife/loginsight/releases/latest")
+
+    auto& updater = Updater::instance();
+    if (updater.latestVersion().isEmpty())
+        ui->versionLabel->setText(updater.currentVersion());
+    else
+        ui->versionLabel->setText(QString(HINT_TPL).arg(updater.latestVersion()));
+
+    connect(&updater, &Updater::noNewVersion, [this]{
+        QMessageBox::warning(this, "", "当前版本已经是最新版本");
+    });
+    //connect newVersionFound：找到新版本会触发MainWindow的对应slot，这里不必再写
+
+    connect(ui->updateButton, &QPushButton::clicked, [&updater]{
+        updater.checkNewVersion();
+    });
 }
 
 AboutDlg::~AboutDlg()
 {
-    delete ui;
-}
 
-void AboutDlg::checkUpdate()
-{
-    QNetworkRequest req(QUrl("https://github.com/compilelife/loginsight/releases/latest"));
-    req.setAttribute(QNetworkRequest::FollowRedirectsAttribute,false);
-    req.setAttribute(QNetworkRequest::BackgroundRequestAttribute, true);
-
-    mNetwork.get(req);
-}
-
-void AboutDlg::httpReplied(QNetworkReply *reply)
-{
-    if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 302) {
-        QString body(reply->readAll());
-        auto begin = body.indexOf("tag/");
-        if (begin < 0) {
-            qDebug()<<"tag/ not found";
-            return;
-        }
-        auto end = body.indexOf("\">", begin);
-        if (end < 0) {
-            qDebug()<<"\"> not found";
-            return;
-        }
-        begin+=4;
-        auto version = body.mid(begin, end - begin);
-        if (version == VERSION)
-            ui->versionLabel->setText("当前已经是最新版本");
-        else
-            ui->versionLabel->setText("发现新版本："+version+", 下载地址: https://github.com/compilelife/loginsight/releases/latest");
-    }
-
-    reply->deleteLater();
 }
