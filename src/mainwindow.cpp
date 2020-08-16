@@ -29,6 +29,7 @@
 #include "searchedit.h"
 #include "taglistwidget.h"
 #include <QMimeData>
+#include <QDockWidget>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -39,6 +40,10 @@ MainWindow::MainWindow(QWidget *parent)
     setContextMenuPolicy(Qt::NoContextMenu);
 
     createCenterWidget();
+    createSubLogDockWidget();
+    createTimelineDockWidget();
+    createToolbar();
+    createTagbar();
     bindActions();
 
     showMaximized();
@@ -276,7 +281,7 @@ void MainWindow::handleCloseFile()
         delete mSubLog;
         mSubLog = nullptr;
         mSubLogEdit->clear();
-        mSubLogEdit->setVisible(false);
+        mSubLogDWidget->setVisible(false);
     }
 
     mLog.close();
@@ -414,7 +419,7 @@ void MainWindow::doOpenFile(const QString &path)
         mSubLog = nullptr;
     }
     mSubLogEdit->setLog(nullptr);
-    mSubLogEdit->setVisible(false);
+    mSubLogDWidget->setVisible(false);
 
     hasDocSetEnbale();
 
@@ -442,12 +447,12 @@ void MainWindow::filter(const QString &text, bool caseSenesitive)
 
     if (mSubLog->lineCount() > 0) {
         mSubLogEdit->setLog(mSubLog);
-        mSubLogEdit->setVisible(true);
+        mSubLogDWidget->setVisible(true);
         Toast::instance().show(Toast::INFO, QString("一共过滤到%1行").arg(mSubLog->lineCount()));
     } else {
         Toast::instance().show(Toast::INFO, "没有找到匹配项");
         mSubLogEdit->setLog(nullptr);
-        mSubLogEdit->setVisible(false);
+        mSubLogDWidget->setVisible(false);
     }
 }
 
@@ -463,122 +468,55 @@ void MainWindow::keyReleaseEvent(QKeyEvent *ev)
     }
 }
 
-//TODO: 使用docker widget?
-//TODO：抽离出部分组件
-void MainWindow::createCenterWidget()
+void MainWindow::createSubLogDockWidget()
 {
-    //log edit
-    auto* logSplitter = new QSplitter(Qt::Vertical);
+    mSubLogEdit = new LogTextEdit();
+    mSubLogEdit->setAcceptDrops(false);
+    auto logEditBar = new QScrollBar(Qt::Vertical);
+    mSubLogEdit->setScrollBar(logEditBar);
 
-    {
-        mLogEdit = new LogTextEdit();
-        auto logEditBar = new QScrollBar(Qt::Vertical);
-        mLogEdit->setScrollBar(logEditBar);
+    auto container = new QHBoxLayout();
+    container->addWidget(mSubLogEdit, 1);
+    container->addWidget(logEditBar);
+    container->setMargin(0);
+    container->setSpacing(0);
 
-        auto container = new QHBoxLayout();
-        container->addWidget(mLogEdit, 1);
-        container->addWidget(logEditBar);
-        container->setMargin(0);
-        container->setSpacing(0);
+    auto dw = new QDockWidget("过滤窗口");
+    dw->setFeatures(QDockWidget::DockWidgetClosable);
+    auto w = new QWidget();
+    w->setLayout(container);
+    dw->setWidget(w);
+    addDockWidget(Qt::BottomDockWidgetArea, dw);
+    ui->menuDWidget->addAction(dw->toggleViewAction());
 
-        auto w = new QWidget();
-        w->setLayout(container);
-        logSplitter->addWidget(w);
-    }
+    dw->setVisible(false);
+    mSubLogDWidget=dw;
 
-    {
-        mSubLogEdit = new LogTextEdit();
-        mSubLogEdit->setAcceptDrops(false);
-        auto logEditBar = new QScrollBar(Qt::Vertical);
-        mSubLogEdit->setScrollBar(logEditBar);
-
-        auto container = new QHBoxLayout();
-        container->addWidget(mSubLogEdit, 1);
-        container->addWidget(logEditBar);
-        mSubLogEdit->setVisible(false);
-        container->setMargin(0);
-        container->setSpacing(0);
-
-        auto w = new QWidget();
-        w->setLayout(container);
-        logSplitter->addWidget(w);
-    }
-
-    logSplitter->setStretchFactor(0, 8);
-    logSplitter->setStretchFactor(1, 2);
-
-    mCurLogEdit = mLogEdit;
-    mCurLogEdit->drawFocused();
-    mAddTagConnection = connect(mCurLogEdit->getHighlighter(), &Highlighter::onPatternAdded, [this](HighlightPattern p){
-        mTagList->addTag(p.key, p.color);
+    connect(dw, &QDockWidget::visibilityChanged, [this](bool visible){
+        if (!visible) {
+            this->mLogEdit->setFocus();
+        }
     });
+}
 
-    //timeline
-    auto* timeLineSplitter = new QSplitter(Qt::Horizontal);
-    timeLineSplitter->addWidget(logSplitter);
+void MainWindow::createTimelineDockWidget()
+{
     mTimeLine = new TimeLine();
-    timeLineSplitter->addWidget(mTimeLine);
+    auto dw = new QDockWidget("时间线");
+    dw->setWidget(mTimeLine);
+    dw->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
+    dw->setFeatures(QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable);
+    addDockWidget(Qt::RightDockWidgetArea, dw);
+    setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+    setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+    ui->menuDWidget->addAction(dw->toggleViewAction());
+}
 
-    timeLineSplitter->setStretchFactor(0,12);
-    timeLineSplitter->setStretchFactor(0,5);
-
-    //tag
-    auto rootLayout = new QVBoxLayout();
-    {
-        auto tagWidget = new QWidget;
-        auto box = new QHBoxLayout();
-
-        mSearchEdit = new SearchEdit();
-        mSearchEdit->setMinimumHeight(26);
-        mSearchEdit->setMinimumWidth(150);
-        mSearchEdit->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
-        box->addWidget(mSearchEdit);
-
-        mCaseSensitiveCheckBox = new QCheckBox();
-        mCaseSensitiveCheckBox->setText("大小写敏感");
-        box->addWidget(mCaseSensitiveCheckBox);
-
-        mTagList = new TagListWidget;
-        mTagList->setMinimumHeight(26);
-        mTagList->setMaximumHeight(26);
-        mTagList->addTag("abc", Qt::red);
-        mTagList->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-        connect(mTagList, &TagListWidget::onTagDeleted, [this](const QString& keyword){
-            mCurLogEdit->getHighlighter()->clearQuickHighlight(keyword);
-        });
-        connect(mTagList, &TagListWidget::onTagColorChanged, [this](const QString& keyword, QColor color){
-            mCurLogEdit->getHighlighter()->quickHighlight(keyword, color);
-        });
-        connect(mTagList, &TagListWidget::requestSearchTag, [this](const QString& keyword){
-            mSearchEdit->setText(keyword);
-            mCaseSensitiveCheckBox->setChecked(true);
-            search(true);
-        });
-        connect(mTagList, &TagListWidget::requestFilterTag, [this](const QString& keyword){
-            filter(keyword, true);
-        });
-        box->addWidget(mTagList);
-
-        box->setMargin(5);
-        box->setSpacing(10);
-        tagWidget->setLayout(box);
-        tagWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-        rootLayout->addWidget(tagWidget);
-    }
-
-    //set central widget
-    rootLayout->addWidget(timeLineSplitter);
-    {
-        rootLayout->setSpacing(0);
-        rootLayout->setMargin(0);
-        auto w = new QWidget;
-        w->setLayout(rootLayout);
-        setCentralWidget(w);
-    }
-
-    //toolbar
+void MainWindow::createToolbar()
+{
     auto toolbar = new QToolBar("主工具栏");
     toolbar->setIconSize(QSize(16,16));
+    toolbar->setFloatable(false);
     toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     {
         auto action = new QAction(QIcon(":/res/img/open.png"), "");
@@ -628,4 +566,76 @@ void MainWindow::createCenterWidget()
         toolbar->addAction(action);
     }
     addToolBar(toolbar);
+}
+
+void MainWindow::createTagbar()
+{
+    auto tagWidget = new QWidget;
+    auto box = new QHBoxLayout();
+
+    mSearchEdit = new SearchEdit();
+    mSearchEdit->setMinimumHeight(26);
+    mSearchEdit->setMinimumWidth(150);
+    mSearchEdit->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
+    box->addWidget(mSearchEdit);
+
+    mCaseSensitiveCheckBox = new QCheckBox();
+    mCaseSensitiveCheckBox->setText("大小写敏感");
+    box->addWidget(mCaseSensitiveCheckBox);
+
+    mTagList = new TagListWidget;
+    mTagList->setMinimumHeight(26);
+    mTagList->setMaximumHeight(26);
+    mTagList->addTag("abc", Qt::red);
+    mTagList->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+    connect(mTagList, &TagListWidget::onTagDeleted, [this](const QString& keyword){
+        mCurLogEdit->getHighlighter()->clearQuickHighlight(keyword);
+    });
+    connect(mTagList, &TagListWidget::onTagColorChanged, [this](const QString& keyword, QColor color){
+        mCurLogEdit->getHighlighter()->quickHighlight(keyword, color);
+    });
+    connect(mTagList, &TagListWidget::requestSearchTag, [this](const QString& keyword){
+        mSearchEdit->setText(keyword);
+        mCaseSensitiveCheckBox->setChecked(true);
+        search(true);
+    });
+    connect(mTagList, &TagListWidget::requestFilterTag, [this](const QString& keyword){
+        filter(keyword, true);
+    });
+    box->addWidget(mTagList);
+
+    box->setMargin(5);
+    box->setSpacing(10);
+    tagWidget->setLayout(box);
+    tagWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+
+    auto toolbar = new QToolBar("tag工具栏");
+    toolbar->setAllowedAreas(Qt::TopToolBarArea|Qt::BottomToolBarArea);
+    toolbar->setFloatable(false);
+    toolbar->addWidget(tagWidget);
+    addToolBar(toolbar);
+}
+
+void MainWindow::createCenterWidget()
+{
+    mLogEdit = new LogTextEdit();
+    auto logEditBar = new QScrollBar(Qt::Vertical);
+    mLogEdit->setScrollBar(logEditBar);
+
+    auto container = new QHBoxLayout();
+    container->addWidget(mLogEdit, 1);
+    container->addWidget(logEditBar);
+    container->setMargin(0);
+    container->setSpacing(0);
+
+    auto w = new QWidget();
+    w->setLayout(container);
+
+    mCurLogEdit = mLogEdit;
+    mCurLogEdit->drawFocused();
+    mAddTagConnection = connect(mCurLogEdit->getHighlighter(), &Highlighter::onPatternAdded, [this](HighlightPattern p){
+        mTagList->addTag(p.key, p.color);
+    });
+
+    setCentralWidget(mLogEdit);
 }

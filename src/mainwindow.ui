@@ -90,9 +90,15 @@
     <addaction name="actiondoc"/>
     <addaction name="actionabout"/>
    </widget>
+   <widget class="QMenu" name="menuDWidget">
+    <property name="title">
+     <string>小窗</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuInsight"/>
    <addaction name="menuTimeline"/>
+   <addaction name="menuDWidget"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionopen">
@@ -231,6 +237,16 @@
   <action name="actionhighlight">
    <property name="text">
     <string>高亮...(&amp;H)</string>
+   </property>
+  </action>
+  <action name="actiontimelineDWidget">
+   <property name="text">
+    <string>时间线小窗</string>
+   </property>
+  </action>
+  <action name="actionfilterDWidget">
+   <property name="text">
+    <string>过滤小窗</string>
    </property>
   </action>
  </widget>

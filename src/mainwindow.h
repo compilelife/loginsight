@@ -59,12 +59,17 @@ private:
     Ui::MainWindow *ui;
     FileLog mLog;
     SubLog* mSubLog{nullptr};
+    QDockWidget* mSubLogDWidget;
     LogTextEdit* mCurLogEdit;
     ShortcutHelpDlg mShortcutHelpDlg;
     AboutDlg mAboutDlg;
     QMetaObject::Connection mAddTagConnection;
 
 private:
+    void createSubLogDockWidget();
+    void createTimelineDockWidget();
+    void createToolbar();
+    void createTagbar();
     void createCenterWidget();
 private:
     LogTextEdit* mLogEdit;
