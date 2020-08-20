@@ -349,7 +349,6 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
     auto cursor = textCursor();
     mMenuCursor = cursorForPosition(e->pos());
     mMenuCursor.select(QTextCursor::WordUnderCursor);
-//    auto cursorWord1 = mMenuCursor.selectedText();//TODO: 可以在设置页面切换是光标下单词还是复制的单词
 
     {
         auto action = menu->addAction("添加到时间线");

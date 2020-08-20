@@ -610,7 +610,7 @@ void MainWindow::createTagbar()
     connect(mTagList, &TagListWidget::requestSearchTag, [this](const QString& keyword){
         mSearchEdit->setText(keyword);
         mCaseSensitiveCheckBox->setChecked(true);
-        search(true);
+        search(mSearchEdit->isSearchFoward());
     });
     connect(mTagList, &TagListWidget::requestFilterTag, [this](const QString& keyword){
         filter(keyword, true);
