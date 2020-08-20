@@ -650,5 +650,5 @@ void MainWindow::createCenterWidget()
         mTagList->addTag(p.key, p.color);
     });
 
-    setCentralWidget(mLogEdit);
+    setCentralWidget(w);
 }
