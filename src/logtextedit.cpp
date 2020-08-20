@@ -367,6 +367,10 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
         connect(action, SIGNAL(triggered()), this, SLOT(addWordHighlightUnderCursor()));
         action = menu->addAction(QString("过滤含\"%1\"的行").arg(cursorWord));
         connect(action, SIGNAL(triggered()), this, SLOT(handleFilterUnderCursor()));
+        action = menu->addAction(QString("搜索\"%1\"").arg(cursorWord));
+        connect(action, &QAction::triggered, [this, &cursorWord]{
+            emit delegateSearch(cursorWord);
+        });
 
         action = menu->addAction("清除搜索高亮");
         connect(action, SIGNAL(triggered()), mHighlighter, SLOT(clearSearchHighlight()));
