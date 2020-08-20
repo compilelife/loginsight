@@ -346,9 +346,17 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
 {
     QMenu* menu = new QMenu();
 
-    auto cursor = textCursor();
     mMenuCursor = cursorForPosition(e->pos());
-    mMenuCursor.select(QTextCursor::WordUnderCursor);
+
+    QString cursorWord;
+    if (mAltHold) {
+        mAltHold = false;
+        mMenuCursor.select(QTextCursor::WordUnderCursor);
+        setTextCursor(mMenuCursor);
+        cursorWord = mMenuCursor.selectedText();
+    } else {
+        cursorWord = textCursor().selectedText();
+    }
 
     {
         auto action = menu->addAction("添加到时间线");
@@ -356,7 +364,8 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
     }
 
     menu->addSeparator();
-    auto cursorWord = cursor.selectedText();
+
+    auto originWord = cursorWord;
 
     if (cursorWord.length() > 20) {
         cursorWord = cursorWord.mid(0, 20) + "...";
@@ -368,8 +377,8 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
         action = menu->addAction(QString("过滤含\"%1\"的行").arg(cursorWord));
         connect(action, SIGNAL(triggered()), this, SLOT(handleFilterUnderCursor()));
         action = menu->addAction(QString("搜索\"%1\"").arg(cursorWord));
-        connect(action, &QAction::triggered, [this, &cursorWord]{
-            emit delegateSearch(cursorWord);
+        connect(action, &QAction::triggered, [this, &originWord]{
+            emit delegateSearch(originWord);
         });
 
         action = menu->addAction("清除搜索高亮");
@@ -394,8 +403,15 @@ void LogTextEdit::mouseDoubleClickEvent(QMouseEvent *e)
     emit emphasizeLine(fromViewPortToLog(cursor.blockNumber()));
 }
 
+void LogTextEdit::keyPressEvent(QKeyEvent *e)
+{
+    mAltHold = e->modifiers().testFlag(Qt::AltModifier);
+}
+
 void LogTextEdit::keyReleaseEvent(QKeyEvent *e)
 {
+    mAltHold = e->modifiers().testFlag(Qt::AltModifier);
+
     if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
         emit returnPressed();
     } else if (e->key() == Qt::Key_PageDown || e->key() == Qt::Key_PageUp) {
