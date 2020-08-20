@@ -96,6 +96,12 @@ void MainWindow::bindLogEditActions()
     connect(mSubLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleSubLogEditEmphasizeLine(int)));
     connect(mLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
     connect(mSubLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
+    auto searchUsingCurDirection = [this](const QString& text){
+        mSearchEdit->setText(text);
+        search(mSearchEdit->isSearchFoward());
+    };
+    connect(mLogEdit, &LogTextEdit::delegateSearch, searchUsingCurDirection);
+    connect(mSubLogEdit, &LogTextEdit::delegateSearch, searchUsingCurDirection);
 
     connect(mLogEdit, &LogTextEdit::userDropFile, [this](const QString& path){
         doOpenFile(path);
