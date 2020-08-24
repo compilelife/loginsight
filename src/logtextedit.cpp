@@ -77,9 +77,11 @@ void LogTextEdit::setLog(Log *log)
     if (log == nullptr) {
         mFromLine = mToLine = 0;
         clear();
+        mExternalBar->setEnabled(false);
         return;
     }
 
+    mExternalBar->setEnabled(true);
     load(1);
 
     mExternalBar->setRange(1, mLog->lineCount() - mViewPortLineCnt);
@@ -90,6 +92,7 @@ void LogTextEdit::setLog(Log *log)
 void LogTextEdit::setScrollBar(QScrollBar *scrollbar)
 {
     mExternalBar = scrollbar;
+    mExternalBar->setEnabled(false);
     connect(mExternalBar, SIGNAL(valueChanged(int)), this, SLOT(handleExternalScroll(int)));
 }
 
@@ -139,6 +142,9 @@ void LogTextEdit::load(int topLine)
 void LogTextEdit::handleInternalScroll(int)
 {
     if (mLoading)
+        return;
+
+    if (!mLog)
         return;
 
     mScrolling = true;

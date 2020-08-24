@@ -16,6 +16,7 @@ extern "C" const char *strcasestr(const char *haystack, const char *needle);
 #include <regex>
 #include <QTextCodec>
 #include <future>
+#include "toast.h"
 
 using namespace std;
 
@@ -120,6 +121,14 @@ bool FileLog::open(const QString &path, LongtimeOperation& op) {
     }
 
     mSize = mFile->size();
+    if (mSize <= 0) {
+        qDebug()<<"file is empty";
+        mFile->close();
+        delete mFile;
+        mFile = nullptr;
+        return false;
+    }
+
     auto mem = mFile->map(0, mSize, QFileDevice::MapPrivateOption);
     //由于map出的内存是不带\0的，所以可能会导致越界访问
     //一个临时的修复方法是把最后一个字节改为\0

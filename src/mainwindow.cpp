@@ -299,11 +299,13 @@ void MainWindow::handleCloseFile()
     if (mSubLog) {
         delete mSubLog;
         mSubLog = nullptr;
+        mSubLogEdit->setLog(nullptr);
         mSubLogEdit->clear();
         mSubLogDWidget->setVisible(false);
     }
 
     mLog.close();
+    mLogEdit->setLog(nullptr);
     mLogEdit->clear();
     mTimeLine->clear();
 
