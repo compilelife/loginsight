@@ -2,6 +2,12 @@
 
 loginsight致力于打造一款日志分析的利器
 
+[gitee下载](https://gitee.com/compilelife/loginsight/releases)
+
+[github下载](https://github.com/compilelife/loginsight/releases/latest)
+
+[网盘下载](https://pan.baidu.com/s/1DzKTmmVL34qQdHKlrs8LCg) : 提取码: x46v
+
 ![preview](https://s1.ax1x.com/2020/06/26/Ns3XGQ.png)
 
 亮点特性：
