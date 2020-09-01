@@ -412,6 +412,7 @@ void LogTextEdit::mouseDoubleClickEvent(QMouseEvent *e)
 void LogTextEdit::keyPressEvent(QKeyEvent *e)
 {
     mAltHold = e->modifiers().testFlag(Qt::AltModifier);
+    QPlainTextEdit::keyPressEvent(e);
 }
 
 void LogTextEdit::keyReleaseEvent(QKeyEvent *e)
