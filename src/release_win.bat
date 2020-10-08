@@ -5,3 +5,4 @@ nmake
 mkdir artifact
 windeployqt release\loginsight.exe --dir artifact
 copy release\loginsight.exe artifact\
+dir artifact
