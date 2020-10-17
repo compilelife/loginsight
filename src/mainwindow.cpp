@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("loginsight");
     setContextMenuPolicy(Qt::NoContextMenu);
 
+    QSettings config;
+
     connect(&Updater::instance(), &Updater::newVersionFound, [](const QString& v){
         QMessageBox mbox;
         mbox.setTextFormat(Qt::RichText);
@@ -49,7 +51,8 @@ MainWindow::MainWindow(QWidget *parent)
         mbox.setText("<p>找到新版本: "+v+"</p><a href='https://github.com/compilelife/loginsight/releases/latest'>前往下载</a>");
         mbox.exec();
     });
-    Updater::instance().checkNewVersion();
+    if (config.value("checkUpdate").toBool())
+        Updater::instance().checkNewVersion();
 
     createCenterWidget();
     createSubLogDockWidget();
@@ -60,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     showMaximized();
 
-    QSettings config;
+
     mCaseSensitiveCheckBox->setChecked(config.value("caseSensitive").toBool());
 
     noDocSetDisable();
