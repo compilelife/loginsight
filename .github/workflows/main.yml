@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master,v1.0_mute_updater ]
     paths:
       - 'src/*'
 
