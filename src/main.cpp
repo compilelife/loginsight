@@ -24,6 +24,10 @@ static void createDefaultSettings()
         config.setValue("gotoEOF", false);
     }
 
+    if (!keys.contains("checkUpdate")) {
+        config.setValue("checkUpdate", true);
+    }
+
     config.sync();
 }
 

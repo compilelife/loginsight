@@ -7,16 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>431</width>
-    <height>140</height>
+    <height>169</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="sizeConstraint">
-    <enum>QLayout::SetMinAndMaxSize</enum>
-   </property>
    <item row="0" column="0">
     <widget class="QPushButton" name="chooseFontBtn">
      <property name="text">
@@ -27,7 +24,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="2">
+   <item row="0" column="1">
     <widget class="QLabel" name="fontLabel">
      <property name="text">
       <string>当前字体：</string>
@@ -41,27 +38,34 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="2" column="0">
     <widget class="QCheckBox" name="caseSensitiveCheckBox">
      <property name="text">
       <string>默认大小写敏感</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
+   <item row="3" column="0">
+    <widget class="QCheckBox" name="checkUpdateCheckBox">
+     <property name="text">
+      <string>检查新版本</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QPushButton" name="okBtn">
+     <property name="text">
+      <string>确定</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
     <widget class="QPushButton" name="cancelBtn">
      <property name="text">
       <string>取消</string>
      </property>
      <property name="autoDefault">
       <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QPushButton" name="okBtn">
-     <property name="text">
-      <string>确定</string>
      </property>
     </widget>
    </item>
