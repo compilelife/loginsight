@@ -51,6 +51,8 @@
     </widget>
     <addaction name="actionopen"/>
     <addaction name="actionclose"/>
+    <addaction name="actionsaveproject"/>
+    <addaction name="actionopenproject"/>
     <addaction name="menuEncoding"/>
     <addaction name="separator"/>
     <addaction name="actionsetting"/>
@@ -247,6 +249,16 @@
   <action name="actionfilterDWidget">
    <property name="text">
     <string>过滤小窗</string>
+   </property>
+  </action>
+  <action name="actionsaveproject">
+   <property name="text">
+    <string>保存工程</string>
+   </property>
+  </action>
+  <action name="actionopenproject">
+   <property name="text">
+    <string>打开工程</string>
    </property>
   </action>
  </widget>

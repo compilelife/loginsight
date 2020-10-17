@@ -8,6 +8,7 @@
 #include <QSet>
 #include "log.h"
 #include "history.h"
+#include <QJsonValue>
 
 class Highlighter;
 class LineNumberArea;
@@ -111,6 +112,13 @@ protected:
 private:
     bool mFocused{false};
 //<===实现主从窗口焦点切换==
+
+
+//===序列化===>
+public:
+    QJsonValue saveToJson();
+    void loadFromJson(const QJsonValue& v);
+//<===序列化===
 
 //===其他===>
 protected:

@@ -6,6 +6,7 @@
 #include <QList>
 #include <functional>
 #include <QTimeLine>
+#include <QJsonObject>
 
 #define LINE_X 70
 #define MARGIN_LEFT 10
@@ -16,6 +17,10 @@ class TimeLine: public QGraphicsView
 public:
     TimeLine(QWidget* parent = nullptr);
     void highlightNode(int lineNum);
+
+public:
+    QJsonValue saveToJson();
+    void loadFromJson(const QJsonValue &jo);
 
 public slots:
     void addNode(int lineNum, const QString& text);
@@ -30,6 +35,7 @@ private slots:
     void deleteNode(TimeNode* node);
 
 private:
+    void addNode(TimeNode* node);
     int calNodeY(int index);
     void fitLine();
     void withExportedImage(std::function<void(QImage&)> handler);
@@ -42,8 +48,6 @@ private:
 private:
     QGraphicsLineItem* mLine;
     QGraphicsEllipseItem* mLineHead;
-    QGraphicsPixmapItem* mSupportImg;
-    QGraphicsTextItem* mSupportText;
     int mWidth;
     int mHeight;
     int mNodeTop;

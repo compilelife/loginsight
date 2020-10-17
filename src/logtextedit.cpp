@@ -12,6 +12,8 @@
 #include <QSettings>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QJsonArray>
+#include <QJsonObject>
 
 
 using namespace std;
@@ -445,6 +447,28 @@ void LogTextEdit::focusInEvent(QFocusEvent *e)
 {
     emit beenFocused(this);
     QPlainTextEdit::focusInEvent(e);
+}
+
+QJsonValue LogTextEdit::saveToJson()
+{
+    QJsonArray arr;
+    for (auto& p : mHighlighter->allQuickHighlights()) {
+        QJsonObject o;
+        o["color"] = p.color.name();
+        o["keyword"] = p.key;
+        arr.push_back(o);
+    }
+    return arr;
+}
+
+void LogTextEdit::loadFromJson(const QJsonValue &v)
+{
+    if (!v.isArray())
+        return;
+    for (auto i : v.toArray()) {
+        auto o = i.toObject();
+        mHighlighter->quickHighlight(o["keyword"].toString(), o["color"].toString());
+    }
 }
 
 void LogTextEdit::setVisible(bool visible)

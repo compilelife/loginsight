@@ -9,6 +9,7 @@
 #include "toast.h"
 #include <QClipboard>
 #include <QPropertyAnimation>
+#include <QJsonArray>
 
 TimeLine::TimeLine(QWidget* parent)
     :QGraphicsView(parent)
@@ -31,17 +32,6 @@ TimeLine::TimeLine(QWidget* parent)
     scene->addItem(mLine);
 
     mNodeTop = 20;
-
-    mSupportImg = new QGraphicsPixmapItem();
-    mSupportImg->setPixmap(QPixmap(":/res/img/support.png").scaledToWidth(300));
-    scene->addItem(mSupportImg);
-
-    mSupportText = new QGraphicsTextItem();
-    mSupportText->setHtml("感谢支持! 让我们把<a href=\"https://github.com/compilelife/loginsight\">loginsight</a>打造的更加强大吧!");
-    mSupportText->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
-    scene->addItem(mSupportText);
-
-    showSupport();
 }
 
 void TimeLine::highlightNode(int lineNum)
@@ -59,9 +49,26 @@ void TimeLine::highlightNode(int lineNum)
     }
 }
 
-void TimeLine::addNode(int lineNum, const QString &text) {
-    hideSupport();
+QJsonValue TimeLine::saveToJson()
+{
+    QJsonArray arr;
+    for (auto& node : mNodes) {
+        arr.push_back(node->saveToJson());
+    }
+    return arr;
+}
 
+void TimeLine::loadFromJson(const QJsonValue &jo)
+{
+    if (!jo.isArray())
+        return;
+
+    for (auto item : jo.toArray()) {
+        addNode(new TimeNode(item));
+    }
+}
+
+void TimeLine::addNode(int lineNum, const QString &text) {
     //找到插入位置
     int pos = mNodes.size();
     for (int i = 0; i < mNodes.size(); i++) {
@@ -118,8 +125,6 @@ void TimeLine::clear()
         scene()->removeItem(node);
     }
     mNodes.clear();
-
-    showSupport();
 }
 
 void TimeLine::deleteNode(TimeNode *node)
@@ -131,11 +136,24 @@ void TimeLine::deleteNode(TimeNode *node)
         mNodes.at(i)->setY(calNodeY(i));
     }
 
-    if (mNodes.empty()) {
-        showSupport();
-    } else {
-        fitLine();
-    }
+    fitLine();
+}
+
+void TimeLine::addNode(TimeNode *node)
+{
+    auto pos = mNodes.size();
+    mNodes.insert(pos, node);
+
+    fitLine();
+
+    node->setX(MARGIN_LEFT);
+    node->setY(calNodeY(pos));
+
+    scene()->addItem(node);
+    node->ensureVisible(0,0,10,10);
+
+    connect(node, SIGNAL(requestDel(TimeNode*)), this, SLOT(deleteNode(TimeNode*)));
+    connect(node, SIGNAL(selected(TimeNode*)), this, SIGNAL(nodeSelected(TimeNode*)));
 }
 
 int TimeLine::calNodeY(int index)
@@ -185,30 +203,6 @@ void TimeLine::withExportedImage(std::function<void (QImage &)> handler)
     painter.drawText(x, y+metrics.height(), site);
 
     handler(img);
-}
-
-void TimeLine::showSupport()
-{
-    mLine->setVisible(false);
-    mLineHead->setVisible(false);
-
-    auto y = (mHeight - mSupportImg->boundingRect().height())/2;
-    mSupportImg->setY(y);
-    mSupportText->setY(y+mSupportImg->boundingRect().height());
-
-    mSupportImg->setVisible(true);
-    mSupportText->setVisible(true);
-    mSupportImg->ensureVisible(QRect(), -300, 0);
-}
-
-void TimeLine::hideSupport()
-{
-    mSupportImg->setVisible(false);
-    mSupportText->setVisible(false);
-
-    mLine->setVisible(true);
-    mLineHead->setVisible(true);
-    mLineHead->ensureVisible();
 }
 
 void TimeLine::highlightItem(QGraphicsObject *item)

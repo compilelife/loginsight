@@ -13,7 +13,7 @@
 #include <QColorDialog>
 #include "choosecolormenu.h"
 
-TimeNode::TimeNode(int lineNum, const QString &locateText, const QString &detailText)
+TimeNode::TimeNode(int lineNum, const QString &locateText, const QString &detailText, const QString& memo)
     :mLineNum(lineNum) {
     setFlag(GraphicsItemFlag::ItemIsSelectable);
 
@@ -24,7 +24,7 @@ TimeNode::TimeNode(int lineNum, const QString &locateText, const QString &detail
 
     mWidth = LINE_X + TIME_NODE_DOT_R;
 
-    mBody = new TimeNodeBody(this, detailText);
+    mBody = new TimeNodeBody(this, detailText, memo);
     mBody->setX(mWidth + 8);
     mBody->setY(0);
     mBody->setParentItem(this);
@@ -41,6 +41,25 @@ TimeNode::TimeNode(int lineNum, const QString &locateText, const QString &detail
     auto blur = new QGraphicsBlurEffect(this);
     blur->setBlurRadius(4);
     mHlRect->setGraphicsEffect(blur);
+
+    mProjectData["lineNum"] = lineNum;
+    mProjectData["detail"] = detailText;
+}
+
+TimeNode::TimeNode(const QJsonValue &jo)
+    :TimeNode(jo["lineNum"].toInt(),
+      QString("%1").arg(jo["lineNum"].toInt()),
+      jo["detail"].toString(),
+      jo["memo"].toString())
+{
+    setColor(jo["color"].toString());
+}
+
+QJsonValue TimeNode::saveToJson()
+{
+    mProjectData["memo"] = mBody->getMemo();
+    mProjectData["color"] = mColor.name();
+    return mProjectData;
 }
 
 QRectF TimeNode::boundingRect() const

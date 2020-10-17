@@ -2,6 +2,7 @@
 #define TIMENODE_H
 
 #include <QGraphicsItem>
+#include <QJsonObject>
 
 #define TIME_NODE_HEIGHT 110
 #define TIME_NODE_DOT_R 4
@@ -12,7 +13,11 @@ class TimeNode: public QGraphicsObject
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
 public:
-    TimeNode(int lineNum, const QString& locateText, const QString& detailText);
+    TimeNode(int lineNum, const QString& locateText, const QString& detailText, const QString& memo = "备注: ");
+    TimeNode(const QJsonValue& jo);
+
+public:
+    QJsonValue saveToJson();
 
 public:
     QColor color() {return mColor;}
@@ -38,6 +43,7 @@ private:
     int mLineNum;
     QColor mColor{Qt::blue};
     TimeNodeBody* mBody;
+    QJsonObject mProjectData;
 };
 
 #endif // TIMENODE_H

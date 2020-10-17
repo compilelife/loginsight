@@ -3,6 +3,7 @@
 
 #include <QListWidget>
 #include "highlighter.h"
+#include <QJsonObject>
 
 class TagListWidget : public QListWidget
 {
@@ -17,8 +18,6 @@ signals:
     void onTagColorChanged(const QString& keyword, QColor color);
     void requestFilterTag(const QString& keyword);
 
-private:
-    void setBgColor(QWidget* w, QColor color);
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
 

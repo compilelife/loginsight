@@ -32,7 +32,9 @@
 #include <QDockWidget>
 #include "updater.h"
 #include "aboutdlg.h"
-
+#include <QJsonDocument>
+#include <QJsonObject>
+#include "version.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -124,6 +126,9 @@ void MainWindow::bindMenuAction()
         dlg.exec();
     });
 
+    connect(ui->actionsaveproject, &QAction::triggered, this, &MainWindow::handleSaveProject);
+    connect(ui->actionopenproject, &QAction::triggered, this, &MainWindow::handleOpenProject);
+
     //检视
     connect(ui->actionsearch, &QAction::triggered, [this]{
         mSearchEdit->setSearchFoward(true);
@@ -167,6 +172,7 @@ void MainWindow::bindMenuAction()
 void MainWindow::noDocSetDisable()
 {
     ui->actionclose->setEnabled(false);
+    ui->actionsaveproject->setEnabled(false);
     ui->menuEncoding->setEnabled(false);
     ui->menuInsight->setEnabled(false);
 
@@ -185,6 +191,7 @@ void MainWindow::noDocSetDisable()
 void MainWindow::hasDocSetEnbale()
 {
     ui->actionclose->setEnabled(true);
+    ui->actionsaveproject->setEnabled(true);
     ui->menuEncoding->setEnabled(true);
     ui->menuInsight->setEnabled(true);
 
@@ -308,6 +315,7 @@ void MainWindow::handleCloseFile()
     mLogEdit->setLog(nullptr);
     mLogEdit->clear();
     mTimeLine->clear();
+    mTagList->clear();
 
     noDocSetDisable();
 
@@ -352,6 +360,7 @@ void MainWindow::handleLogEditFocus(LogTextEdit *logEdit)
         }
 
         mAddTagConnection = connect(highlighter, &Highlighter::onPatternAdded, [this](HighlightPattern p){
+                qDebug()<<"add "<<p.key;
             mTagList->addTag(p.key, p.color);
         });
     }
@@ -391,6 +400,58 @@ void MainWindow::handleSubLogEditEmphasizeLine(int lineNum)
 void MainWindow::handleSubLogMarkLine(int line, const QString &text)
 {
     mTimeLine->addNode(mSubLog->toParentLine(line), text);
+}
+
+void MainWindow::handleSaveProject()
+{
+    auto savePath = QFileDialog::getSaveFileName(this, "保存工程文件", QString(), "*.liprj");
+    if (savePath.isEmpty())
+        return;
+
+    mProjectData["timeline"] = mTimeLine->saveToJson();
+    mProjectData["mainEdit"] = mLogEdit->saveToJson();
+    mProjectData["subEdit"] = mSubLogEdit->saveToJson();
+    QJsonDocument doc(mProjectData);
+    QFile file(savePath);
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        Toast::instance().show(Toast::ERROR, "保存到"+savePath+"失败");
+        return;
+    }
+
+    file.write(doc.toJson());
+    file.close();
+}
+
+void MainWindow::handleOpenProject()
+{
+    auto path = QFileDialog::getOpenFileName(this, "打开工程文件", QString(), "*.liprj");
+    if (path.isEmpty())
+        return;
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        Toast::instance().show(Toast::ERROR, "打开"+path+"失败");
+        return;
+    }
+
+    if (mLog.isOpened())
+        handleCloseFile();
+
+    auto doc = QJsonDocument::fromJson(file.readAll());
+    file.close();
+
+    auto jo = doc.object();
+
+    doOpenFile(jo["path"].toString());
+    mTimeLine->loadFromJson(jo["timeline"]);
+
+    auto filterJo = jo["filter"].toObject();
+    if (!filterJo.empty())
+        filter(filterJo["keyword"].toString(), filterJo["caseSensitive"].toBool());
+
+    mLogEdit->loadFromJson(jo["mainEdit"]);
+    mSubLogEdit->loadFromJson(jo["subEdit"]);
 }
 
 void MainWindow::search(bool foward)
@@ -442,6 +503,9 @@ void MainWindow::doOpenFile(const QString &path)
     mSubLogEdit->setLog(nullptr);
     mSubLogDWidget->setVisible(false);
 
+    mProjectData = {};
+    mProjectData["VERSION"] = VERSION;
+    mProjectData["path"] = path;
     hasDocSetEnbale();
 
     QSettings config;
@@ -470,6 +534,11 @@ void MainWindow::filter(const QString &text, bool caseSenesitive)
         mSubLogEdit->setLog(mSubLog);
         mSubLogDWidget->setVisible(true);
         Toast::instance().show(Toast::INFO, QString("一共过滤到%1行").arg(mSubLog->lineCount()));
+
+        mProjectData["filter"] = QJsonObject{
+            {"keyword", text},
+            {"caseSensitive", caseSenesitive}
+        };
     } else {
         Toast::instance().show(Toast::INFO, "没有找到匹配项");
         mSubLogEdit->setLog(nullptr);
@@ -607,7 +676,6 @@ void MainWindow::createTagbar()
     mTagList = new TagListWidget;
     mTagList->setMinimumHeight(26);
     mTagList->setMaximumHeight(26);
-    mTagList->addTag("abc", Qt::red);
     mTagList->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
     connect(mTagList, &TagListWidget::onTagDeleted, [this](const QString& keyword){
         mCurLogEdit->getHighlighter()->clearQuickHighlight(keyword);

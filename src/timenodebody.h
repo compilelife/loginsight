@@ -2,6 +2,7 @@
 #define TIMENODEBODY_H
 
 #include <QGraphicsItem>
+#include <QJsonObject>
 
 #define TIME_NODE_BODY_WIDTH 250
 
@@ -15,7 +16,8 @@ private:
     QGraphicsRectItem* mColorRect;
     QGraphicsTextItem* mMemo;
 public:
-    TimeNodeBody(TimeNode* node, const QString& text);
+    TimeNodeBody(TimeNode* node, const QString& text, const QString& memo);
+    QString getMemo();
 protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;

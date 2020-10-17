@@ -10,6 +10,7 @@
 #include "searchedit.h"
 #include <QCheckBox>
 #include "taglistwidget.h"
+#include <QJsonObject>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -47,6 +48,8 @@ private slots:
     void handleLogEditEmphasizeLine(int lineNum);
     void handleSubLogEditEmphasizeLine(int lineNum);
     void handleSubLogMarkLine(int line, const QString& text);
+    void handleSaveProject();
+    void handleOpenProject();
 private:
     void search(bool foward);
     void filter(const QString& text, bool caseSenesitive);
@@ -80,5 +83,6 @@ private:
     QAction* mGotoLineAction;
     QAction* mFilterAction;
     TagListWidget* mTagList;
+    QJsonObject mProjectData;
 };
 #endif // MAINWINDOW_H

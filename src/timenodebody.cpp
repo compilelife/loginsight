@@ -35,7 +35,7 @@ protected:
     }
 };
 
-TimeNodeBody::TimeNodeBody(TimeNode* node, const QString &text)
+TimeNodeBody::TimeNodeBody(TimeNode* node, const QString &text, const QString& memo)
     :mNode(node){
     auto rect = new QGraphicsRectItem(0,0,TIME_NODE_BODY_WIDTH, TIME_NODE_HEIGHT, this);
     rect->setBrush(Qt::white);
@@ -58,7 +58,7 @@ TimeNodeBody::TimeNodeBody(TimeNode* node, const QString &text)
                   MARGIN+COLOR_RECT_WIDTH+CONTENT_WIDTH-20, MARGIN+CONTENT_HEIGHT);
     line->setPen(QPen(Qt::DotLine));
 
-    mMemo = new QGraphicsTextItem("备注: ", this);
+    mMemo = new QGraphicsTextItem(memo, this);
     mMemo->setTextInteractionFlags(Qt::TextEditorInteraction);
     mMemo->setTextWidth(CONTENT_WIDTH);
     mMemo->setX(MARGIN+COLOR_RECT_WIDTH);
@@ -67,6 +67,11 @@ TimeNodeBody::TimeNodeBody(TimeNode* node, const QString &text)
     op.setWrapMode(QTextOption::WrapAnywhere);
     mMemo->document()->setDefaultTextOption(op);
     mMemo->setY(MARGIN+CONTENT_HEIGHT);
+}
+
+QString TimeNodeBody::getMemo()
+{
+    return mMemo->toPlainText();
 }
 
 QRectF TimeNodeBody::boundingRect() const {
