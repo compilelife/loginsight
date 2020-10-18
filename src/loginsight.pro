@@ -36,7 +36,8 @@ SOURCES += \
     timenodebody.cpp \
     timenodehead.cpp \
     toast.cpp \
-    updater.cpp
+    updater.cpp \
+    recent.cpp
 
 HEADERS += \
     LongtimeOperation.h \
@@ -61,7 +62,8 @@ HEADERS += \
     timenodehead.h \
     toast.h \
     updater.h \
-    version.h
+    version.h \
+    recent.h
 
 FORMS += \
     aboutdlg.ui \

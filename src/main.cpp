@@ -28,6 +28,14 @@ static void createDefaultSettings()
         config.setValue("checkUpdate", true);
     }
 
+    if (!keys.contains("recentFile")) {
+        config.setValue("recentFile", QStringList{});
+    }
+
+    if (!keys.contains("recentPrj")) {
+        config.setValue("recentPrj", QStringList{});
+    }
+
     config.sync();
 }
 

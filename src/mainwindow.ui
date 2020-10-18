@@ -49,11 +49,24 @@
      <addaction name="actionGBK"/>
      <addaction name="actionUTF8"/>
     </widget>
+    <widget class="QMenu" name="menurecentFile">
+     <property name="title">
+      <string>最近打开的文件</string>
+     </property>
+    </widget>
+    <widget class="QMenu" name="menurecentPrj">
+     <property name="title">
+      <string>最近打开的工程</string>
+     </property>
+    </widget>
     <addaction name="actionopen"/>
     <addaction name="actionclose"/>
     <addaction name="actionsaveproject"/>
     <addaction name="actionopenproject"/>
     <addaction name="menuEncoding"/>
+    <addaction name="separator"/>
+    <addaction name="menurecentFile"/>
+    <addaction name="menurecentPrj"/>
     <addaction name="separator"/>
     <addaction name="actionsetting"/>
     <addaction name="separator"/>
@@ -253,12 +266,22 @@
   </action>
   <action name="actionsaveproject">
    <property name="text">
-    <string>保存工程</string>
+    <string>保存工程...</string>
    </property>
   </action>
   <action name="actionopenproject">
    <property name="text">
-    <string>打开工程</string>
+    <string>打开工程...</string>
+   </property>
+  </action>
+  <action name="actiona">
+   <property name="text">
+    <string>a</string>
+   </property>
+  </action>
+  <action name="actiona_2">
+   <property name="text">
+    <string>a</string>
    </property>
   </action>
  </widget>
