@@ -27,10 +27,18 @@ jobs:
         cd src
         ./release_linux.sh
     
-    - uses: actions/upload-artifact@v1
+    - uses: actions/setup-python@v2
       with:
-        name: linux
-        path: build/artifact 
+        python-version: '3.8'
+    - name: Upload
+      run: |
+        pip install -r requirements.txt
+        python upload.py
+      env: 
+        filename: 'linux.zip'
+        nutstore_url: ${{ secrets.NUTSTORE_URL }}
+        nutstore_username: ${{ secrets.NUTSTORE_USERNAME }}
+        nutstore_password: ${{ secrets.NUTSTORE_PASSWORD }}
 
   build_mac:
     runs-on: macos-latest
@@ -43,10 +51,18 @@ jobs:
     - name: do build
       run: cd src;./release_macos.sh
     
-    - uses: actions/upload-artifact@v1
+    - uses: actions/setup-python@v2
       with:
-        name: macos
-        path: build/artifact 
+        python-version: '3.8'
+    - name: Upload
+      run: |
+        pip install -r requirements.txt
+        python upload.py
+      env: 
+        filename: 'macos.zip'
+        nutstore_url: ${{ secrets.NUTSTORE_URL }}
+        nutstore_username: ${{ secrets.NUTSTORE_USERNAME }}
+        nutstore_password: ${{ secrets.NUTSTORE_PASSWORD }}
 
   build_windows:
     runs-on: windows-latest
@@ -63,7 +79,15 @@ jobs:
         cd src
         release_win.bat
     
-    - uses: actions/upload-artifact@v1
+    - uses: actions/setup-python@v2
       with:
-        name: windows
-        path: build\artifact  
+        python-version: '3.8'
+    - name: Upload
+      run: |
+        pip install -r requirements.txt
+        python upload.py
+      env: 
+        filename: 'windows.zip'
+        nutstore_url: ${{ secrets.NUTSTORE_URL }}
+        nutstore_username: ${{ secrets.NUTSTORE_USERNAME }}
+        nutstore_password: ${{ secrets.NUTSTORE_PASSWORD }}
