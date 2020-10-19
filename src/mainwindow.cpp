@@ -100,8 +100,8 @@ void MainWindow::bindLogEditActions()
     connect(mSubLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
     connect(mLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleLogEditEmphasizeLine(int)));
     connect(mSubLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleSubLogEditEmphasizeLine(int)));
-    connect(mLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
-    connect(mSubLogEdit, SIGNAL(requestFilter(const QString&)), this, SLOT(handleFilterRequest(const QString&)));
+    connect(mLogEdit, &LogTextEdit::requestFilter, this, &MainWindow::doFilter);
+    connect(mSubLogEdit, &LogTextEdit::requestFilter, this, &MainWindow::doFilter);
     auto searchUsingCurDirection = [this](const QString& text){
         mSearchEdit->setText(text);
         search(mSearchEdit->isSearchFoward());
@@ -234,6 +234,9 @@ void MainWindow::handleFilter()
     caseSensentiveCheckBox.setChecked(config.value("caseSensitive").toBool());
     caseSensentiveCheckBox.setFocusPolicy(Qt::NoFocus);
     layout.addWidget(&caseSensentiveCheckBox);
+    QCheckBox revertCheckBox("反转过滤");
+    revertCheckBox.setFocusPolicy(Qt::NoFocus);
+    layout.addWidget(&revertCheckBox);
 
     QLineEdit lineEdit;
     lineEdit.setPlaceholderText("请输入要过滤的关键字");
@@ -248,14 +251,11 @@ void MainWindow::handleFilter()
         return;
     }
 
-    auto text = lineEdit.text();
-    filter(text, caseSensentiveCheckBox.isChecked());
-}
-
-void MainWindow::handleFilterRequest(const QString& text)
-{
-    QSettings config;
-    filter(text, config.value("caseSensitive").toBool());
+    Filter filter;
+    filter.keyword = lineEdit.text();
+    filter.caseSensitive = caseSensentiveCheckBox.isChecked();
+    filter.revert = revertCheckBox.isChecked();
+    doFilter(filter);
 }
 
 void MainWindow::handleNodeSelected(TimeNode *node)
@@ -455,9 +455,9 @@ void MainWindow::doOpenProject(const QString &path)
     doOpenFile(jo["path"].toString());
     mTimeLine->loadFromJson(jo["timeline"]);
 
-    auto filterJo = jo["filter"].toObject();
-    if (!filterJo.empty())
-        filter(filterJo["keyword"].toString(), filterJo["caseSensitive"].toBool());
+    auto filterJo = jo["filter"];
+    if (!filterJo.isUndefined())
+        doFilter(Filter(filterJo));
 
     mLogEdit->loadFromJson(jo["mainEdit"]);
     mSubLogEdit->loadFromJson(jo["subEdit"]);
@@ -530,15 +530,17 @@ void MainWindow::doOpenFile(const QString &path)
     mRecentFile.add(path);
 }
 
-void MainWindow::filter(const QString &text, bool caseSenesitive)
+void MainWindow::doFilter(const Filter& filter)
 {
     if (mSubLog) {
         delete mSubLog;
     }
 
-    auto canceled = BackgroundRunner::instance().exec(QString("过滤%1").arg(text), [&](LongtimeOperation& op){
-        mSubLog = mLog.createSubLog(text, caseSenesitive, op);
-    });
+    auto canceled = BackgroundRunner::instance().exec(
+                QString("过滤%1").arg(filter.keyword),
+                [&](LongtimeOperation& op){
+                    mSubLog = mLog.createSubLog(filter, op);
+                });
 
     if (canceled)
         return;
@@ -548,10 +550,7 @@ void MainWindow::filter(const QString &text, bool caseSenesitive)
         mSubLogDWidget->setVisible(true);
         Toast::instance().show(Toast::INFO, QString("一共过滤到%1行").arg(mSubLog->lineCount()));
 
-        mProjectData["filter"] = QJsonObject{
-            {"keyword", text},
-            {"caseSensitive", caseSenesitive}
-        };
+        mProjectData["filter"] = filter.saveToJson();
     } else {
         Toast::instance().show(Toast::INFO, "没有找到匹配项");
         mSubLogEdit->setLog(nullptr);
@@ -701,9 +700,7 @@ void MainWindow::createTagbar()
         mCaseSensitiveCheckBox->setChecked(true);
         search(mSearchEdit->isSearchFoward());
     });
-    connect(mTagList, &TagListWidget::requestFilterTag, [this](const QString& keyword){
-        filter(keyword, true);
-    });
+    connect(mTagList, &TagListWidget::requestFilterTag, this, &MainWindow::doFilter);
     box->addWidget(mTagList);
 
     box->setMargin(5);

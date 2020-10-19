@@ -339,7 +339,7 @@ bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options)
     return true;
 }
 
-void LogTextEdit::handleFilterUnderCursor()
+void LogTextEdit::requestFilterUnderCursor(bool revert)
 {
     auto cursor = textCursor();
 
@@ -347,7 +347,10 @@ void LogTextEdit::handleFilterUnderCursor()
         cursor.select(QTextCursor::WordUnderCursor);
     }
 
-    emit requestFilter(cursor.selectedText());
+    Filter filter;
+    filter.keyword = cursor.selectedText();
+    filter.revert = revert;
+    emit requestFilter(filter);
 }
 
 void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
@@ -366,10 +369,7 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
         cursorWord = textCursor().selectedText();
     }
 
-    {
-        auto action = menu->addAction("添加到时间线");
-        connect(action, SIGNAL(triggered()), this, SLOT(handleMarkLineAction()));
-    }
+    menu->addAction("添加到时间线", this, SLOT(handleMarkLineAction()));
 
     menu->addSeparator();
 
@@ -380,25 +380,24 @@ void LogTextEdit::contextMenuEvent(QContextMenuEvent *e)
     }
 
     if (cursorWord.length() > 0 ) {
-        auto action = menu->addAction(QString("高亮\"%1\"").arg(cursorWord));
-        connect(action, SIGNAL(triggered()), this, SLOT(addWordHighlightUnderCursor()));
-        action = menu->addAction(QString("过滤含\"%1\"的行").arg(cursorWord));
-        connect(action, SIGNAL(triggered()), this, SLOT(handleFilterUnderCursor()));
-        action = menu->addAction(QString("搜索\"%1\"").arg(cursorWord));
-        connect(action, &QAction::triggered, [this, &originWord]{
+        menu->addAction(QString("高亮\"%1\"").arg(cursorWord), this, SLOT(addWordHighlightUnderCursor()));
+        menu->addAction(QString("搜索\"%1\"").arg(cursorWord), [this, &originWord]{
             emit delegateSearch(originWord);
         });
 
-        action = menu->addAction("清除搜索高亮");
-        connect(action, SIGNAL(triggered()), mHighlighter, SLOT(clearSearchHighlight()));
+        menu->addAction(QString("过滤含\"%1\"的行").arg(cursorWord), [this]{requestFilterUnderCursor(false);});
+        menu->addAction(QString("反转过滤含\"%1\"的行").arg(cursorWord), [this]{requestFilterUnderCursor(true);});
     }
     else {
         menu->addAction("请选择文本来高亮、过滤和搜索")->setEnabled(false);
     }
 
+    menu->addSeparator();
+    menu->addAction("清除搜索高亮", mHighlighter, SLOT(clearSearchHighlight()));
+
     if (cursorWord.length() > 0) {
         menu->addSeparator();
-        connect(menu->addAction("复制"), SIGNAL(triggered()), this, SLOT(copy()));
+        menu->addAction("复制", this, SLOT(copy()));
     }
 
     menu->exec(e->globalPos());

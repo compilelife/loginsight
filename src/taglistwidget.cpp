@@ -40,7 +40,9 @@ void TagListWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addMenu(chooseColorMenu);
 
     connect(menu.addAction("在小窗过滤"), &QAction::triggered, [&]{
-        emit requestFilterTag(keyword);
+        Filter filter;
+        filter.keyword = keyword;
+        emit requestFilterTag(filter);
     });
 
     connect(menu.addAction("搜索"), &QAction::triggered, [&]{

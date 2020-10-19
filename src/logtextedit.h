@@ -77,11 +77,11 @@ private:
 public:
     bool search(const QString& text, QTextDocument::FindFlags options);
 signals:
-    void requestFilter(const QString& text);
+    void requestFilter(const Filter& filter);
     //请求代理搜索，比如用户选择单词后发起搜索，主窗口可以根据当前的搜索方向来搜索
     void delegateSearch(const QString& text);
-private slots:
-    void handleFilterUnderCursor();
+private:
+    void requestFilterUnderCursor(bool revert);
 //<===实现搜索===
 
 //===实现时间线===>
