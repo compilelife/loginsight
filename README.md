@@ -24,9 +24,9 @@ loginsight致力于打造一款日志分析的利器
 
 [版本说明](https://github.com/compilelife/loginsight/wiki/%E7%89%88%E6%9C%AC%E8%AF%B4%E6%98%8E)
 
-最新版本(v1.2.0): 
+最新版本(v1.3.0): 
 
-- 新增设置项，可以关闭自动检查更新
+- 新增"最近打开的"功能
 
 [下载安装](https://github.com/compilelife/loginsight/wiki/下载安装)
 
