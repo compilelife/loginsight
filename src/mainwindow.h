@@ -11,6 +11,7 @@
 #include <QCheckBox>
 #include "taglistwidget.h"
 #include <QJsonObject>
+#include "recent.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -55,6 +56,7 @@ private:
     void filter(const QString& text, bool caseSenesitive);
 public:
     void doOpenFile(const QString& path);
+    void doOpenProject(const QString& path);
 protected:
     void keyReleaseEvent(QKeyEvent* ev) override;
 private:
@@ -72,6 +74,7 @@ private:
     void createToolbar();
     void createTagbar();
     void createCenterWidget();
+    void createRecentActions();
 private:
     LogTextEdit* mLogEdit;
     LogTextEdit* mSubLogEdit;
@@ -84,5 +87,7 @@ private:
     QAction* mFilterAction;
     TagListWidget* mTagList;
     QJsonObject mProjectData;
+    Recent mRecentFile{"recentFile", 5};
+    Recent mRecentPrj{"recentPrj", 5};
 };
 #endif // MAINWINDOW_H

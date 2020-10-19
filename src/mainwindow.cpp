@@ -62,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
     createToolbar();
     createTagbar();
     bindActions();
+    createRecentActions();
 
     showMaximized();
 
@@ -432,6 +433,11 @@ void MainWindow::handleOpenProject()
     if (path.isEmpty())
         return;
 
+    doOpenProject(path);
+}
+
+void MainWindow::doOpenProject(const QString &path)
+{
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
         Toast::instance().show(Toast::ERROR, "打开"+path+"失败");
@@ -455,6 +461,8 @@ void MainWindow::handleOpenProject()
 
     mLogEdit->loadFromJson(jo["mainEdit"]);
     mSubLogEdit->loadFromJson(jo["subEdit"]);
+
+    mRecentPrj.add(path);
 }
 
 void MainWindow::search(bool foward)
@@ -518,6 +526,8 @@ void MainWindow::doOpenFile(const QString &path)
     }
 
     setWindowTitle("loginsight - " + path);
+
+    mRecentFile.add(path);
 }
 
 void MainWindow::filter(const QString &text, bool caseSenesitive)
@@ -730,4 +740,10 @@ void MainWindow::createCenterWidget()
     });
 
     setCentralWidget(w);
+}
+
+void MainWindow::createRecentActions()
+{
+    mRecentFile.mount(ui->menurecentFile, bind(&MainWindow::doOpenFile, this, placeholders::_1));
+    mRecentPrj.mount(ui->menurecentPrj, bind(&MainWindow::doOpenProject, this, placeholders::_1));
 }
