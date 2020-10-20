@@ -2,9 +2,9 @@ name: Sync
 on: [gollum]
 jobs:
     build:
-        runs-on: ubuntu-latest
-        steps:
-        - name: Sync to Gitee Wiki
+      runs-on: ubuntu-latest
+      steps:
+      - name: Sync to Gitee Wiki
         uses: wearerequired/git-mirror-action@master
         env:
             SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
