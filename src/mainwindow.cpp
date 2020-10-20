@@ -416,6 +416,9 @@ void MainWindow::handleSaveProject()
     mProjectData["mainEdit"] = mLogEdit->saveToJson();
     mProjectData["subEdit"] = mSubLogEdit->saveToJson();
     QJsonDocument doc(mProjectData);
+    if (!savePath.endsWith(".liprj")) {
+        savePath += ".liprj";
+    }
     QFile file(savePath);
 
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
