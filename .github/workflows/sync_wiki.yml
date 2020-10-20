@@ -1,4 +1,4 @@
-name: Sync
+name: Sync Wiki
 on: [gollum]
 jobs:
     build:
