@@ -19,6 +19,15 @@ def zip_dir(dirname,zipfilename):
     zf.write(tar,arcname)
   zf.close()
 
+def get_version():
+  f = open("./src/version.h")
+  lines = f.readlines()
+  f.close()
+  for line in lines:
+    if line.startswith('#define VERSION '):
+      return line[17:-2]
+  return 'unknown'
+
 driver_prefix = 'nutstore'
 
 webdav_url = os.getenv(f"{driver_prefix}_url")
@@ -42,7 +51,7 @@ filename=os.getenv("filename")
 
 zip_dir('build/artifact', filename)
 
-remotedir = '我的坚果云/'+time.strftime("%Y-%m-%d %H%M%S", time.localtime())+'/'
+remotedir = '我的坚果云/'+get_version()+'/'
 client.mkdir(remotedir)
 
 client.upload(remote_path=remotedir+filename,local_path=filename)
