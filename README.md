@@ -8,6 +8,7 @@ loginsight致力于打造一款日志分析的利器
 
 亮点特性：
 
+- 支持windows/macos/linux
 - 支持大文件秒开(macbook 2015上2.5G文件5s内打开)
 - 时间线功能：日志再乱，思路清晰
 - 小窗过滤：双线程查问题
@@ -24,9 +25,9 @@ loginsight致力于打造一款日志分析的利器
 
 [版本说明](https://github.com/compilelife/loginsight/wiki/%E7%89%88%E6%9C%AC%E8%AF%B4%E6%98%8E)
 
-最新版本(v1.3.0): 
+最新版本(v1.3.1): 
 
-- 新增"最近打开的"功能
+- 修复linux上工程保存后没有后缀的问题
 
 [下载安装](https://github.com/compilelife/loginsight/wiki/下载安装)
 
