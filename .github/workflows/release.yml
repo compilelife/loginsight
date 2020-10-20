@@ -1,10 +1,7 @@
 name: Build
 
 on:
-  push:
-    branches: [ master ]
-    paths:
-      - 'src/*'
+  workflow_dispatch:
 
 jobs:
   build_linux:
@@ -26,6 +23,19 @@ jobs:
         cp /usr/lib/x86_64-linux-gnu/qt5/plugins/platforminputcontexts/libfcitxplatforminputcontextplugin.so $Qt5_Dir/plugins/platforminputcontexts/
         cd src
         ./release_linux.sh
+    
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Upload
+      run: |
+        pip install -r requirements.txt
+        python upload.py
+      env: 
+        filename: 'linux.zip'
+        nutstore_url: ${{ secrets.NUTSTORE_URL }}
+        nutstore_username: ${{ secrets.NUTSTORE_USERNAME }}
+        nutstore_password: ${{ secrets.NUTSTORE_PASSWORD }}
 
   build_mac:
     runs-on: macos-latest
@@ -38,6 +48,19 @@ jobs:
     - name: do build
       run: cd src;./release_macos.sh
     
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Upload
+      run: |
+        pip install -r requirements.txt
+        python upload.py
+      env: 
+        filename: 'macos.zip'
+        nutstore_url: ${{ secrets.NUTSTORE_URL }}
+        nutstore_username: ${{ secrets.NUTSTORE_USERNAME }}
+        nutstore_password: ${{ secrets.NUTSTORE_PASSWORD }}
+
   build_windows:
     runs-on: windows-latest
 
@@ -52,3 +75,16 @@ jobs:
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
         cd src
         release_win.bat
+    
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Upload
+      run: |
+        pip install -r requirements.txt
+        python upload.py
+      env: 
+        filename: 'windows.zip'
+        nutstore_url: ${{ secrets.NUTSTORE_URL }}
+        nutstore_username: ${{ secrets.NUTSTORE_USERNAME }}
+        nutstore_password: ${{ secrets.NUTSTORE_PASSWORD }}
