@@ -7,10 +7,21 @@
 #include <QTextDocument>
 #include "LongtimeOperation.h"
 #include <QTextCodec>
+#include <QJsonValue>
 
 struct SearchResult {
     int line;
     int pos;
+};
+
+struct Filter {
+    QString keyword;
+    bool caseSensitive{false};
+    bool revert{false};
+
+    QJsonValue saveToJson() const;
+    Filter(const QJsonValue& jv);
+    Filter();
 };
 
 class SubLog;
@@ -32,7 +43,7 @@ public:
                                 QTextDocument::FindFlags flag,
                                 int fromLine, int fromPos,
                                 LongtimeOperation& op);
-    virtual SubLog* createSubLog(const QString& text, bool caseSensitive, LongtimeOperation& op);
+    virtual SubLog* createSubLog(const Filter& filter, LongtimeOperation& op);
 };
 
 class FileLog : public Log
@@ -49,7 +60,7 @@ public:
 public:
     QString getLine(int from, int to) override;
     int lineCount() override {return mLineCnt;}
-    SubLog* createSubLog(const QString& text, bool caseSensitive, LongtimeOperation& op) override;
+    SubLog* createSubLog(const Filter& filter, LongtimeOperation& op) override;
     SearchResult search(const QString& text,
                         QTextDocument::FindFlags flag,
                         int fromLine, int fromPos,

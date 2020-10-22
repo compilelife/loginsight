@@ -17,6 +17,9 @@ extern "C" const char *strcasestr(const char *haystack, const char *needle);
 #include <QTextCodec>
 #include <future>
 #include "toast.h"
+#include <functional>
+#include <QJsonObject>
+#include <QSettings>
 
 using namespace std;
 
@@ -76,12 +79,23 @@ SearchResult Log::search(const QString &text, QTextDocument::FindFlags flag, int
     return {0,0};
 }
 
-SubLog *Log::createSubLog(const QString &text, bool caseSensitive, LongtimeOperation& op)
+SubLog *Log::createSubLog(const Filter &filter, LongtimeOperation& op)
 {
     SubLog* sub = new SubLog(this);
 
     op.from = 1;
     op.to = lineCount();
+
+    auto caseSensitive = filter.caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
+    auto keyword = filter.keyword;
+
+    function<bool(const QString& s)> test;
+    if (filter.revert){
+        test = [&](const QString& s){return s.indexOf(keyword, 0, caseSensitive) < 0;};
+    } else {
+        test = [&](const QString& s){return s.indexOf(keyword, 0, caseSensitive) >= 0;};
+    }
+
     for (op.cur = op.from; op.cur <= op.to; op.cur++) {
         if (op.terminate) {
             delete sub;
@@ -89,7 +103,7 @@ SubLog *Log::createSubLog(const QString &text, bool caseSensitive, LongtimeOpera
         }
 
         auto s = getLine(op.cur);
-        if (s.indexOf(text, 0, caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive) >= 0) {
+        if (test(s)) {
             sub->addLine(op.cur);
         }
     }
@@ -297,18 +311,18 @@ QString FileLog::getLine(int from, int to) {
     return mCodec->toUnicode(ba);
 }
 
-SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeOperation& op)
+SubLog *FileLog::createSubLog(const Filter &filter, LongtimeOperation& op)
 {
     //Log的默认实现太慢了，直接操作内存块会快很多。
     //2G文件（已cache）在2015 Macbook上耗时只有默认实现的1/11 (3500~5000 ms vs 58255 ms)
     //release会更低
 
-    //TODO:记录到工程文件中，下次秒载。记录过去2次结果
-
     QTime time;
     time.start();
 
-    auto textInRaw = mCodec->fromUnicode(text).toStdString();
+    auto keyword = filter.keyword;
+
+    auto textInRaw = mCodec->fromUnicode(keyword).toStdString();
     SubLog* sub = new SubLog(this);
 
 #if defined (Q_OS_MACOS) || defined (__MINGW32__)
@@ -317,7 +331,7 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
     typedef const char*(*StrstrFunc)(const char*,const char*);
 #endif
     StrstrFunc strstrFunc = (StrstrFunc)strstr;
-    if (!caseSensitive) {
+    if (!filter.caseSensitive) {
         strstrFunc = (StrstrFunc)strcasestr;
     }
 
@@ -325,9 +339,18 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
     op.from = 1;
     op.to = mLineCnt;
     op.cur = 1;
+    int lastLine = 1;
     while (!op.terminate && (ptr = strstrFunc(ptr, textInRaw.c_str())) != nullptr) {
         op.cur = lineFromPos(ptr - mMem, op.cur);
-        sub->addLine(op.cur);
+        if (filter.revert) {
+            for (int i = lastLine; i < op.cur - 1; i++) {
+                sub->addLine(i);
+            }
+            lastLine = op.cur+1;
+        } else {
+            sub->addLine(op.cur);
+        }
+
         if (op.cur < op.to) {
             ptr = mMem + mEnters[op.cur];//直接到下一行
             op.cur++;
@@ -340,6 +363,12 @@ SubLog *FileLog::createSubLog(const QString &text, bool caseSensitive, LongtimeO
     if (op.terminate) {
         delete sub;
         return nullptr;
+    } else {
+        if (filter.revert) {
+            for (int i = lastLine; i < op.to; i++) {
+                sub->addLine(i);
+            }
+        }
     }
 
     qDebug()<<"create sub cost "<<time.elapsed();
@@ -420,4 +449,27 @@ int SubLog::fromParentLine(int lineNum)
     }
 
     return distance(mLines.begin(), it)+1;
+}
+
+QJsonValue Filter::saveToJson() const
+{
+    return QJsonObject{
+        {"keyword", keyword},
+        {"caseSensitive", caseSensitive},
+        {"revert", revert}
+    };
+}
+
+Filter::Filter(const QJsonValue &jv)
+    :keyword(jv["keyword"].toString()),
+      caseSensitive(jv["caseSensitive"].toBool()),
+      revert(jv["revert"].toBool())
+{
+
+}
+
+Filter::Filter()
+{
+    QSettings config;
+    caseSensitive = config.value("caseSensitive").toBool();
 }

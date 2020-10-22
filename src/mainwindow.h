@@ -34,7 +34,6 @@ private:
 private slots:
     void handleExportTimeLine();
     void handleFilter();
-    void handleFilterRequest(const QString &text);
     void handleNodeSelected(TimeNode* node);
     void handleSearchBackward();
     void handleSearchFoward();
@@ -51,9 +50,9 @@ private slots:
     void handleSubLogMarkLine(int line, const QString& text);
     void handleSaveProject();
     void handleOpenProject();
+    void doFilter(const Filter &filter);
 private:
     void search(bool foward);
-    void filter(const QString& text, bool caseSenesitive);
 public:
     void doOpenFile(const QString& path);
     void doOpenProject(const QString& path);
