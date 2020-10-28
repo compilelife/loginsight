@@ -2,6 +2,7 @@ name: Release
 
 on:
   workflow_dispatch:
+  repository_dispatch:
 
 jobs:
   build_linux:
