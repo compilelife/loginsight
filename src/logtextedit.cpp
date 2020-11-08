@@ -41,13 +41,14 @@ private:
 LogTextEdit::LogTextEdit(QWidget* parent)
     :QPlainTextEdit(parent)
 {
-    setLineWrapMode(QPlainTextEdit::NoWrap);
-
     QFont font;
     QSettings setting;
     font.setFamily(setting.value("editorFont").toString());
     font.setPointSize(setting.value("editorFontSize", 12).toInt());
     setFont(font);
+
+    if (!setting.value("wrap").toBool())
+        setLineWrapMode(QPlainTextEdit::NoWrap);
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
@@ -86,7 +87,7 @@ void LogTextEdit::setLog(Log *log)
     mExternalBar->setEnabled(true);
     load(1);
 
-    mExternalBar->setRange(1, mLog->lineCount() - mViewPortLineCnt);
+    mExternalBar->setRange(1, mLog->lineCount() - mViewPortMaxLineCnt);
 
     emit beenFocused(this);
 }
@@ -103,7 +104,7 @@ void LogTextEdit::resizeEvent(QResizeEvent *e)
     QPlainTextEdit::resizeEvent(e);
 
     auto metrics = fontMetrics();
-    mViewPortLineCnt = height()/metrics.height();
+    mViewPortMaxLineCnt = height()/metrics.height();
 
     QRect cr = contentsRect();
     mLineNumArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
@@ -122,10 +123,7 @@ void LogTextEdit::load(int topLine)
 {
     mLoading = true;
 
-    //从中间行向上向下拓宽mPreloadLineCnt / 2来加载，这样可以保证滚动到一半，反向滚动的时候无需触发加载
-    //即，会让窗口可视区处于新加载后内容的中央位置
-    auto centerLine = topLine + mViewPortLineCnt / 2;
-    mFromLine = centerLine - (mPreloadLineCnt / 2);
+    mFromLine = topLine - (mPreloadLineCnt / 2);
     if (mFromLine < 1)
         mFromLine = 1;
     mToLine = mFromLine + mPreloadLineCnt - 1;
@@ -136,7 +134,7 @@ void LogTextEdit::load(int topLine)
     setPlainText(mLog->getLine(mFromLine, mToLine));
     horizontalScrollBar()->setValue(horiValue);
 
-    verticalScrollBar()->setValue(fromLogToViewPort(topLine));
+    setVertialScrollbarByBlockNum(fromLogToViewPort(topLine));
 
     mLoading = false;
 }
@@ -155,10 +153,10 @@ void LogTextEdit::handleInternalScroll(int)
     mExternalBar->setValue(topLine);
 
     //window的作用是在还没消耗完预加载内容的时候就触发加载
-    auto windowTop = topLine - 5;
+    auto windowTop = topLine-1;
     if (windowTop < 1)
         windowTop = 1;
-    auto windowBottom = topLine + mViewPortLineCnt + 5;
+    auto windowBottom = topLine + mViewPortMaxLineCnt+1;
     if (windowBottom > mLog->lineCount()) {
         windowBottom = mLog->lineCount();
     }
@@ -172,37 +170,33 @@ void LogTextEdit::handleInternalScroll(int)
 
 void LogTextEdit::handleExternalScroll(int value)
 {
-    auto viewportTopLine = fromLogToViewPort(value);
-    if (viewportTopLine == verticalScrollBar()->value()) {
+    auto viewportBlock = fromLogToViewPort(value);
+    if (viewportBlock == firstVisibleBlock().blockNumber()) {
         return;
     }
 
-    auto min = verticalScrollBar()->minimum();
-    auto max = verticalScrollBar()->maximum();
-    if (viewportTopLine >= min && viewportTopLine <= max) {
+    if (mFromLine<= value && value <= mToLine) {
         mLoading = true;
-        verticalScrollBar()->setValue(viewportTopLine);
+        setVertialScrollbarByBlockNum(fromLogToViewPort(value));
         mLoading = false;
     } else {
         load(value);
     }
 }
 
-int LogTextEdit::fromViewPortToLog(int index)
+int LogTextEdit::fromViewPortToLog(int blockNum)
 {
-    //返回index从1开始
-    return index + mFromLine;
+    return blockNum + mFromLine;
 }
 
 int LogTextEdit::fromLogToViewPort(int line)
 {
-    //返回index从0开始
     return  line - mFromLine;
 }
 
-int LogTextEdit::centerLineGetTopRow(int line)
+void LogTextEdit::setVertialScrollbarByBlockNum(int number)
 {
-    return line - mViewPortLineCnt/2;
+    verticalScrollBar()->setValue(document()->findBlockByNumber(number).firstLineNumber());
 }
 
 void LogTextEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
@@ -272,9 +266,9 @@ void LogTextEdit::highlightCurrentLine()
         QTextEdit::ExtraSelection selection;
 
         selection.format.setTextOutline(QPen(Qt::black));
-        selection.format.setProperty(QTextFormat::FullWidthSelection, true);
         selection.cursor = textCursor();
         selection.cursor.clearSelection();
+        selection.cursor.select(QTextCursor::BlockUnderCursor);
         extraSelections.append(selection);
     }
 
@@ -436,7 +430,7 @@ void LogTextEdit::refresh()
     load(topLine);
 
     auto cursor = textCursor();
-    auto block = document()->findBlockByLineNumber(fromLogToViewPort(hlLine));
+    auto block = document()->findBlockByNumber(fromLogToViewPort(hlLine));
     cursor.setPosition(block.position());
 
     setTextCursor(cursor);
@@ -483,10 +477,10 @@ void LogTextEdit::scrollToLine(int lineNum, int col, bool recordToHistory)
     if (recordToHistory)
         mHistory.push(fromViewPortToLog(cursor.blockNumber()), cursor.columnNumber());
 
-    handleExternalScroll(centerLineGetTopRow(lineNum));//将target行滚动到窗口中间
+    handleExternalScroll(lineNum);//将target行滚动到窗口中间
 
     auto viewPortTarget = fromLogToViewPort(lineNum);
-    auto block = document()->findBlockByLineNumber(viewPortTarget);
+    auto block = document()->findBlockByNumber(viewPortTarget);
     auto pos = block.position() + col;
 
     cursor.setPosition(pos);

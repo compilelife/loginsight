@@ -32,9 +32,9 @@ signals:
     void userDropFile(const QString& path);
 private:
     void load(int topLine);
-    int fromViewPortToLog(int index);
+    int fromViewPortToLog(int blockNum);
     int fromLogToViewPort(int line);
-    int centerLineGetTopRow(int line/*or index*/);
+    void setVertialScrollbarByBlockNum(int number);
 private slots:
     void handleInternalScroll(int value);
     void handleExternalScroll(int value);
@@ -45,7 +45,7 @@ private:
     int mPreloadLineCnt{200};//预加载多少行
     bool mLoading{false};
     bool mScrolling{false};
-    int mViewPortLineCnt{0};
+    int mViewPortMaxLineCnt{0};
     QScrollBar* mExternalBar;
 //<===实现大文件的显示===
 

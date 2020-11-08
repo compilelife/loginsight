@@ -22,6 +22,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->gotoEOFCheckBox->setChecked(config.value("gotoEOF", true).toBool());
     ui->caseSensitiveCheckBox->setChecked(config.value("caseSensitive", true).toBool());
     ui->checkUpdateCheckBox->setChecked(config.value("checkUpdate", true).toBool());
+    ui->wrapCheckBox->setChecked(config.value("wrap", false).toBool());
 
     connect(ui->cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
     connect(ui->okBtn, &QPushButton::clicked, [this]{
@@ -31,6 +32,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
        saveConfig.setValue("gotoEOF", ui->gotoEOFCheckBox->isChecked());
        saveConfig.setValue("caseSensitive", ui->caseSensitiveCheckBox->isChecked());
        saveConfig.setValue("checkUpdate", ui->checkUpdateCheckBox->isChecked());
+       saveConfig.setValue("wrap", ui->wrapCheckBox->isChecked());
        saveConfig.sync();
        Toast::instance().show(Toast::INFO, "设置保存成功，重启后生效！");
        this->accept();

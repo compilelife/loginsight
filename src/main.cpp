@@ -36,6 +36,10 @@ static void createDefaultSettings()
         config.setValue("recentPrj", QStringList{});
     }
 
+    if (!keys.contains("wrap")) {
+        config.setValue("wrap", false);
+    }
+
     config.sync();
 }
 
