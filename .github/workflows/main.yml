@@ -43,7 +43,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2.6.2
+      uses: jurplel/install-qt-action@v2.10.0
 
     - name: do build
       shell: cmd
