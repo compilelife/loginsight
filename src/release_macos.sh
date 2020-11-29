@@ -5,4 +5,4 @@ qmake ../src/loginsight.pro -spec macx-clang CONFIG+=x86_64 CONFIG+=qtquickcompi
 make -j4
 macdeployqt loginsight.app -dmg
 mkdir artifact
-mv loginsight.dmg artifact
+mv loginsight.dmg artifact #
