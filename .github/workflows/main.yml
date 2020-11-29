@@ -18,7 +18,7 @@ jobs:
     - name: Install importlib-metadata (jurplel/install-qt-action issue 65 workaround)
       run: pip3 install importlib-metadata==2.1.0
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2.10.0
+      uses: jurplel/install-qt-action@master
 
     - name: do build
       run: |
