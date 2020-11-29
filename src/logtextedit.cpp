@@ -318,16 +318,19 @@ bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options, 
 
     scrollToLine(target.line, target.pos);//将target行滚动到窗口中间
 
-    //利用select选择search词
-    cursor = textCursor();
-    if (options.testFlag(QTextDocument::FindBackward)) {
-        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, text.length());
-    } else {
-        cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor, text.length());
-    }
-    setTextCursor(cursor);
+    if (!regex) {//使用正则表达式，还无法准确估计单词的长度；以及具体要高亮的单词
+        //利用select选择search词
+        cursor = textCursor();
+        if (options.testFlag(QTextDocument::FindBackward)) {
+            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, text.length());
+        } else {
+            cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor, text.length());
+        }
+        setTextCursor(cursor);
 
-    mHighlighter->searchHighlight(text, options.testFlag(QTextDocument::FindCaseSensitively));
+        mHighlighter->searchHighlight(text, options.testFlag(QTextDocument::FindCaseSensitively));
+    }
+    
     repaint();
 
     return true;
