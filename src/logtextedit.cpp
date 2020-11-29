@@ -329,10 +329,9 @@ bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options, 
         setTextCursor(cursor);
 
         mHighlighter->searchHighlight(text, options.testFlag(QTextDocument::FindCaseSensitively));
+        repaint();
     }
     
-    repaint();
-
     return true;
 }
 
