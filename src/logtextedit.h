@@ -75,7 +75,7 @@ private:
 
 //===实现搜索===>
 public:
-    bool search(const QString& text, QTextDocument::FindFlags options);
+    bool search(const QString& text, QTextDocument::FindFlags options, bool regex=false);
 signals:
     void requestFilter(const Filter& filter);
     //请求代理搜索，比如用户选择单词后发起搜索，主窗口可以根据当前的搜索方向来搜索

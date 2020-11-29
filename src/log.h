@@ -42,7 +42,7 @@ public:
     virtual SearchResult search(const QString& text,
                                 QTextDocument::FindFlags flag,
                                 int fromLine, int fromPos,
-                                LongtimeOperation& op);
+                                LongtimeOperation& op, bool regex=false);
     virtual SubLog* createSubLog(const Filter& filter, LongtimeOperation& op);
 };
 
@@ -64,7 +64,7 @@ public:
     SearchResult search(const QString& text,
                         QTextDocument::FindFlags flag,
                         int fromLine, int fromPos,
-                        LongtimeOperation& op) override;
+                        LongtimeOperation& op, bool regex=false) override;
 
 private:
     qint64 getLineStart(int num);

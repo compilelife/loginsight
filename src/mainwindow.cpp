@@ -483,7 +483,7 @@ void MainWindow::search(bool foward)
         flag.setFlag(QTextDocument::FindCaseSensitively);
     }
 
-    if (!mCurLogEdit->search(keyword, flag)) {
+    if (!mCurLogEdit->search(keyword, flag, mRegexCheckBox->isChecked())) {
         if (flag.testFlag(QTextDocument::FindBackward)) {
             Toast::instance().show(Toast::INFO, "到达顶部，没有找到匹配项");
         } else {
@@ -688,6 +688,10 @@ void MainWindow::createTagbar()
     mCaseSensitiveCheckBox->setText("大小写敏感");
     box->addWidget(mCaseSensitiveCheckBox);
 
+    mRegexCheckBox = new QCheckBox();
+    mRegexCheckBox->setText("使用正则表达式");
+    box->addWidget(mRegexCheckBox);
+
     mTagList = new TagListWidget;
     mTagList->setMinimumHeight(26);
     mTagList->setMaximumHeight(26);
@@ -701,6 +705,7 @@ void MainWindow::createTagbar()
     connect(mTagList, &TagListWidget::requestSearchTag, [this](const QString& keyword){
         mSearchEdit->setText(keyword);
         mCaseSensitiveCheckBox->setChecked(true);
+        mRegexCheckBox->setChecked(false);
         search(mSearchEdit->isSearchFoward());
     });
     connect(mTagList, &TagListWidget::requestFilterTag, this, &MainWindow::doFilter);

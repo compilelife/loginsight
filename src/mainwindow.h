@@ -80,6 +80,7 @@ private:
     TimeLine* mTimeLine;
     SearchEdit* mSearchEdit;
     QCheckBox* mCaseSensitiveCheckBox;
+    QCheckBox* mRegexCheckBox;
     QAction* mNavBackAction;
     QAction* mNavAheadAction;
     QAction* mGotoLineAction;

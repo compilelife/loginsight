@@ -31,7 +31,7 @@ QString Log::getLine(int num) {
     return getLine(num, num);
 }
 
-SearchResult Log::search(const QString &text, QTextDocument::FindFlags flag, int fromLine, int fromPos, LongtimeOperation& op)
+SearchResult Log::search(const QString &text, QTextDocument::FindFlags flag, int fromLine, int fromPos, LongtimeOperation& op, bool regex)
 {
     //因为文本里可能有汉字，要定位关键字出现在行里的位置，用strstr定位受编码影响，会定位偏。
     //最简单的做法是直接用QString的indexOf查找好位置返回出去
@@ -52,7 +52,11 @@ SearchResult Log::search(const QString &text, QTextDocument::FindFlags flag, int
             op.cur = fromLine;
             ret.line = fromLine;
             auto cur = getLine(fromLine);
-            ret.pos = cur.lastIndexOf(text, fromPos, caseSensitivity);
+            if(regex) {
+                ret.pos = cur.lastIndexOf(QRegExp(text), fromPos);
+            }else {
+                ret.pos = cur.lastIndexOf(text, fromPos, caseSensitivity);
+            }
             if (ret.pos >= 0) {
                 return ret;
             }
@@ -66,7 +70,11 @@ SearchResult Log::search(const QString &text, QTextDocument::FindFlags flag, int
             op.cur = fromLine;
             ret.line = fromLine;
             auto cur = getLine(fromLine);
-            ret.pos = cur.indexOf(text, fromPos, caseSensitivity);
+            if (regex) {
+                ret.pos = cur.indexOf(QRegExp(text), fromPos);
+            } else {
+                ret.pos = cur.indexOf(text, fromPos, caseSensitivity);
+            }
             if (ret.pos >= 0) {
                 ret.pos += text.length();
                 return ret;
@@ -376,8 +384,11 @@ SubLog *FileLog::createSubLog(const Filter &filter, LongtimeOperation& op)
     return sub;
 }
 
-SearchResult FileLog::search(const QString &text, QTextDocument::FindFlags flag, int fromLine, int fromPos, LongtimeOperation &op)
+SearchResult FileLog::search(const QString &text, QTextDocument::FindFlags flag, int fromLine, int fromPos, LongtimeOperation &op, bool regex)
 {
+    if (regex) {//先丢给默认实现处理，将来优化
+        return Log::search(text, flag, fromLine, fromPos, op, true);
+    }
     if (flag.testFlag(QTextDocument::FindBackward)) {//对于向后查找，我们需要str[r]casestr来作优化
         return Log::search(text, flag, fromLine, fromPos, op);
     }

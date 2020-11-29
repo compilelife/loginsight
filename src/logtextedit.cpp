@@ -286,7 +286,7 @@ void LogTextEdit::addWordHighlightUnderCursor()
     mHighlighter->quickHighlight(cursor.selectedText());
 }
 
-bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options)
+bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options, bool regex)
 {
     auto cursor = textCursor();
     auto line = fromViewPortToLog(cursor.blockNumber());
@@ -303,7 +303,7 @@ bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options)
 
     SearchResult target;
     bool canceled = BackgroundRunner::instance().exec(QString("查找%1").arg(text), [&](LongtimeOperation& op){
-        target = mLog->search(text, options, line, cursor.position() - cursor.block().position(), op);
+        target = mLog->search(text, options, line, cursor.position() - cursor.block().position(), op, regex);
     });
 
     if (canceled) {
