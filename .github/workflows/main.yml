@@ -16,7 +16,7 @@ jobs:
         sudo DEBIAN_FRONTEND=noninteractive apt-get update
         sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libfcitx-qt5-dev fcitx-frontend-qt5
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2.6.2
+      uses: jurplel/install-qt-action@v2.10.0
 
     - name: do build
       run: |
@@ -32,7 +32,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2.6.2
+      uses: jurplel/install-qt-action@v2.10.0
 
     - name: do build
       run: cd src;./release_macos.sh
