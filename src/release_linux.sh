@@ -10,3 +10,4 @@ mkdir appdir/usr/lib
 ../tool/linuxdeployqt appdir/usr/bin/loginsight -appimage
 mkdir artifact
 mv loginsight-*.AppImage artifact/loginsight.AppImage
+
