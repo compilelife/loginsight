@@ -289,7 +289,6 @@ void LogTextEdit::addWordHighlightUnderCursor()
 bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options, bool regex)
 {
     auto cursor = textCursor();
-    auto line = fromViewPortToLog(cursor.blockNumber());
 
     //清除选区以保证连续search的正确
     if (cursor.hasSelection()) {
@@ -300,6 +299,7 @@ bool LogTextEdit::search(const QString &text, QTextDocument::FindFlags options, 
             cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, len);
         }
     }
+    auto line = fromViewPortToLog(cursor.blockNumber());
 
     SearchResult target;
     bool canceled = BackgroundRunner::instance().exec(QString("查找%1").arg(text), [&](LongtimeOperation& op){
