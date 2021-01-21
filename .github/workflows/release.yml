@@ -19,6 +19,7 @@ jobs:
            pip3 install --upgrade pip
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.10.0
+      mirror: 'http://mirrors.ocf.berkeley.edu/qt/'
       with:
         aqtversion: '==0.9.5'
         py7zrversion: '==0.10.1'
@@ -51,6 +52,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.10.0
+      mirror: 'http://mirrors.ocf.berkeley.edu/qt/'
 
     - name: do build
       run: cd src;./release_macos.sh
@@ -75,6 +77,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.10.0
+      mirror: 'http://mirrors.ocf.berkeley.edu/qt/'
 
     - name: do build
       shell: cmd
