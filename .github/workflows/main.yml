@@ -1,6 +1,7 @@
 name: Build
 
 on:
+  repository_dispatch:
   push:
     paths:
       - 'src/*'
@@ -23,7 +24,6 @@ jobs:
       with:
         aqtversion: '==0.9.5'
         py7zrversion: '==0.10.1'
-        mirror: 'http://mirrors.ocf.berkeley.edu/qt/'
 
     - name: do build
       run: |
