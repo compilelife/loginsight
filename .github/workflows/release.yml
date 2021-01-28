@@ -14,15 +14,15 @@ jobs:
       run: |
         sudo DEBIAN_FRONTEND=noninteractive apt-get update
         sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libfcitx-qt5-dev fcitx-frontend-qt5
+        sudo QT_DEBUG_PLUGINS=1 apt install --reinstall libxcb-xinerama0
     - name: Update pip (Ubuntu-16.05)
       run: |
            pip3 install --upgrade pip
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2.10.0
+      uses: jurplel/install-qt-action@v2
       with:
         aqtversion: '==0.9.5'
         py7zrversion: '==0.10.1'
-        mirror: 'http://mirrors.ocf.berkeley.edu/qt/'
 
     - name: do build
       run: |
