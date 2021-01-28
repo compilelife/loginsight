@@ -17,6 +17,7 @@ jobs:
       run: |
         sudo DEBIAN_FRONTEND=noninteractive apt-get update
         sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libfcitx-qt5-dev fcitx-frontend-qt5
+        sudo QT_DEBUG_PLUGINS=1 apt install --reinstall libxcb-xinerama0
     - name: Update pip (Ubuntu-16.05)
       run: |
            pip3 install --upgrade pip
