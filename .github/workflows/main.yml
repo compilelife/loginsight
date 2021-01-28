@@ -1,6 +1,7 @@
 name: Build
 
 on:
+  workflow_dispatch:
   repository_dispatch:
   push:
     paths:
