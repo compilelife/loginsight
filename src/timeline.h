@@ -1,4 +1,4 @@
-#ifndef TIMELINEEX_H
+﻿#ifndef TIMELINEEX_H
 #define TIMELINEEX_H
 
 #include <QGraphicsView>

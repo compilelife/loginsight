@@ -1,4 +1,4 @@
-#ifndef HIGHLIGHTER_H
+﻿#ifndef HIGHLIGHTER_H
 #define HIGHLIGHTER_H
 
 #include <QSyntaxHighlighter>

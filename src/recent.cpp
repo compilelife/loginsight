@@ -1,4 +1,4 @@
-#include "recent.h"
+﻿#include "recent.h"
 #include <QSettings>
 
 Recent::Recent(QString key, int maxCount)

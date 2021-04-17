@@ -1,4 +1,4 @@
-#include "timenodehead.h"
+﻿#include "timenodehead.h"
 #include <QPainter>
 #include "timeline.h"
 #include "timenode.h"

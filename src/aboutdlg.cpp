@@ -1,4 +1,4 @@
-#include "aboutdlg.h"
+﻿#include "aboutdlg.h"
 #include "ui_aboutdlg.h"
 #include "updater.h"
 #include <QMessageBox>

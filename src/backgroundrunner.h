@@ -1,4 +1,4 @@
-#ifndef BACKGROUNDRUNNER_H
+﻿#ifndef BACKGROUNDRUNNER_H
 #define BACKGROUNDRUNNER_H
 
 #include <QObject>

@@ -1,4 +1,4 @@
-#ifndef ABOUTDLG_H
+﻿#ifndef ABOUTDLG_H
 #define ABOUTDLG_H
 
 #include <QDialog>

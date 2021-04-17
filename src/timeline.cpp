@@ -1,4 +1,4 @@
-#include "timeline.h"
+﻿#include "timeline.h"
 #include <QGraphicsScene>
 #include <QGraphicsLineItem>
 #include <QGraphicsDropShadowEffect>

@@ -1,4 +1,4 @@
-#include "searchedit.h"
+﻿#include "searchedit.h"
 #include <QIcon>
 #include <QAction>
 #include <QStringListModel>

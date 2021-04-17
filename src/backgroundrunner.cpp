@@ -1,4 +1,4 @@
-#include "backgroundrunner.h"
+﻿#include "backgroundrunner.h"
 #include <QEventLoop>
 #include <memory>
 #include <QDebug>

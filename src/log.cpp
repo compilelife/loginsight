@@ -1,4 +1,4 @@
-#include <QtGlobal>
+﻿#include <QtGlobal>
 #ifdef Q_OS_LINUX
 #define _GNU_SOURCE //strcasestr in linux
 #endif

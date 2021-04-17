@@ -1,4 +1,4 @@
-#ifndef HISTORY_H
+﻿#ifndef HISTORY_H
 #define HISTORY_H
 
 #include <QList>

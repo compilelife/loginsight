@@ -1,4 +1,4 @@
-#include "taglistwidget.h"
+﻿#include "taglistwidget.h"
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMenu>

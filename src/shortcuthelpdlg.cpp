@@ -1,4 +1,4 @@
-#include "shortcuthelpdlg.h"
+﻿#include "shortcuthelpdlg.h"
 #include "ui_shortcuthelpdlg.h"
 
 ShortcutHelpDlg::ShortcutHelpDlg(QWidget *parent) :

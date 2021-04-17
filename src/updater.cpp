@@ -1,4 +1,4 @@
-#include "updater.h"
+﻿#include "updater.h"
 #include <QNetworkRequest>
 #include "version.h"
 

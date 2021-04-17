@@ -1,4 +1,4 @@
-#ifndef SEARCHEDIT_H
+﻿#ifndef SEARCHEDIT_H
 #define SEARCHEDIT_H
 
 #include <QLineEdit>

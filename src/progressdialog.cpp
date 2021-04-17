@@ -1,4 +1,4 @@
-#include "progressdialog.h"
+﻿#include "progressdialog.h"
 #include "ui_progressdialog.h"
 #include <QPushButton>
 

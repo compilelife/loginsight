@@ -1,4 +1,4 @@
-#ifndef CHOOSECOLORMENU_H
+﻿#ifndef CHOOSECOLORMENU_H
 #define CHOOSECOLORMENU_H
 
 #include <QMenu>

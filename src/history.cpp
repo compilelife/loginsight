@@ -1,4 +1,4 @@
-#include "history.h"
+﻿#include "history.h"
 
 History::History(AbstractNavPosReplayer* replayer, int max)
     :mMax(max), mReplayer(replayer)

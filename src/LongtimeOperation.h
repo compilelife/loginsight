@@ -1,4 +1,4 @@
-#ifndef LONGTIMEOPERATION_H
+﻿#ifndef LONGTIMEOPERATION_H
 #define LONGTIMEOPERATION_H
 
 struct LongtimeOperation {

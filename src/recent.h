@@ -1,4 +1,4 @@
-#ifndef RECENT_H
+﻿#ifndef RECENT_H
 #define RECENT_H
 
 #include <QString>

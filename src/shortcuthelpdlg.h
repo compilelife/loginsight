@@ -1,4 +1,4 @@
-#ifndef SHORTCUTHELPDLG_H
+﻿#ifndef SHORTCUTHELPDLG_H
 #define SHORTCUTHELPDLG_H
 
 #include <QDialog>

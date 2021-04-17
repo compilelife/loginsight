@@ -1,4 +1,4 @@
-#include "backgroundtaskcontainer.h"
+﻿#include "backgroundtaskcontainer.h"
 #include <QDebug>
 
 BackgroundTaskContainer::BackgroundTaskContainer(BackgroundTask task, LongtimeOperation& op)

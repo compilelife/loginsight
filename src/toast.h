@@ -1,4 +1,4 @@
-#ifndef TOAST_H
+﻿#ifndef TOAST_H
 #define TOAST_H
 
 #include <QObject>

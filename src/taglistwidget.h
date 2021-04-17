@@ -1,4 +1,4 @@
-#ifndef TAGLISTWIDGET_H
+﻿#ifndef TAGLISTWIDGET_H
 #define TAGLISTWIDGET_H
 
 #include <QListWidget>

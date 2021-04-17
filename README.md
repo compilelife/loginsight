@@ -2,8 +2,6 @@
 
 loginsight致力于打造一款日志分析的利器
 
-前往👉[下载](https://mianbaoduo.com/o/bread/aZeTkpc=): https://mianbaoduo.com/o/bread/aZeTkpc=
-
 ![preview](https://s1.ax1x.com/2020/06/26/Ns3XGQ.png)
 
 亮点特性：
@@ -27,8 +25,13 @@ loginsight致力于打造一款日志分析的利器
 
 [使用说明](https://github.com/compilelife/loginsight/wiki/使用说明)
 
-[开发计划](https://github.com/compilelife/loginsight/projects/1)
+## 开发计划
 
+本开源项目接下来将逐步商业化（专业版），在这里仍然会更新基础功能的代码，专业版在此基础功能上增加更多优质功能
+
+早期的赞助用户，将自动分配专业版的注册码，升级为专业版用户。
+
+专业版正在制作中，敬请期待。
 
 
 PS：

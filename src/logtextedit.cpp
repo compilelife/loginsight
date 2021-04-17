@@ -1,4 +1,4 @@
-#include "logtextedit.h"
+﻿#include "logtextedit.h"
 #include <QFile>
 #include <QDebug>
 #include <string>

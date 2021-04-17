@@ -1,4 +1,4 @@
-#ifndef LOGTEXTEDIT_H
+﻿#ifndef LOGTEXTEDIT_H
 #define LOGTEXTEDIT_H
 
 #include <QPlainTextEdit>

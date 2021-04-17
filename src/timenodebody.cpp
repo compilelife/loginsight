@@ -1,4 +1,4 @@
-#include "timenodebody.h"
+﻿#include "timenodebody.h"
 #include <QTextOption>
 #include <QPainter>
 #include "timenode.h"
