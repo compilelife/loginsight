@@ -1,6 +1,6 @@
 loginsight致力于打造一款日志分析的利器
 
-官网：www.loginsight.top
+[官网](http://39.103.210.5)
 
 ![preview](https://s1.ax1x.com/2020/06/26/Ns3XGQ.png)
 
@@ -34,5 +34,7 @@ loginsight致力于打造一款日志分析的利器
 - 全平台：https://mianbaoduo.com/o/bread/YZibmZtw
 
 **之前所有赞助者，不论赞助费多少，都可以直接使用“面包多”赞助页面的订单号完成注册，无需购买。**
+
+[安装说明](http://39.103.210.5/Downloading/auto)
 
 本工程的源码包含了基础板的功能，并与专业版保持同步更新，您随时可以从源码构建基础版的功能
