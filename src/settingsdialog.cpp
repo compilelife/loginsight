@@ -3,8 +3,9 @@
 
 #include <QSettings>
 #include <QPushButton>
-#include "toast.h"
+#include <QMessageBox>
 #include <QFontDialog>
+#include "util.h"
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
     QDialog(parent),
@@ -19,7 +20,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     mEditorFont.setPointSize(config.value("editorFontSize", 12).toInt());
     updateFontLabel();
 
-    ui->gotoEOFCheckBox->setChecked(config.value("gotoEOF", true).toBool());
     ui->caseSensitiveCheckBox->setChecked(config.value("caseSensitive", true).toBool());
     ui->checkUpdateCheckBox->setChecked(config.value("checkUpdate", true).toBool());
     ui->wrapCheckBox->setChecked(config.value("wrap", false).toBool());
@@ -29,13 +29,25 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
        QSettings saveConfig;
        saveConfig.setValue("editorFont", mEditorFont.family());
        saveConfig.setValue("editorFontSize", mEditorFont.pointSize());
-       saveConfig.setValue("gotoEOF", ui->gotoEOFCheckBox->isChecked());
        saveConfig.setValue("caseSensitive", ui->caseSensitiveCheckBox->isChecked());
        saveConfig.setValue("checkUpdate", ui->checkUpdateCheckBox->isChecked());
        saveConfig.setValue("wrap", ui->wrapCheckBox->isChecked());
        saveConfig.sync();
-       Toast::instance().show(Toast::INFO, "设置保存成功，重启后生效！");
-       this->accept();
+
+       QMessageBox hint;
+       hint.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+       hint.button(QMessageBox::Ok)->setText("立即重启");
+       hint.button(QMessageBox::Cancel)->setText("稍后重启");
+       hint.setText("设置保存成功，重启后生效！");
+       hint.setWindowTitle("保存成功");
+       switch(hint.exec()) {
+       case QMessageBox::Ok:
+           relaunchApp();
+           return;
+       default:
+           this->accept();
+            break;
+       }
     });
 
     connect(ui->chooseFontBtn, &QPushButton::clicked, [this]{

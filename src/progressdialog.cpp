@@ -1,66 +1,45 @@
-﻿#include "progressdialog.h"
-#include "ui_progressdialog.h"
-#include <QPushButton>
+#include "progressdialog.h"
+#include <QDebug>
 
-ProgressDialog::ProgressDialog(LongtimeOperation& op, QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::ProgressDialog),
-    mOp(op)
+ProgressDialog::ProgressDialog(shared_ptr<LongtimeOperation> op, const QString &hint, function<void()> cleanup)
 {
-    ui->setupUi(this);
-    setWindowFlags(Qt::CustomizeWindowHint|Qt::WindowTitleHint);
-    connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(handleUserCancel()));
+    mOp = op;
+
+    setModal(true);
+
+    setMaximum(op->getProgressMax());
+    setMinimum(op->getProgressMin());
+
+    setMinimumDuration(1000);//大于2s的操作才显示
+
+    setLabelText(hint);
+    setAutoClose(true);
+
+    connect(this, &QProgressDialog::canceled, [this]{
+        mOp->cancel();
+        finished(1);
+    });
+
+    connect(this, &QProgressDialog::finished, [this, cleanup]{
+        qDebug()<<"finished";
+
+        cleanup();
+        killTimer(mTimerId);
+        this->deleteLater();
+    });
+
+    setValue(minimum());
+
+    mTimerId = startTimer(50);//每50ms更新一次进度
+    mOp->start();
 }
 
-ProgressDialog::~ProgressDialog()
-{
-    delete ui;
+void ProgressDialog::timerEvent(QTimerEvent *e) {
+    QProgressDialog::timerEvent(e);
+
+//    qDebug()<<"set value:"<<mOp->getProgressValue();
+    setValue(mOp->getProgressValue());
+    if (mOp->getState() == LongtimeOperation::eStateDone)
+        finished(0);
 }
 
-int ProgressDialog::exec()
-{
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(true);
-    mCanceled=false;
-    mLast = 0;
-    updateValue();
-    mTimerId = startTimer(500);
-    return QDialog::exec();
-}
-
-void ProgressDialog::finish()
-{
-    if (mCanceled)
-        reject();
-    else
-        accept();
-}
-
-void ProgressDialog::handleUserCancel()
-{
-    mOp.terminate = true; //引起处理线程退出耗时操作
-    mCanceled = true;//等待finish()被调用
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(false);
-}
-
-void ProgressDialog::timerEvent(QTimerEvent *event)
-{
-    updateValue();
-}
-
-void ProgressDialog::closeEvent(QCloseEvent *)
-{
-    killTimer(mTimerId);
-}
-
-void ProgressDialog::updateValue()
-{
-    if (mOp.cur == mLast) {
-        ++mOp.cur;//让进度条看起来至少有在动
-    }
-    mLast = mOp.cur;
-
-    auto value = (mOp.cur - mOp.from) * 1.0f / (mOp.to - mOp.from) * 100;
-    ui->progressBar->setValue(value);
-
-    ui->label->setText(QString("%1 / %2 - %3  (%4%)").arg(mOp.cur).arg(mOp.from).arg(mOp.to).arg(ui->progressBar->value()));
-}

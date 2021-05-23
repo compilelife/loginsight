@@ -1,4 +1,4 @@
-﻿#ifndef HIGHLIGHTER_H
+#ifndef HIGHLIGHTER_H
 #define HIGHLIGHTER_H
 
 #include <QSyntaxHighlighter>
@@ -7,6 +7,9 @@ struct HighlightPattern {
     QString key;
     bool caseSensitive{false};
     QColor color;
+
+    QJsonObject saveToJson();
+    void loadFromJson(QJsonObject o);
 };
 
 class Highlighter: public QSyntaxHighlighter
@@ -22,6 +25,10 @@ public:
     void searchHighlight(const QString& text, bool caseSensitive);
 
     const QList<HighlightPattern> allQuickHighlights(){return mQuickHls.values();}
+
+public:
+    QJsonObject saveToJson();
+    void loadFromJson(QJsonObject o);
 
 signals:
     void onPatternAdded(HighlightPattern pattern);

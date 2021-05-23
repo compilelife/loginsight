@@ -1,36 +1,23 @@
-﻿#ifndef PROGRESSDIALOG_H
+#ifndef PROGRESSDIALOG_H
 #define PROGRESSDIALOG_H
 
-#include <QDialog>
-#include "LongtimeOperation.h"
+#include <QProgressDialog>
+#include "longtimeoperation.h"
+#include <memory>
+#include <functional>
 
-namespace Ui {
-class ProgressDialog;
-}
+using namespace std;
 
-class ProgressDialog : public QDialog
+class ProgressDialog : public QProgressDialog
 {
-    Q_OBJECT
+public:
+    ProgressDialog(shared_ptr<LongtimeOperation> op, const QString &hint, function<void()> cleanup);
 
 public:
-    explicit ProgressDialog(LongtimeOperation& op, QWidget *parent = nullptr);
-    ~ProgressDialog() override;
-public:
-    int exec() override;
-    void finish();
-public slots:
-    void handleUserCancel();
-protected:
     void timerEvent(QTimerEvent *event) override;
-    void closeEvent(QCloseEvent *) override;
 private:
-    void updateValue();
-private:
-    Ui::ProgressDialog *ui;
-    LongtimeOperation& mOp;
-    int mTimerId;
-    int mLast;
-    bool mCanceled{false};
+    shared_ptr<LongtimeOperation> mOp;
+    int mTimerId{-1};
 };
 
 #endif // PROGRESSDIALOG_H

@@ -1,4 +1,4 @@
-﻿#include "timeline.h"
+#include "timeline.h"
 #include <QGraphicsScene>
 #include <QGraphicsLineItem>
 #include <QGraphicsDropShadowEffect>
@@ -6,10 +6,10 @@
 #include <QImage>
 #include <QtGlobal>
 #include <QApplication>
-#include "toast.h"
 #include <QClipboard>
 #include <QPropertyAnimation>
 #include <QJsonArray>
+#include <QMessageBox>
 
 TimeLine::TimeLine(QWidget* parent)
     :QGraphicsView(parent)
@@ -115,7 +115,7 @@ void TimeLine::exportToClipboard()
 {
     withExportedImage([](QImage& img){
         QApplication::clipboard()->setImage(img);
-        Toast::instance().show(Toast::INFO, "时间线已复制到剪贴板");
+        QMessageBox::information(nullptr, "复制时间线", "时间线已复制到剪贴板");
     });
 }
 

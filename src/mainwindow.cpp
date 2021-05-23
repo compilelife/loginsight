@@ -1,754 +1,425 @@
-﻿#include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include <QFile>
+#include "mainwindow.h"
+#include <QTabWidget>
+#include <QPlainTextEdit>
+#include <QTabBar>
 #include <QDebug>
-#include <QScrollBar>
-#include "timeline.h"
-#include "timenode.h"
-#include <QTime>
-#include <QToolBar>
-#include <QStyle>
-#include <QFileDialog>
-#include <QInputDialog>
-#include <QMessageBox>
-#include "history.h"
-#include <QSplitterHandle>
-#include "backgroundrunner.h"
-#include <QVBoxLayout>
-#include <QDialogButtonBox>
-#include <QResizeEvent>
-#include "toast.h"
+#include <QSplitter>
+#include "documenttab.h"
+#include "filesource.h"
+#include "progressdialog.h"
+#include <memory>
+#include <QMenuBar>
 #include <QMenu>
-#include <QTextCodec>
-#include <QDesktopServices>
-#include "settingsdialog.h"
+#include <QToolBar>
+#include "searchbar.h"
+#include <QMessageBox>
+#include "filterdialog.h"
+#include <QInputDialog>
 #include <QSettings>
-#include <QToolButton>
-#include <QCheckBox>
-#include <QListWidget>
-#include "searchedit.h"
-#include "taglistwidget.h"
-#include <QMimeData>
-#include <QDockWidget>
-#include "updater.h"
-#include "aboutdlg.h"
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <QAction>
+#include <memory>
+#include "QTextCodec"
+#include <QJsonArray>
 #include "version.h"
+#include <QFileDialog>
+#include "settingsdialog.h"
+#include <QJsonDocument>
+#include <QDesktopServices>
+#include <QUrl>
+#include "aboutdlg.h"
+#include "updater.h"
+#include "webhome.h"
+
+using namespace std;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
-    setWindowTitle("loginsight");
-    setContextMenuPolicy(Qt::NoContextMenu);
+    buildTabWidget();
+    mWelcomePage = new WelcomePage(this);
 
-    QSettings config;
+    mCenterWidget = new QStackedWidget;
+    mCenterWidget->addWidget(mTabWidget);
+    mCenterWidget->addWidget(mWelcomePage);
 
-    connect(&Updater::instance(), &Updater::newVersionFound, [](const QString& v){
-        QMessageBox mbox;
-        mbox.setTextFormat(Qt::RichText);
-        mbox.setWindowTitle("软件更新");
-        mbox.setText("<p>找到新版本: "+v+"</p><a href='https://github.com/compilelife/loginsight/releases/latest'>前往下载</a>");
-        mbox.exec();
-    });
-    if (config.value("checkUpdate").toBool())
-        Updater::instance().checkNewVersion();
+    setCentralWidget(mCenterWidget);
 
-    createCenterWidget();
-    createSubLogDockWidget();
-    createTimelineDockWidget();
-    createToolbar();
-    createTagbar();
-    bindActions();
-    createRecentActions();
+    mCenterWidget->setCurrentWidget(mWelcomePage);
 
-    showMaximized();
+        buildMenuBar();
+        buildToolbars();
 
-
-    mCaseSensitiveCheckBox->setChecked(config.value("caseSensitive").toBool());
-
-    noDocSetDisable();
+        bindUserControls();
+        noDocDisableActions();
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
 }
 
-void MainWindow::bindActions()
+void MainWindow::closeEvent(QCloseEvent *ev)
 {
-    connect(mSearchEdit, SIGNAL(searchFoward()), this, SLOT(handleSearchFoward()));
-    connect(mSearchEdit, SIGNAL(searchBackward()), this, SLOT(handleSearchBackward()));
-
-    connect(mTimeLine, SIGNAL(nodeSelected(TimeNode*)), this, SLOT(handleNodeSelected(TimeNode*)));
-
-    bindLogEditActions();
-    bindMenuAction();
-}
-
-void MainWindow::bindLogEditActions()
-{
-    connect(mLogEdit, SIGNAL(requestMarkLine(int, const QString&)), mTimeLine, SLOT(addNode(int,const QString&)));
-    connect(mSubLogEdit, SIGNAL(requestMarkLine(int, const QString&)), this, SLOT(handleSubLogMarkLine(int, const QString&)));
-    connect(mLogEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
-    connect(mSubLogEdit->history(), SIGNAL(posChanged()), this, SLOT(handleHistoryPosChanged()));
-    connect(mLogEdit, SIGNAL(returnPressed()), mSearchEdit, SLOT(transferReturnBehavior()));
-    connect(mSubLogEdit, SIGNAL(returnPressed()), mSearchEdit, SLOT(transferReturnBehavior()));
-    connect(mLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
-    connect(mSubLogEdit, &LogTextEdit::beenFocused, this, &MainWindow::handleLogEditFocus);
-    connect(mLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleLogEditEmphasizeLine(int)));
-    connect(mSubLogEdit, SIGNAL(emphasizeLine(int)), this, SLOT(handleSubLogEditEmphasizeLine(int)));
-    connect(mLogEdit, &LogTextEdit::requestFilter, this, &MainWindow::doFilter);
-    connect(mSubLogEdit, &LogTextEdit::requestFilter, this, &MainWindow::doFilter);
-    auto searchUsingCurDirection = [this](const QString& text){
-        mSearchEdit->setText(text);
-        search(mSearchEdit->isSearchFoward());
-    };
-    connect(mLogEdit, &LogTextEdit::delegateSearch, searchUsingCurDirection);
-    connect(mSubLogEdit, &LogTextEdit::delegateSearch, searchUsingCurDirection);
-
-    connect(mLogEdit, &LogTextEdit::userDropFile, [this](const QString& path){
-        doOpenFile(path);
-    });
-}
-
-void MainWindow::bindMenuAction()
-{
-    //文件
-    auto group = new QActionGroup(this);
-    group->addAction(ui->actionGBK);
-    group->addAction(ui->actionUTF8);
-
-    connect(group, &QActionGroup::triggered, [this](QAction* action){setEncoding(action->text());});
-    connect(ui->actionopen, &QAction::triggered, this, &MainWindow::handleOpenFile);
-    connect(ui->actionclose, &QAction::triggered, this, &MainWindow::handleCloseFile);
-    connect(ui->actionquit, &QAction::triggered, []{QCoreApplication::quit();});
-    connect(ui->actionsetting, &QAction::triggered, []{
-        SettingsDialog dlg;
-        dlg.exec();
-    });
-
-    connect(ui->actionsaveproject, &QAction::triggered, this, &MainWindow::handleSaveProject);
-    connect(ui->actionopenproject, &QAction::triggered, this, &MainWindow::handleOpenProject);
-
-    //检视
-    connect(ui->actionsearch, &QAction::triggered, [this]{
-        mSearchEdit->setSearchFoward(true);
-        mSearchEdit->setFocus();
-    });
-    connect(ui->actionreverseSearch, &QAction::triggered, [this]{
-        mSearchEdit->setSearchFoward(false);
-        mSearchEdit->setFocus();
-    });
-    connect(ui->actionsearchFoward, &QAction::triggered, this, &MainWindow::handleSearchFoward);
-    connect(ui->actionsearchBack, &QAction::triggered, this, &MainWindow::handleSearchFoward);
-    connect(ui->actionfilter, &QAction::triggered, this, &MainWindow::handleFilter);
-    connect(ui->actiongoBack, &QAction::triggered, this, &MainWindow::handleNavBackward);
-    connect(ui->actiongoFoward, &QAction::triggered, this, &MainWindow::handleNavFoward);
-    connect(ui->actiongotoLine, &QAction::triggered, this, &MainWindow::handleGotoLine);
-    connect(ui->actionhighlight, &QAction::triggered, [this]{
-        auto text = QInputDialog::getText(this, "高亮", "输入要高亮的单词(大小写敏感)");
-        if (text.length() > 0) {
-            mCurLogEdit->getHighlighter()->quickHighlight(text);
-        }
-    });
-
-    //时间线
-    connect(ui->actiontoClipboard, &QAction::triggered, mTimeLine, &TimeLine::exportToClipboard);
-    connect(ui->actionexport, &QAction::triggered, this, &MainWindow::handleExportTimeLine);
-    connect(ui->actionclearAll, &QAction::triggered, mTimeLine, &TimeLine::clear);
-
-    //帮助
-    connect(ui->actionshortcut, &QAction::triggered, [this]{
-        mShortcutHelpDlg.show();
-    });
-    connect(ui->actiondoc, &QAction::triggered, []{
-        QDesktopServices::openUrl(QUrl("https://github.com/compilelife/loginsight/wiki"));
-    });
-    connect(ui->actionabout, &QAction::triggered, []{
-        AboutDlg dlg;
-        dlg.exec();
-    });
-}
-
-void MainWindow::noDocSetDisable()
-{
-    ui->actionclose->setEnabled(false);
-    ui->actionsaveproject->setEnabled(false);
-    ui->menuEncoding->setEnabled(false);
-    ui->menuInsight->setEnabled(false);
-
-    ui->actiongoBack->setEnabled(false);
-    ui->actiongoFoward->setEnabled(false);
-    mNavBackAction->setEnabled(false);
-    mNavAheadAction->setEnabled(false);
-
-    mSearchEdit->setEnabled(false);
-    mGotoLineAction->setEnabled(false);
-    mFilterAction->setEnabled(false);
-
-    mTagList->clear();
-}
-
-void MainWindow::hasDocSetEnbale()
-{
-    ui->actionclose->setEnabled(true);
-    ui->actionsaveproject->setEnabled(true);
-    ui->menuEncoding->setEnabled(true);
-    ui->menuInsight->setEnabled(true);
-
-    ui->actiongoBack->setEnabled(false);
-    ui->actiongoFoward->setEnabled(false);
-    mNavBackAction->setEnabled(false);
-    mNavAheadAction->setEnabled(false);
-
-    mSearchEdit->setEnabled(true);
-    mGotoLineAction->setEnabled(true);
-    mFilterAction->setEnabled(true);
-
-    mTagList->clear();
-}
-
-void MainWindow::handleExportTimeLine()
-{
-    auto filename = QFileDialog::getSaveFileName(this, "保存时间线到", QString(), "Images (*.png)");
-    if (!filename.contains('.')) {
-        filename += ".png";
-    }
-    mTimeLine->exportToImage(filename);
-}
-
-void MainWindow::handleFilter()
-{
-    if (!mLog.isOpened())
-        return;
-
-    QDialog inputDlg;
-    inputDlg.setWindowTitle("过滤日志");
-
-    QVBoxLayout layout(&inputDlg);
-    QCheckBox caseSensentiveCheckBox("大小写敏感");
-    QSettings config;
-    caseSensentiveCheckBox.setChecked(config.value("caseSensitive").toBool());
-    caseSensentiveCheckBox.setFocusPolicy(Qt::NoFocus);
-    layout.addWidget(&caseSensentiveCheckBox);
-    QCheckBox revertCheckBox("反转过滤");
-    revertCheckBox.setFocusPolicy(Qt::NoFocus);
-    layout.addWidget(&revertCheckBox);
-
-    QLineEdit lineEdit;
-    lineEdit.setPlaceholderText("请输入要过滤的关键字");
-    lineEdit.setFocus();
-    layout.addWidget(&lineEdit);
-
-    QDialogButtonBox btnBox(QDialogButtonBox::Ok);
-    layout.addWidget(&btnBox);
-    connect(&btnBox, SIGNAL(accepted()), &inputDlg, SLOT(accept()));
-
-    if (inputDlg.exec() != QDialog::Accepted || lineEdit.text().isEmpty()) {
-        return;
-    }
-
-    Filter filter;
-    filter.keyword = lineEdit.text();
-    filter.caseSensitive = caseSensentiveCheckBox.isChecked();
-    filter.revert = revertCheckBox.isChecked();
-    doFilter(filter);
-}
-
-void MainWindow::handleNodeSelected(TimeNode *node)
-{
-    auto lineNum = node->data();
-    mLogEdit->scrollToLine(lineNum);
-    if (mSubLog) {
-        auto subLogLine = mSubLog->fromParentLine(lineNum);
-        if (subLogLine > 0)
-            mSubLogEdit->scrollToLine(subLogLine);
+    auto cnt = mTabWidget->count();
+    for (auto i = 0; i < cnt; i++) {
+        doCloseDocumentTab(i);
     }
 }
 
-void MainWindow::handleSearchBackward()
+void MainWindow::openFile()
 {
-    search(false);
-}
-
-void MainWindow::handleSearchFoward()
-{
-    search(true);
-}
-
-void MainWindow::handleGotoLine()
-{
-    if (!mLog.isOpened())
+    auto path = QFileDialog::getOpenFileName(this, "打开文件");
+    if (path.isEmpty())
         return;
-
-    bool ok = false;
-    auto log = mCurLogEdit->getLog();
-
-    auto lineNum = QInputDialog::getInt(this,
-                                        "跳转到行",
-                                        QString("范围：1 - %1").arg(log->lineCount()),
-                                        1, 1, mCurLogEdit->getLineCount(),1,&ok);
-    if (ok)
-        mCurLogEdit->scrollToLine(lineNum);
-}
-
-void MainWindow::handleOpenFile()
-{
-    auto path = QFileDialog::getOpenFileName(this, "打开日志文件");
-    if (path.isEmpty()) {
-        return;
-    }
 
     doOpenFile(path);
 }
 
-void MainWindow::handleCloseFile()
+void MainWindow::closeDocumentTab(int index)
 {
-    if (mSubLog) {
-        delete mSubLog;
-        mSubLog = nullptr;
-        mSubLogEdit->setLog(nullptr);
-        mSubLogEdit->clear();
-        mSubLogDWidget->setVisible(false);
-    }
-
-    mLog.close();
-    mLogEdit->setLog(nullptr);
-    mLogEdit->clear();
-    mTimeLine->clear();
-    mTagList->clear();
-
-    noDocSetDisable();
-
-    setWindowTitle("loginsight");
-}
-
-void MainWindow::handleHistoryPosChanged()
-{
-    mNavBackAction->setEnabled(mCurLogEdit->history()->availableBackwardCount() > 0);
-    ui->actiongoBack->setEnabled(mCurLogEdit->history()->availableBackwardCount() > 0);
-    mNavAheadAction->setEnabled(mCurLogEdit->history()->availableFowardCount() > 0);
-    ui->actiongoFoward->setEnabled(mCurLogEdit->history()->availableFowardCount() > 0);
-}
-
-void MainWindow::handleNavBackward()
-{
-    mCurLogEdit->history()->backward();
-}
-
-void MainWindow::handleNavFoward()
-{
-    mCurLogEdit->history()->foward();
-}
-
-void MainWindow::handleLogEditFocus(LogTextEdit *logEdit)
-{
-    if (logEdit != mCurLogEdit) {
-        mCurLogEdit->drawUnFocused();
-        logEdit->drawFocused();
-        mCurLogEdit = logEdit;
-
-        handleHistoryPosChanged();
-
-        mTagList->clear();
-        auto highlighter = mCurLogEdit->getHighlighter();
-        for (auto& p : highlighter->allQuickHighlights()) {
-            mTagList->addTag(p.key, p.color);
-        }
-
-        if (mAddTagConnection) {
-            disconnect(mAddTagConnection);
-        }
-
-        mAddTagConnection = connect(highlighter, &Highlighter::onPatternAdded, [this](HighlightPattern p){
-                qDebug()<<"add "<<p.key;
-            mTagList->addTag(p.key, p.color);
-        });
+    auto tabText = mTabWidget->tabText(index);
+    auto btn = QMessageBox::warning(this,
+                                    "关闭日志", QString("确认要关闭标签页【%1】吗？").arg(tabText),
+                                    QMessageBox::Ok,
+                                    QMessageBox::Cancel);
+    if (btn == QMessageBox::Ok) {
+        doCloseDocumentTab(index);
     }
 }
 
-void MainWindow::setEncoding(const QString& text)
+void MainWindow::savePrj()
 {
-    if (text != mLog.getCodec()->name()) {
-        qDebug()<<"change to encoding:"<<text;
-        mLog.setCodec(QTextCodec::codecForName(text.toStdString().c_str()));
-        mLogEdit->refresh();
-        if (mSubLogEdit->isVisible()) {
-            mSubLogEdit->refresh();
-        }
-    }
-}
-
-void MainWindow::handleLogEditEmphasizeLine(int lineNum)
-{
-    if (mSubLog) {
-        auto subLogLine = mSubLog->fromParentLine(lineNum);
-        if (subLogLine > 0)
-            mSubLogEdit->scrollToLine(subLogLine);
-    }
-
-    mTimeLine->highlightNode(lineNum);
-}
-
-void MainWindow::handleSubLogEditEmphasizeLine(int lineNum)
-{
-    auto logLine = mSubLog->toParentLine(lineNum);
-    mLogEdit->scrollToLine(logLine);
-
-    mTimeLine->highlightNode(logLine);
-}
-
-void MainWindow::handleSubLogMarkLine(int line, const QString &text)
-{
-    mTimeLine->addNode(mSubLog->toParentLine(line), text);
-}
-
-void MainWindow::handleSaveProject()
-{
-    auto savePath = QFileDialog::getSaveFileName(this, "保存工程文件", QString(), "*.liprj");
-    if (savePath.isEmpty())
+    auto savepath = QFileDialog::getSaveFileName(this, "保存工程到...", QString(), "*.liprj");
+    if (savepath.isEmpty())
         return;
-
-    mProjectData["timeline"] = mTimeLine->saveToJson();
-    mProjectData["mainEdit"] = mLogEdit->saveToJson();
-    mProjectData["subEdit"] = mSubLogEdit->saveToJson();
-    QJsonDocument doc(mProjectData);
-    if (!savePath.endsWith(".liprj")) {
-        savePath += ".liprj";
+    if (!savepath.endsWith(".liprj")) {
+        savepath += ".liprj";
     }
-    QFile file(savePath);
+    auto json = saveToJson();
 
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Toast::instance().show(Toast::ERROR, "保存到"+savePath+"失败");
-        return;
+    QJsonDocument doc(json);
+    QFile file(savepath);
+    if (!file.open(QFile::WriteOnly)) {
+         QMessageBox::critical(this, "保存失败", QString("工程文件无法打开：%1").arg(savepath));
+         return;
     }
 
-    file.write(doc.toJson());
+    if (file.write(doc.toJson()) < 0) {
+        QMessageBox::critical(this, "保存失败", QString("工程文件无法写入到%1").arg(savepath));
+    }
+
     file.close();
 }
 
-void MainWindow::handleOpenProject()
+void MainWindow::loadPrj()
 {
-    auto path = QFileDialog::getOpenFileName(this, "打开工程文件", QString(), "*.liprj");
-    if (path.isEmpty())
+    auto filepath = QFileDialog::getOpenFileName(this, "打开工程...", QString(), "*.liprj");
+    if (filepath.isEmpty())
         return;
 
-    doOpenProject(path);
-}
-
-void MainWindow::doOpenProject(const QString &path)
-{
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
-        Toast::instance().show(Toast::ERROR, "打开"+path+"失败");
-        return;
-    }
-
-    if (mLog.isOpened())
-        handleCloseFile();
-
-    auto doc = QJsonDocument::fromJson(file.readAll());
-    file.close();
-
-    auto jo = doc.object();
-
-    doOpenFile(jo["path"].toString());
-    mTimeLine->loadFromJson(jo["timeline"]);
-
-    auto filterJo = jo["filter"];
-    if (!filterJo.isUndefined())
-        doFilter(Filter(filterJo));
-
-    mLogEdit->loadFromJson(jo["mainEdit"]);
-    mSubLogEdit->loadFromJson(jo["subEdit"]);
-
-    mRecentPrj.add(path);
-}
-
-void MainWindow::search(bool foward)
-{
-    auto keyword = mSearchEdit->text();
-    if (keyword.isEmpty())
-        return;
-
-    QTextDocument::FindFlags flag = QTextDocument::FindFlags();
-    if (!foward) {
-        flag.setFlag(QTextDocument::FindBackward);
-    }
-
-    if (mCaseSensitiveCheckBox->isChecked()) {
-        flag.setFlag(QTextDocument::FindCaseSensitively);
-    }
-
-    if (!mCurLogEdit->search(keyword, flag, mRegexCheckBox->isChecked())) {
-        if (flag.testFlag(QTextDocument::FindBackward)) {
-            Toast::instance().show(Toast::INFO, "到达顶部，没有找到匹配项");
-        } else {
-            Toast::instance().show(Toast::INFO, "到达底部，没有找到匹配项");
-        }
-    }
+    doOpenPrj(filepath);
 }
 
 void MainWindow::doOpenFile(const QString &path)
-{    
-    bool ret = false;
-    bool canceled = BackgroundRunner::instance().exec("打开文件", [&](LongtimeOperation& op){
-        ret = mLog.open(path, op);
-    });
+{
+    auto tab = new DocumentTab();
+    shared_ptr<FileSource> log(new FileSource(tab));
+    log->setFileName(path);
+    tab->init(log);
+    tab->setName(path);
 
-    if (canceled) {
+    if (!log->open()) {
+        QMessageBox::critical(this, "无法打开文件", QString("%1打开失败").arg(path));
         return;
     }
 
-    if (!ret) {
-        Toast::instance().show(Toast::INFO, "文件打开失败");
-        return;
-    }
-
-    mLogEdit->setLog(&mLog);
-
-    if (mSubLog){
-        delete mSubLog;
-        mSubLog = nullptr;
-    }
-    mSubLogEdit->setLog(nullptr);
-    mSubLogDWidget->setVisible(false);
-
-    mProjectData = {};
-    mProjectData["VERSION"] = VERSION;
-    mProjectData["path"] = path;
-    hasDocSetEnbale();
-
-    QSettings config;
-    if (config.value("gotoEOF").toBool()) {
-        mLogEdit->scrollToLine(mLog.lineCount());
-        Toast::instance().show(Toast::INFO, "已定位到最后一行");
-    }
-
-    setWindowTitle("loginsight - " + path);
+    appendDocumentTab(tab, path);
 
     mRecentFile.add(path);
 }
 
-void MainWindow::doFilter(const Filter& filter)
+void MainWindow::doOpenPrj(const QString &path)
 {
-    if (mSubLog) {
-        delete mSubLog;
+    QFile file(path);
+
+    if (!file.open(QFile::ReadOnly)) {
+         QMessageBox::critical(this, "打开失败", QString("工程文件无法打开：%1").arg(path));
+         return;
     }
 
-    auto canceled = BackgroundRunner::instance().exec(
-                QString("过滤%1").arg(filter.keyword),
-                [&](LongtimeOperation& op){
-                    mSubLog = mLog.createSubLog(filter, op);
-                });
-
-    if (canceled)
+    auto bytes = file.readAll();
+    if (bytes.isEmpty()) {
+        QMessageBox::critical(this, "打开失败", QString("工程文件为空：%1").arg(path));
         return;
+    }
 
-    if (mSubLog->lineCount() > 0) {
-        mSubLogEdit->setLog(mSubLog);
-        mSubLogDWidget->setVisible(true);
-        Toast::instance().show(Toast::INFO, QString("一共过滤到%1行").arg(mSubLog->lineCount()));
+    loadFromJson(QJsonDocument::fromJson(bytes).object());
 
-        mProjectData["filter"] = filter.saveToJson();
-    } else {
-        Toast::instance().show(Toast::INFO, "没有找到匹配项");
-        mSubLogEdit->setLog(nullptr);
-        mSubLogDWidget->setVisible(false);
+    mRecentPrj.add(path);
+}
+
+void MainWindow::doCloseDocumentTab(int index)
+{
+    auto tab = (DocumentTab*)mTabWidget->widget(index);
+    tab->unInit();
+    mTabWidget->removeTab(index);
+    delete tab;
+
+    if (mTabWidget->count() == 0) {
+        mCenterWidget->setCurrentWidget(mWelcomePage);
+        noDocDisableActions();
     }
 }
 
-void MainWindow::keyReleaseEvent(QKeyEvent *ev)
+void MainWindow::noDocDisableActions()
 {
-    if ((ev->modifiers() & Qt::CTRL) && (ev->key() == Qt::Key_F)) {
-        if (ev->modifiers() & Qt::SHIFT)
-            mSearchEdit->setSearchFoward(false);
-        else
-            mSearchEdit->setSearchFoward(true);
-        mSearchEdit->setFocus();
-        mSearchEdit->selectAll();
+
+}
+
+void MainWindow::hasDocEnableActions()
+{
+
+}
+
+void MainWindow::loadFromJson(const QJsonObject &o)
+{
+    if (o.contains("mainEdit")) {
+        QMessageBox::critical(this, "打开失败", "不支持旧格式的工程文件");
+        return;
+    }
+    for (auto&& tabObj : o["tabs"].toArray()) {
+        auto tab = new DocumentTab();
+        if (tab->loadFromJson(tabObj)) {
+            appendDocumentTab(tab, tab->getName());
+        }
     }
 }
 
-void MainWindow::createSubLogDockWidget()
+QJsonObject MainWindow::saveToJson()
 {
-    mSubLogEdit = new LogTextEdit();
-    mSubLogEdit->setAcceptDrops(false);
-    auto logEditBar = new QScrollBar(Qt::Vertical);
-    mSubLogEdit->setScrollBar(logEditBar);
+    QJsonObject o;
+    o["version"] = VERSION;
+    QJsonArray tabObjs;
+    auto cnt = mTabWidget->count();
+    for (auto i = 0; i < cnt; i++) {
+        auto tab = (DocumentTab*) mTabWidget->widget(i);
+        tabObjs.append(tab->saveToJson());
+    }
+    o["tabs"] = tabObjs;
+    return o;
+}
 
-    auto container = new QHBoxLayout();
-    container->addWidget(mSubLogEdit, 1);
-    container->addWidget(logEditBar);
-    container->setMargin(0);
-    container->setSpacing(0);
+void MainWindow::bindUserControls()
+{
+    auto a = UserControl::instance();
+    connect(a.actionFor(UserControl::OpenFileIntent), &QAction::triggered, this, &MainWindow::openFile);
+    connect(a.actionFor(UserControl::UsageIntent), &QAction::triggered, []{
+        QDesktopServices::openUrl(QUrl("https://gitee.com/compilelife/loginsight/wikis/使用说明"));
+    });
+    connect(a.actionFor(UserControl::ShortcutIntent), &QAction::triggered, []{
+        auto shortcuts = UserControl::instance().getShortcutHint();
+        QMessageBox::information(nullptr, "快捷键", shortcuts);
+    });
+}
 
-    auto dw = new QDockWidget("过滤窗口");
-    dw->setFeatures(QDockWidget::DockWidgetClosable);
-    auto w = new QWidget();
-    w->setLayout(container);
-    dw->setWidget(w);
-    addDockWidget(Qt::BottomDockWidgetArea, dw);
-    ui->menuDWidget->addAction(dw->toggleViewAction());
+void MainWindow::buildTabWidget()
+{
+    mTabWidget = new QTabWidget();
+    mTabWidget->setTabsClosable(true);
+    connect(mTabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::closeDocumentTab);
+    connect(mTabWidget, &QTabWidget::currentChanged, [this]{
+        if (mLastDocument) {
+            mLastDocument->disconnectUserControls();
+            mLastDocument = nullptr;
+        }
 
-    dw->setVisible(false);
-    mSubLogDWidget=dw;
-
-    connect(dw, &QDockWidget::visibilityChanged, [this](bool visible){
-        if (!visible) {
-            this->mLogEdit->setFocus();
+        auto doc = currentDocument();
+        if (doc) {
+            doc->connectUserControls();
+            mLastDocument = doc;
         }
     });
 }
 
-void MainWindow::createTimelineDockWidget()
+void MainWindow::buildToolbars()
 {
-    mTimeLine = new TimeLine();
-    auto dw = new QDockWidget("时间线");
-    dw->setWidget(mTimeLine);
-    dw->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
-    dw->setFeatures(QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable);
-    addDockWidget(Qt::RightDockWidgetArea, dw);
-    setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
-    setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
-    ui->menuDWidget->addAction(dw->toggleViewAction());
+    //<==mainBar==>
+    auto bar = new QToolBar;
+    bar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    bar->setFloatable(false);
+    bar->setIconSize(QSize(16,16));
+    bar->addAction(UserControl::instance().actionFor(UserControl::OpenFileIntent));
+    bar->addAction(UserControl::instance().actionFor(UserControl::LocateLineIntent));
+    bar->addAction(UserControl::instance().actionFor(UserControl::FilterIntent));
+    bar->addAction(UserControl::instance().actionFor(UserControl::GoBackwardIntent));
+    bar->addAction(UserControl::instance().actionFor(UserControl::GoForwardIntent));
+    addToolBar(bar);
+
+    //<==timelineBar==>
+    auto timelineBar = new QToolBar;
+    timelineBar->setAllowedAreas(Qt::TopToolBarArea|Qt::BottomToolBarArea);
+    timelineBar->setFloatable(false);
+    timelineBar->setIconSize(QSize(16,16));
+    timelineBar->addAction(UserControl::instance().actionFor(UserControl::CopyTimeLineIntent));
+    timelineBar->addAction(UserControl::instance().actionFor(UserControl::SaveTimeLineIntent));
+    addToolBar(timelineBar);
+
+    //<==auxBar==>
+    auto auxBar = new QToolBar;
+    auxBar->setAllowedAreas(Qt::TopToolBarArea|Qt::BottomToolBarArea);
+    auxBar->setFloatable(false);
+
+    auto searchBar = new SearchBar;
+    auxBar->addWidget(searchBar);
+    UserControl::instance().setSearchBar(searchBar);
+
+    auto taglist = new TagListWidget;
+    taglist->setMinimumHeight(26);
+    taglist->setMaximumHeight(26);
+    taglist->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
+    auxBar->addWidget(taglist);
+    UserControl::instance().setTagList(taglist);
+
+    addToolBar(auxBar);
 }
 
-void MainWindow::createToolbar()
+void MainWindow::buildMenuBar()
 {
-    auto toolbar = new QToolBar("主工具栏");
-    toolbar->setIconSize(QSize(16,16));
-    toolbar->setFloatable(false);
-    toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    {
-        auto action = new QAction(QIcon(":/res/img/open.png"), "");
-        action->setToolTip("打开文件");
-        connect(action, SIGNAL(triggered()), this, SLOT(handleOpenFile()));
-        toolbar->addAction(action);
-    }
-    {
-        auto action = new QAction(QIcon(":/res/img/filter.png"), "");
-        action->setToolTip("过滤关键字");
-        connect(action, SIGNAL(triggered()), this, SLOT(handleFilter()));
-        toolbar->addAction(action);
-        mFilterAction = action;
-    }
-    {
-        auto action = new QAction(QIcon(":/res/img/locate.png"), "");
-        action->setToolTip("跳转到行");
-        connect(action, SIGNAL(triggered()), this, SLOT(handleGotoLine()));
-        toolbar->addAction(action);
-        mGotoLineAction = action;
-    }
-    {
-        auto action = new QAction(QIcon(":/res/img/left.png"), "");
-        action->setToolTip("后退");
-        connect(action, SIGNAL(triggered()), this, SLOT(handleNavBackward()));
-        toolbar->addAction(action);
-        mNavBackAction = action;
-    }
-    {
-        auto action = new QAction(QIcon(":/res/img/right.png"), "");
-        action->setToolTip("前进");
-        connect(action, SIGNAL(triggered()), this, SLOT(handleNavFoward()));
-        toolbar->addAction(action);
-        mNavAheadAction = action;
-    }
-    toolbar->addSeparator();
-    {
-        auto action = new QAction(QIcon(":/res/img/clipboard.png"), "");
-        action->setToolTip("复制时间线到粘贴板");
-        connect(action, SIGNAL(triggered()), mTimeLine, SLOT(exportToClipboard()));
-        toolbar->addAction(action);
-    }
-    {
-        auto action = new QAction(QIcon(":/res/img/export.png"), "");
-        action->setToolTip("导出时间线到图片");
-        connect(action, SIGNAL(triggered()), this, SLOT(handleExportTimeLine()));
-        toolbar->addAction(action);
-    }
-    addToolBar(toolbar);
+    auto menuBar = new QMenuBar;
+    menuBar->addMenu(buildFileMenu());
+    menuBar->addMenu(buildInsightMenu());
+    menuBar->addMenu(buildTimelineMenu());
+    menuBar->addMenu(buildHelpMenu());
+    menuBar->addMenu(buildBuyMenu());
+    setMenuBar(menuBar);
 }
 
-void MainWindow::createTagbar()
+QMenu* MainWindow::buildTimelineMenu()
 {
-    auto tagWidget = new QWidget;
-    auto box = new QHBoxLayout();
+    auto actions = UserControl::instance();
 
-    mSearchEdit = new SearchEdit();
-    mSearchEdit->setMinimumHeight(26);
-    mSearchEdit->setMinimumWidth(150);
-    mSearchEdit->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
-    box->addWidget(mSearchEdit);
+    auto menu = new QMenu("时间线");
+    menu->addAction(actions.actionFor(UserControl::CopyTimeLineIntent));
+    menu->addAction(actions.actionFor(UserControl::SaveTimeLineIntent));
+    menu->addSeparator();
+    menu->addAction(actions.actionFor(UserControl::ClearTimeLineIntent));
 
-    mCaseSensitiveCheckBox = new QCheckBox();
-    mCaseSensitiveCheckBox->setText("大小写敏感");
-    box->addWidget(mCaseSensitiveCheckBox);
-
-    mRegexCheckBox = new QCheckBox();
-    mRegexCheckBox->setText("使用正则表达式");
-    box->addWidget(mRegexCheckBox);
-
-    mTagList = new TagListWidget;
-    mTagList->setMinimumHeight(26);
-    mTagList->setMaximumHeight(26);
-    mTagList->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-    connect(mTagList, &TagListWidget::onTagDeleted, [this](const QString& keyword){
-        mCurLogEdit->getHighlighter()->clearQuickHighlight(keyword);
-    });
-    connect(mTagList, &TagListWidget::onTagColorChanged, [this](const QString& keyword, QColor color){
-        mCurLogEdit->getHighlighter()->quickHighlight(keyword, color);
-    });
-    connect(mTagList, &TagListWidget::requestSearchTag, [this](const QString& keyword){
-        mSearchEdit->setText(keyword);
-        mCaseSensitiveCheckBox->setChecked(true);
-        mRegexCheckBox->setChecked(false);
-        search(mSearchEdit->isSearchFoward());
-    });
-    connect(mTagList, &TagListWidget::requestFilterTag, this, &MainWindow::doFilter);
-    box->addWidget(mTagList);
-
-    box->setMargin(5);
-    box->setSpacing(10);
-    tagWidget->setLayout(box);
-    tagWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
-
-    auto toolbar = new QToolBar("tag工具栏");
-    toolbar->setAllowedAreas(Qt::TopToolBarArea|Qt::BottomToolBarArea);
-    toolbar->setFloatable(false);
-    toolbar->addWidget(tagWidget);
-    addToolBar(toolbar);
+    return menu;
 }
 
-void MainWindow::createCenterWidget()
+QMenu *MainWindow::buildHelpMenu()
 {
-    mLogEdit = new LogTextEdit();
-    auto logEditBar = new QScrollBar(Qt::Vertical);
-    mLogEdit->setScrollBar(logEditBar);
-
-    auto container = new QHBoxLayout();
-    container->addWidget(mLogEdit, 1);
-    container->addWidget(logEditBar);
-    container->setMargin(0);
-    container->setSpacing(0);
-
-    auto w = new QWidget();
-    w->setLayout(container);
-
-    mCurLogEdit = mLogEdit;
-    mCurLogEdit->drawFocused();
-    mAddTagConnection = connect(mCurLogEdit->getHighlighter(), &Highlighter::onPatternAdded, [this](HighlightPattern p){
-        mTagList->addTag(p.key, p.color);
+    auto menu = new QMenu("帮助");
+    auto a = UserControl::instance();
+    menu->addAction(a.actionFor(UserControl::ShortcutIntent));
+    menu->addAction(a.actionFor(UserControl::UsageIntent));
+    menu->addAction("关于", []{
+        AboutDlg dlg;
+        dlg.exec();
     });
 
-    setCentralWidget(w);
+    return menu;
 }
 
-void MainWindow::createRecentActions()
+QMenu* MainWindow::buildFileMenu()
 {
-    mRecentFile.mount(ui->menurecentFile, bind(&MainWindow::doOpenFile, this, placeholders::_1));
-    mRecentPrj.mount(ui->menurecentPrj, bind(&MainWindow::doOpenProject, this, placeholders::_1));
+    auto menu = new QMenu("文件");
+
+    menu->addAction(UserControl::instance().actionFor(UserControl::OpenFileIntent));
+    menu->addAction("关闭当前文档", [this]{
+        closeDocumentTab(mTabWidget->currentIndex());
+    });
+    menu->addAction("打开工程...", this, &MainWindow::loadPrj);
+    menu->addAction("保存工程...", this, &MainWindow::savePrj);
+
+    auto codecMenu = new QMenu("编码");
+    auto supportedCodec = QTextCodec::availableCodecs();
+    for (auto&& name : supportedCodec) {
+        codecMenu->addAction(name,[name, this]{
+            auto tab = currentDocument();
+            if (tab)
+                tab->setCodec(name);
+        });
+    }
+    menu->addMenu(codecMenu);
+
+    menu->addSeparator();
+
+    auto recentFileMenu = menu->addMenu("最近打开的文件");
+    mRecentFile.mount(recentFileMenu, bind(&MainWindow::doOpenFile, this, placeholders::_1));
+    auto recentPrjMenu = menu->addMenu("最近打开的工程");
+    mRecentPrj.mount(recentPrjMenu, bind(&MainWindow::doOpenPrj, this, placeholders::_1));
+
+    menu->addSeparator();
+    menu->addAction("设置", []{
+        SettingsDialog dlg;
+        dlg.exec();
+    });
+
+    menu->addSeparator();
+    menu->addAction("退出", this, &QMainWindow::close);
+
+    return menu;
+}
+
+QMenu *MainWindow::buildInsightMenu()
+{
+    auto actions = UserControl::instance();
+    auto menu = new QMenu("检视");
+    menu->addAction(actions.actionFor(UserControl::FindIntent));
+    menu->addAction(actions.actionFor(UserControl::RevertFindIntent));
+    menu->addAction(actions.actionFor(UserControl::FindNextIntent));
+    menu->addAction(actions.actionFor(UserControl::FindPreviousIntent));
+    menu->addAction(actions.actionFor(UserControl::HighlightIntent));
+    menu->addSeparator();
+    menu->addAction(actions.actionFor(UserControl::FilterIntent));
+    menu->addSeparator();
+    menu->addAction(actions.actionFor(UserControl::GoBackwardIntent));
+    menu->addAction(actions.actionFor(UserControl::GoForwardIntent));
+    menu->addAction(actions.actionFor(UserControl::LocateLineIntent));
+    return menu;
+}
+
+int MainWindow::appendDocumentTab(DocumentTab *tab, const QString &title)
+{
+    auto count = mTabWidget->count();
+    if (mTabWidget->count() >= 1) {
+        for (int i = 0; i < count; i++) {
+            doCloseDocumentTab(i);
+        }
+    }
+
+    auto index = mTabWidget->addTab(tab, title);
+    mTabWidget->setCurrentIndex(index);
+
+    mCenterWidget->setCurrentWidget(mTabWidget);
+    hasDocEnableActions();
+
+    return index;
+}
+
+DocumentTab *MainWindow::currentDocument()
+{
+    return (DocumentTab*)mTabWidget->widget(0);
+}
+
+QMenu* MainWindow::buildBuyMenu()
+{
+    auto menu = new QMenu("了解专业版");
+    auto gotoDownload = []{
+        QDesktopServices::openUrl(QUrl(WEB_DOWNLOAD_URL));
+    };
+
+    menu->addAction("下载试用", gotoDownload);
+
+    auto gotoWeb = []{
+        QDesktopServices::openUrl(QUrl(WEB_PAGE));
+    };
+    auto intro = new QMenu("特性介绍");
+    intro->addAction("多标签页支持", gotoWeb);
+    intro->addAction("多过滤窗/嵌套过滤支持", gotoWeb);
+    intro->addAction("多线程加速", gotoWeb);
+
+    menu->addMenu(intro);
+
+    return menu;
 }

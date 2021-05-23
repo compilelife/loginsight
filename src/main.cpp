@@ -1,6 +1,9 @@
-﻿#include "mainwindow.h"
+#include "mainwindow.h"
 
 #include <QApplication>
+#include <QThread>
+#include <QThreadPool>
+#include "register.h"
 #include <QSettings>
 
 static void createDefaultSettings()
@@ -20,12 +23,12 @@ static void createDefaultSettings()
         config.setValue("caseSensitive", true);
     }
 
-    if (!keys.contains("gotoEOF")) {
-        config.setValue("gotoEOF", false);
-    }
-
     if (!keys.contains("checkUpdate")) {
         config.setValue("checkUpdate", true);
+    }
+
+    if (!keys.contains("tryFrom")) {
+        config.setValue("tryFrom", QDateTime::currentDateTime());
     }
 
     if (!keys.contains("recentFile")) {
@@ -40,11 +43,12 @@ static void createDefaultSettings()
         config.setValue("wrap", false);
     }
 
+    if (!keys.contains("register")) {
+        config.setValue("register", "");
+    }
+
     config.sync();
 }
-
-
-
 
 int main(int argc, char *argv[])
 {
@@ -54,7 +58,14 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("loginsight");
     a.setWindowIcon(QIcon(":/res/img/logo.png"));
 
+    auto idealCpuCount = QThread::idealThreadCount();
+    qDebug()<<"cpu count: "<<idealCpuCount;
+    if (idealCpuCount >= 2) {
+        QThreadPool::globalInstance()->setMaxThreadCount(2);
+    }
+
     createDefaultSettings();
+
 
     MainWindow w;
     w.show();

@@ -1,4 +1,4 @@
-﻿#include "history.h"
+#include "history.h"
 
 History::History(AbstractNavPosReplayer* replayer, int max)
     :mMax(max), mReplayer(replayer)
@@ -12,7 +12,7 @@ void History::clear()
     setPos(-1);
 }
 
-void History::foward()
+void History::forward()
 {
     if (availableFowardCount() <= 0) {
         return;
@@ -48,7 +48,7 @@ void History::push(int lineNum, int col)
 {
     if (mItems.size() > 0) {
         auto cur = mItems.at(mCur);
-        if (cur.line == lineNum && cur.col == col) {
+        if (cur.line == lineNum && cur.offset == col) {
             return;
         }
     }

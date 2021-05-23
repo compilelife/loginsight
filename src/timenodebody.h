@@ -1,4 +1,4 @@
-﻿#ifndef TIMENODEBODY_H
+#ifndef TIMENODEBODY_H
 #define TIMENODEBODY_H
 
 #include <QGraphicsItem>

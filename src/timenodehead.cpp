@@ -1,4 +1,4 @@
-﻿#include "timenodehead.h"
+#include "timenodehead.h"
 #include <QPainter>
 #include "timeline.h"
 #include "timenode.h"
@@ -11,7 +11,7 @@ QRectF TimeNodeHead::boundingRect() const {
     return QRectF(0, 0, LINE_X + TIME_NODE_DOT_R, TIME_NODE_HEIGHT);
 }
 
-void TimeNodeHead::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
+void TimeNodeHead::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *){
     QRectF textRect(0, 0, LINE_X, TIME_NODE_HEIGHT);
     painter->setPen(mNode->color());
     painter->drawText(textRect, mText, QTextOption(Qt::AlignCenter));

@@ -1,10 +1,14 @@
 ﻿#include "updater.h"
 #include <QNetworkRequest>
 #include "version.h"
+#include "webhome.h"
+#include <QJsonDocument>
+#include <QJsonObject>
+#include "httpmanager.h"
 
 Updater::Updater(QObject *parent) : QObject(parent), mCurrentVersion(VERSION)
 {
-    connect(&mNetwork, &QNetworkAccessManager::finished, this, &Updater::httpReplied);
+    mCurrentVersion = VERSION;
 }
 
 Updater &Updater::instance()
@@ -15,36 +19,25 @@ Updater &Updater::instance()
 
 void Updater::checkNewVersion()
 {
-    QNetworkRequest req(QUrl("https://github.com/compilelife/loginsight/releases/latest"));
+    QNetworkRequest req(QUrl(WEB_GET_VERSION_URL));
     req.setAttribute(QNetworkRequest::FollowRedirectsAttribute,false);
     req.setAttribute(QNetworkRequest::BackgroundRequestAttribute, true);
+    mHasCheckUpdate = true;
 
-    mNetwork.get(req);
-}
+    HttpManager::instance().get(req, [this](QNetworkReply* reply){
+        if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 200) {
+            auto ans = QJsonDocument::fromJson(reply->readAll()).object();
+            auto version = ans["version"].toString();
+            mChangeLog = ans["change"].toString();
 
-void Updater::httpReplied(QNetworkReply *reply)
-{
-    if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 302) {
-        QString body(reply->readAll());
-        auto begin = body.indexOf("tag/");
-        if (begin < 0) {
-            qDebug()<<"tag/ not found";
-            return;
-        }
-        auto end = body.indexOf("\">", begin);
-        if (end < 0) {
-            qDebug()<<"\"> not found";
-            return;
-        }
-        begin+=4;
-        auto version = body.mid(begin, end - begin);
-        if (version == VERSION)
-            emit noNewVersion();
-        else{
-            mLatestVersion = version;
-            emit newVersionFound(version);
-        }
-    }
+            qDebug()<<version;
 
-    reply->deleteLater();
+            if (version == VERSION)
+                emit noNewVersion();
+            else{
+                mLatestVersion = version;
+                emit newVersionFound(version);
+            }
+        }
+    });
 }

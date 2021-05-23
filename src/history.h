@@ -1,18 +1,14 @@
-﻿#ifndef HISTORY_H
+#ifndef HISTORY_H
 #define HISTORY_H
 
 #include <QList>
 #include <QObject>
-
-struct NavPos {
-    int line;
-    int col;
-};
+#include "ilog.h"
 
 class AbstractNavPosReplayer {
 public:
     virtual ~AbstractNavPosReplayer();
-    virtual void onReplay(const NavPos& pos) = 0;
+    virtual void onReplay(const Location& pos) = 0;
 };
 
 class History: public QObject
@@ -24,7 +20,7 @@ public:
 
 public:
     void clear();
-    void foward();
+    void forward();
     void backward();
     int availableBackwardCount();
     int availableFowardCount();
@@ -37,7 +33,7 @@ private:
     void setPos(int pos);
 
 private:
-    QList<NavPos> mItems;
+    QList<Location> mItems;
     int mCur;
     const int mMax;
     AbstractNavPosReplayer* mReplayer;

@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>431</width>
-    <height>207</height>
+    <height>175</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QPushButton" name="chooseFontBtn">
+   <item row="4" column="2">
+    <widget class="QPushButton" name="cancelBtn">
      <property name="text">
-      <string>设置字体</string>
+      <string>取消</string>
      </property>
-     <property name="flat">
+     <property name="autoDefault">
       <bool>false</bool>
      </property>
     </widget>
@@ -31,48 +31,41 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QCheckBox" name="gotoEOFCheckBox">
-     <property name="text">
-      <string>打开日志后定位到最后一行</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QCheckBox" name="caseSensitiveCheckBox">
-     <property name="text">
-      <string>默认大小写敏感</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QCheckBox" name="checkUpdateCheckBox">
-     <property name="text">
-      <string>检查新版本</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QCheckBox" name="wrapCheckBox">
-     <property name="text">
-      <string>日志文本框中是否自动折行显示</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
+   <item row="4" column="1">
     <widget class="QPushButton" name="okBtn">
      <property name="text">
       <string>确定</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="2">
-    <widget class="QPushButton" name="cancelBtn">
+   <item row="0" column="0">
+    <widget class="QPushButton" name="chooseFontBtn">
      <property name="text">
-      <string>取消</string>
+      <string>设置字体</string>
      </property>
-     <property name="autoDefault">
+     <property name="flat">
       <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QCheckBox" name="wrapCheckBox">
+     <property name="text">
+      <string>日志文本框中是否自动折行显示</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QCheckBox" name="checkUpdateCheckBox">
+     <property name="text">
+      <string>检查新版本</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QCheckBox" name="caseSensitiveCheckBox">
+     <property name="text">
+      <string>默认大小写敏感</string>
      </property>
     </widget>
    </item>

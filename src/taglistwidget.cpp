@@ -1,4 +1,4 @@
-﻿#include "taglistwidget.h"
+#include "taglistwidget.h"
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMenu>
@@ -40,9 +40,10 @@ void TagListWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addMenu(chooseColorMenu);
 
     connect(menu.addAction("在小窗过滤"), &QAction::triggered, [&]{
-        Filter filter;
-        filter.keyword = keyword;
-        emit requestFilterTag(filter);
+        SearchArg arg;
+        arg.pattern = keyword;
+        arg.caseSensitive = true;
+        emit requestFilterTag(arg);
     });
 
     connect(menu.addAction("搜索"), &QAction::triggered, [&]{

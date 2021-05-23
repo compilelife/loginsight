@@ -2,9 +2,6 @@
 #define UPDATER_H
 
 #include <QObject>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QAtomicInt>
 
 class Updater : public QObject
 {
@@ -17,18 +14,19 @@ public:
 
     QString currentVersion() {return mCurrentVersion;}
     QString latestVersion() {return mLatestVersion;}
+    QString changeLog() {return mChangeLog;}
+
+    bool hasCheckUpdate(){return mHasCheckUpdate;}
 
 signals:
     void newVersionFound(const QString& version);
     void noNewVersion();
 
-public slots:
-private slots:
-    void httpReplied(QNetworkReply* reply);
 private:
-    QNetworkAccessManager mNetwork;
     QString mCurrentVersion;
     QString mLatestVersion;
+    bool mHasCheckUpdate{false};
+    QString mChangeLog;
 };
 
 #endif // UPDATER_H

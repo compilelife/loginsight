@@ -1,4 +1,6 @@
-﻿#include "highlighter.h"
+#include "highlighter.h"
+#include <QJsonObject>
+#include <QJsonArray>
 
 Highlighter::Highlighter(QTextDocument* doc): QSyntaxHighlighter(doc) {
 }
@@ -68,6 +70,28 @@ void Highlighter::searchHighlight(const QString &text, bool caseSensitive)
     rehighlight();
 }
 
+QJsonObject Highlighter::saveToJson()
+{
+    QJsonObject o;
+    o["searchHl"] = mSearchHl.saveToJson();
+    QJsonArray quickHls;
+    for (auto&& v : mQuickHls.values()) {
+        quickHls.append(v.saveToJson());
+    }
+    o["quickHls"] = quickHls;
+    return o;
+}
+
+void Highlighter::loadFromJson(QJsonObject o)
+{
+    mSearchHl.loadFromJson(o["searchHl"].toObject());
+    for (auto&& v : o["quickHls"].toArray()) {
+        HighlightPattern p;
+        p.loadFromJson(v.toObject());
+        mQuickHls[p.key] = p;
+    }
+}
+
 void Highlighter::clearSearchHighlight()
 {
     mSearchHl.key.clear();
@@ -87,3 +111,19 @@ void Highlighter::clearQuickHighlight(const QString& text)
     rehighlight();
 }
 
+
+QJsonObject HighlightPattern::saveToJson()
+{
+    QJsonObject o;
+    o["key"] = key;
+    o["caseSentive"] = caseSensitive;
+    o["color"] = color.name();
+    return o;
+}
+
+void HighlightPattern::loadFromJson(QJsonObject o)
+{
+    key = o["key"].toString();
+    caseSensitive = o["caseSentive"].toBool();
+    color = o["color"].toString();
+}

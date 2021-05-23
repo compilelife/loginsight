@@ -1,4 +1,4 @@
-﻿#ifndef TIMELINEEX_H
+#ifndef TIMELINEEX_H
 #define TIMELINEEX_H
 
 #include <QGraphicsView>
@@ -7,6 +7,7 @@
 #include <functional>
 #include <QTimeLine>
 #include <QJsonObject>
+#include "ilog.h"
 
 #define LINE_X 70
 #define MARGIN_LEFT 10

@@ -1,4 +1,4 @@
-﻿#include "choosecolormenu.h"
+#include "choosecolormenu.h"
 #include <QColorDialog>
 
 ChooseColorMenu::ChooseColorMenu(const QList<pair<QString,QColor>>& preset)

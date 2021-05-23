@@ -3,6 +3,9 @@
 #include "updater.h"
 #include <QMessageBox>
 #include <QDebug>
+#include "webhome.h"
+#include <QDesktopServices>
+#include <QUrl>
 
 AboutDlg::AboutDlg(QWidget *parent) :
     QDialog(parent),
@@ -11,14 +14,9 @@ AboutDlg::AboutDlg(QWidget *parent) :
     ui->setupUi(this);
     setWindowTitle("关于");
 
-#define HINT_TPL ("发现新版本：%1, 下载地址: https://github.com/compilelife/loginsight/releases/latest")
-
     auto& updater = Updater::instance();
-    if (updater.latestVersion().isEmpty())
-        ui->versionLabel->setText(updater.currentVersion());
-    else
-        ui->versionLabel->setText(QString(HINT_TPL).arg(updater.latestVersion()));
 
+    ui->versionLabel->setText(updater.currentVersion());
     connect(&updater, &Updater::noNewVersion, [this]{
         QMessageBox::warning(this, "", "当前版本已经是最新版本");
     });
@@ -26,6 +24,10 @@ AboutDlg::AboutDlg(QWidget *parent) :
 
     connect(ui->updateButton, &QPushButton::clicked, [&updater]{
         updater.checkNewVersion();
+    });
+
+    connect(ui->infoLabel, &QLabel::linkActivated, [](const QString& url){
+        QDesktopServices::openUrl(QUrl(url));
     });
 }
 
