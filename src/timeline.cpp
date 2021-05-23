@@ -195,7 +195,7 @@ void TimeLine::withExportedImage(std::function<void (QImage &)> handler)
     auto metrics = painter.fontMetrics();
     QString author("created by loginsight");
 
-    QString site("https://github.com/compilelife/loginsight");
+    QString site("http://www.loginsight.top");
     auto width = metrics.horizontalAdvance(site);
     auto x = img.width() - width - 2*borderMargin;
     auto y = img.height() - metrics.height() - 2*borderMargin;

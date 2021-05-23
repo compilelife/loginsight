@@ -3,7 +3,6 @@
 #include <QApplication>
 #include <QThread>
 #include <QThreadPool>
-#include "register.h"
 #include <QSettings>
 
 static void createDefaultSettings()
