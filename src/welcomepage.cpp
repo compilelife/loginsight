@@ -74,7 +74,9 @@ void WelcomePage::showEvent(QShowEvent *)
     //右上：帮助
     //右下：版本、注册
 
-    QWidget().setLayout(layout());
+    auto old = layout();
+    if (old)
+        QWidget().setLayout(old);
 
     auto box = new QGridLayout;
     box->setMargin(30);

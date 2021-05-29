@@ -4,6 +4,10 @@
 #include <QThread>
 #include <QThreadPool>
 #include <QSettings>
+#include <QtGlobal>
+#include <QFile>
+#include <QDir>
+#include <QDateTime>
 
 static void createDefaultSettings()
 {
@@ -49,6 +53,26 @@ static void createDefaultSettings()
     config.sync();
 }
 
+QFile gLogFile;
+static const QString gLevels[] = {"Debg", "Warn", "Err-", "Err+", "Info", "Syst"};
+static void myMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+{
+    auto level = gLevels[(int)type];
+    auto time = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss.z");
+    QString filePath(context.file);
+    auto lastSeperartor=filePath.lastIndexOf(QDir::separator());
+    if (lastSeperartor >= 0) {
+        filePath = filePath.mid(lastSeperartor+1);
+    }
+
+    auto line = QString("[%1][%2][%3:%4] %5\n").arg(level, time, filePath).arg(context.line).arg(msg.toLocal8Bit().data());
+
+    fprintf(stdout, "%s", line.toLocal8Bit().data());
+    fflush(stdout);
+    gLogFile.write(line.toLocal8Bit());
+    gLogFile.flush();
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -57,9 +81,18 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("loginsight");
     a.setWindowIcon(QIcon(":/res/img/logo.png"));
 
+    auto logPath = QDir::tempPath()+QDir::separator()+"loginsight.log";
+    gLogFile.setFileName(logPath);
+    if (gLogFile.open(QIODevice::WriteOnly)) {
+        qInfo()<<"logfile at: "<<logPath;
+        qInstallMessageHandler(myMessageHandler);
+    } else {
+        qWarning()<<"can't not open "<<logPath;
+    }
+
     auto idealCpuCount = QThread::idealThreadCount();
     qDebug()<<"cpu count: "<<idealCpuCount;
-    if (idealCpuCount >= 2) {
+    if (idealCpuCount >= 3) {
         QThreadPool::globalInstance()->setMaxThreadCount(2);
     }
 
@@ -67,10 +100,14 @@ int main(int argc, char *argv[])
 
 
     MainWindow w;
+    w.setWindowTitle("Loginsight");
     w.show();
     if (argc > 1) {
         w.doOpenFile(argv[1]);
     }
 
-    return a.exec();
+    auto ret =  a.exec();
+
+    gLogFile.close();
+    return ret;
 }

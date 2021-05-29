@@ -36,6 +36,42 @@ LogEdit::LogEdit(FocusManager* focusManager)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     mHighlighter.reset(new Highlighter(document()));
+
+    auto shortcut = new QShortcut(QKeySequence(QString("Ctrl+E")), this);
+    shortcut->setContext(Qt::WidgetShortcut);
+    connect(shortcut, &QShortcut::activated, [this]{
+        QTextCursor cursor = textCursor();
+        auto word = cursor.selectedText();
+        if (word.isEmpty()) {
+            QMessageBox::warning(this, "", "需要先选择一个单词再高亮");
+            return;
+        }
+
+        mHighlighter->quickHighlight(word);
+    });
+
+    shortcut = new QShortcut(QKeySequence(QString("Ctrl+R")), this);
+    shortcut->setContext(Qt::WidgetShortcut);
+    connect(shortcut, &QShortcut::activated, [this]{
+        QTextCursor cursor = textCursor();
+        auto word = cursor.selectedText();
+        if (word.isEmpty()) {
+            QMessageBox::warning(this, "", "需要先选择一个单词再过滤");
+            return;
+        }
+
+        emit filterRequested(word);
+    });
+
+    shortcut = new QShortcut(QKeySequence(QString("Ctrl+T")), this);
+    shortcut->setContext(Qt::WidgetShortcut);
+    connect(shortcut, &QShortcut::activated, [this]{
+        QTextCursor cursor = textCursor();
+        int lineNum = blockNumberToPresenter(cursor.blockNumber());
+        emit addToTimeLineRequested(lineNum);
+    });
+
+
 }
 
 void LogEdit::setMode(LogEdit::Mode mode)

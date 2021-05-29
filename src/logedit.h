@@ -7,6 +7,7 @@
 #include "history.h"
 #include "highlighter.h"
 #include "ilog.h"
+#include <QShortcut>
 
 class LineNumberArea;
 class LogEdit : public QPlainTextEdit, public AbstractNavPosReplayer
@@ -69,6 +70,9 @@ public:
     shared_ptr<LongtimeOperation> find(SearchArg arg, bool forward);
     void onLogFindOne(SearchResult ret);
 
+signals:
+    void filterRequested(QString word);
+
 //行号
 private:
     friend class LineNumberArea;
@@ -94,6 +98,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent* e) override;
 signals:
     void emphasizeLineRequested(int lineNum);
+    void addToTimeLineRequested(int lineNum);
 private:
     void highlightCurrentLine();
 

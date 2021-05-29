@@ -84,7 +84,7 @@ void FileSource::parse()
             QVector<qint64> lines;
             lines.reserve(210000);//20M按一行100字符，估计21w行，空间不够的话，每次再分配1w行
 
-            qDebug()<<r;
+//            qDebug()<<r;
             auto from = r.first;
             auto to = r.second;
 
@@ -108,7 +108,7 @@ void FileSource::parse()
 
         for (auto i = 0; i < taskRanges.size() && mRunning; i++) {
             auto ret = rets.resultAt(i);
-            qDebug()<<"post "<<i;
+//            qDebug()<<"post "<<i;
             post(new LogChangeEvent(mLog, [this, ret]{mLog->addLines(ret);}));
         }
 
@@ -124,6 +124,7 @@ void FileSource::doClose()
         mParseTask.waitForFinished();
         mFile.unmap(mMem);
         mFile.close();
+        mMem = nullptr;
     }
 
     mLog.reset();

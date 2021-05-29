@@ -26,7 +26,7 @@ protected:
 private:
     MainWindow* mMainWnd;
     QString mTitleStyle;
-    QWidget* mVersionWidget;
+    QWidget* mVersionWidget{nullptr};
 };
 
 #endif // WELCOMEPAGE_H

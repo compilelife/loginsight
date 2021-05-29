@@ -18,6 +18,8 @@ public:
 
 protected:
     void closeEvent(QCloseEvent* ev) override;
+    void dragEnterEvent(QDragEnterEvent* ev) override;
+    void dropEvent(QDropEvent* ev) override;
 
 private slots:
     void openFile();

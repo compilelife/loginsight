@@ -14,6 +14,7 @@ SOURCES += \
     aboutdlg.cpp \
     choosecolormenu.cpp \
     documenttab.cpp \
+    feedbackdlg.cpp \
     filesource.cpp \
     filterdialog.cpp \
     focusmanager.cpp \
@@ -48,6 +49,7 @@ HEADERS += \
     choosecolormenu.h \
     documenttab.h \
     events.h \
+    feedbackdlg.h \
     filesource.h \
     filterdialog.h \
     focusmanager.h \
@@ -91,6 +93,7 @@ RESOURCES += \
 
 FORMS += \
     aboutdlg.ui \
+    feedbackdlg.ui \
     settingsdialog.ui
 
 macx {

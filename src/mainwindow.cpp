@@ -29,6 +29,11 @@
 #include "aboutdlg.h"
 #include "updater.h"
 #include "webhome.h"
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
+#include <QFileInfo>
+#include "feedbackdlg.h"
 
 using namespace std;
 
@@ -51,6 +56,8 @@ MainWindow::MainWindow(QWidget *parent)
 
         bindUserControls();
         noDocDisableActions();
+
+        this->setAcceptDrops(true);
 }
 
 MainWindow::~MainWindow()
@@ -60,9 +67,27 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *ev)
 {
     auto cnt = mTabWidget->count();
-    for (auto i = 0; i < cnt; i++) {
-        doCloseDocumentTab(i);
+    while(cnt-->0) {
+        doCloseDocumentTab(0);
     }
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *ev)
+{
+    auto data = ev->mimeData();
+    if (!data->hasUrls())
+        return;
+    auto url = data->urls()[0];
+    if (!QFileInfo(url.toLocalFile()).isFile())
+        return;
+
+    ev->acceptProposedAction();
+}
+
+void MainWindow::dropEvent(QDropEvent *ev)
+{
+    auto url = ev->mimeData()->urls()[0];
+    doOpenFile(url.toLocalFile());
 }
 
 void MainWindow::openFile()
@@ -213,7 +238,7 @@ void MainWindow::bindUserControls()
     auto a = UserControl::instance();
     connect(a.actionFor(UserControl::OpenFileIntent), &QAction::triggered, this, &MainWindow::openFile);
     connect(a.actionFor(UserControl::UsageIntent), &QAction::triggered, []{
-        QDesktopServices::openUrl(QUrl("https://gitee.com/compilelife/loginsight/wikis/使用说明"));
+        QDesktopServices::openUrl(QUrl("http://www.loginsight.top/manual/"));
     });
     connect(a.actionFor(UserControl::ShortcutIntent), &QAction::triggered, []{
         auto shortcuts = UserControl::instance().getShortcutHint();
@@ -315,6 +340,9 @@ QMenu *MainWindow::buildHelpMenu()
     menu->addAction("关于", []{
         AboutDlg dlg;
         dlg.exec();
+    });
+    menu->addAction("反馈", []{
+        FeedbackDlg().exec();
     });
 
     return menu;

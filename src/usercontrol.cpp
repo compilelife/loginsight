@@ -40,11 +40,21 @@ UserControl::UserControl()
 QString UserControl::getShortcutHint()
 {
     QStringList seqs;
+    seqs.push_back("[全局]");
     for (auto&& action : mActions.values()) {
+        if(action->shortcut().isEmpty())
+            continue;
         auto description = action->text() + ":" + action->shortcut().toString(QKeySequence::NativeText);
         seqs.push_back(description);
     }
-    return seqs.join("\n");
+
+    seqs.push_back("\n------------------");
+    seqs.push_back("[日志文本框]");
+    seqs.push_back("高亮所选词：Ctrl+E");
+    seqs.push_back("过滤所选词：Ctrl+R");
+    seqs.push_back("添加当前行到时间线：Ctrl+T");
+
+    return seqs.join('\n');
 }
 
 UserControl &UserControl::instance()

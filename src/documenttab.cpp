@@ -66,6 +66,7 @@ DocumentTab::DocumentTab()
 
     auto box = new QHBoxLayout;
     box->addWidget(hsplitter);
+    box->setMargin(0);
     setLayout(box);
 }
 
@@ -87,6 +88,21 @@ void DocumentTab::connectLogEdit(LogEdit* edit)
     //所有edit的emphasize请求都提交给root presenter
     connect(edit, &LogEdit::emphasizeLineRequested, [this, edit](int lineNum){
         qApp->postEvent(this, new EmphasizeLineEvent(edit->getLog(), lineNum, true));
+    });
+
+    connect(edit, &LogEdit::addToTimeLineRequested, [this, edit](int lineNum){
+        auto log = edit->getLog();
+
+        auto sourceLine = log->toRootLine(lineNum);
+        auto text = log->readLine(sourceLine);
+        mTimeLine->addNode(sourceLine, text);
+    });
+
+    connect(edit, &LogEdit::filterRequested, [this](QString cursorWord){
+        SearchArg arg;
+        arg.pattern = cursorWord;
+        arg.caseSensitive = true;
+        doFilter(arg);
     });
 
     //右键菜单
