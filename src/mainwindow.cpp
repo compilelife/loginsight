@@ -133,6 +133,8 @@ void MainWindow::savePrj()
     }
 
     file.close();
+
+    mRecentPrj.add(savepath);
 }
 
 void MainWindow::loadPrj()

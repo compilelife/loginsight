@@ -14,6 +14,7 @@ public:
         GoForwardIntent,
         FilterIntent,
         OpenFileIntent,
+        OpenClipboardIntent,
         LocateLineIntent,
         CopyTimeLineIntent,
         SaveTimeLineIntent,

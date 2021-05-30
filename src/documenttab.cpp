@@ -466,7 +466,11 @@ void DocumentTab::filter()
 
 void DocumentTab::setCodec(QString name)
 {
-    mLogSource->setCodec(name);
+    if (!mLogSource->setCodec(name)) {
+        QMessageBox::warning(this, "编码设置失败", "当前日志源不支持切换编码");
+        return;
+    }
+
     mLogViewer->display()->reload();
 
     auto cnt = mSubLogTabWidget->count();

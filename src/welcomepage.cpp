@@ -81,7 +81,7 @@ void WelcomePage::showEvent(QShowEvent *)
     auto box = new QGridLayout;
     box->setMargin(30);
 
-    box->addWidget(buildActionsArea("启动", {UserControl::OpenFileIntent}), 0, 0);
+    box->addWidget(buildActionsArea("启动", {UserControl::OpenFileIntent, UserControl::OpenClipboardIntent}), 0, 0);
     box->setRowMinimumHeight(1, 50);
     box->addWidget(buildRecentArea("文件", "recentFile", SLOT(doOpenFile(const QString&))), 2, 0);
     box->setRowMinimumHeight(3, 50);
@@ -149,7 +149,8 @@ QWidget *WelcomePage::buildActionsArea(const QString &name, const QVector<int> &
     QStringList actionStrList;
     for (auto&& intent : actions) {
         auto action = UserControl::instance().actionFor((UserControl::Intent)(intent));
-        actionStrList.append(QString("<p><a href=%1>%2</a></p>").arg(intent).arg(action->text()));
+        if (action)
+            actionStrList.append(QString("<p><a href=%1>%2</a></p>").arg(intent).arg(action->text()));
     }
 
     auto label = createAreaLabel();

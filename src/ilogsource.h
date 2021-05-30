@@ -41,8 +41,9 @@ public:
         return mLoadOp;
     }
 
-    void setCodec(QString name) {
+    virtual bool setCodec(QString name) {
         mCodec = QTextCodec::codecForName(name.toStdString().c_str());
+        return true;
     }
 
     QTextCodec* getCodec() {
