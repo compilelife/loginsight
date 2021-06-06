@@ -1,44 +1,28 @@
-loginsight致力于打造一款日志分析的利器
+loginsight致力于打造一款通用的日志分析利器
 
-[官网](http://www.loginsight.top)
+详细介绍请移步：[官网](http://www.loginsight.top) 或 [使用文档](http://www.loginsight.top/manual/)
 
 ![preview](https://z3.ax1x.com/2021/05/24/gxZ9s0.png)
-
-# 亮点特性
-
-- 支持windows/macos/linux
-- 支持大文件秒开
-- 时间线功能：日志再乱，思路清晰
-- 小窗过滤：双线程查问题
-- TAG栏加持
-- 快速、轻量、内存占用少
-- 保存、打开工程：没有日志是看一天解决不了的，如果有，那就多看几天
-- *支持多标签页
-- *支持多个过滤窗口，嵌套过滤
-- *支持多线程加速，打开文件、过滤速度更快
-- /支持实时日志流
-- /支持时间线分支
-- /支持日志格式化
-
-> 标记*的是专业版专属功能，开源代码不包含
->
-> 标记/的是开发中的功能
-
-[鸣谢](https://github.com/compilelife/loginsight/wiki)
 
 # 下载
 
 [下载地址](https://mianbaoduo.com/o/bread/YZmYkpts)
 
-上述下载地址提供的是专业版的下载地址，专业版可以免费试用3天，3天后需要购买。购买地址：
+# 版权声明
 
-- Windows: https://mianbaoduo.com/o/bread/YZibl55q
-- Mac: https://mianbaoduo.com/o/bread/YZibmZpx
-- Linux: https://mianbaoduo.com/o/bread/YZibmZtp
-- 全平台：https://mianbaoduo.com/o/bread/YZibmZtw
+本开源代码可用于学习、编译、二次开发，但禁止用于任何商业用途。
 
-**之前所有赞助者，不论赞助费多少，都可以直接使用“面包多”赞助页面的订单号完成注册，无需购买。**
+本开源代码不含专业版的功能，敬请谅解
 
-# 使用文档
+# 鸣谢
 
-您可以通过[使用文档](http://www.loginsight.top/manual/)了解详细的软件功能
+感谢以下赞助者给予的支持！：[鸣谢](https://github.com/compilelife/loginsight/wiki)
+
+# 支持
+
+如果该项目对您有帮助，可通过以下方式贡献，以保持项目持续开发：
+
+1. 购买专业版: [Windows](https://mianbaoduo.com/o/bread/YZibl55q)，[Mac](https://mianbaoduo.com/o/bread/YZibmZpx)，[Linux](https://mianbaoduo.com/o/bread/YZibmZtp)
+2. 点击右上的star
+3. 推荐给更多的人
+4. 提出您宝贵的建议, 欢迎提issue/pull request

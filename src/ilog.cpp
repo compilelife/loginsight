@@ -13,6 +13,11 @@ ILog::ILog(QString type)
 {
 }
 
+QString ILog::readLines(int from, int to)
+{
+    return mSource->getCodec()->toUnicode(readRawLines(from, to));
+}
+
 int ILog::toRootLine(int line)
 {
     auto cur = shared_from_this();
@@ -52,12 +57,12 @@ shared_ptr<LongtimeOperation> ILog::createChild(SearchArg arg, QString id)
     auto chunkSize = 200000;//20w行一个块
     QVector<Range> taskRanges;
     int offset = range.from;
-    while (offset + chunkSize <= range.size()) {
+    while (offset + chunkSize <= range.to) {
         taskRanges.push_back({offset, offset+chunkSize-1});
         offset+=chunkSize;
     }
-    if (offset+chunkSize > range.size()) {
-        taskRanges.push_back({offset, range.size() - 1});
+    if (offset+chunkSize > range.to) {
+        taskRanges.push_back({offset, range.to});
     }
 
     op->setProgressMin(0);
@@ -76,6 +81,9 @@ shared_ptr<LongtimeOperation> ILog::createChild(SearchArg arg, QString id)
         mChildren.push_back(sub);
 
         function<QVector<int>(const Range&)> mapFunc = [this, arg, op](const Range& r){
+            if (op->isCanceled())
+                return QVector<int>();
+
             auto revert = arg.revert;
             auto caseSense = arg.caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
             QRegExp pattern(arg.pattern, caseSense);
@@ -83,7 +91,7 @@ shared_ptr<LongtimeOperation> ILog::createChild(SearchArg arg, QString id)
             ret.reserve(r.size());
             QString line;
 
-            qDebug()<<r.from<<r.to;
+//            qDebug()<<r.from<<r.to;
             for (int i = r.from; i <= r.to && !op->isCanceled(); i++) {
                 line.clear();
                 line.append(readLine(i));
@@ -192,6 +200,11 @@ void ILog::post(BaseEvent *ev)
 {
     if (mSource)
         mSource->post(ev);
+}
+
+QString ILog::type()
+{
+    return mType;
 }
 
 shared_ptr<ILog> ILog::findLogById(QString id)

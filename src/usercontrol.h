@@ -15,6 +15,8 @@ public:
         FilterIntent,
         OpenFileIntent,
         OpenClipboardIntent,
+        OpenProcessIntent,
+        CloseTabIntent,
         LocateLineIntent,
         CopyTimeLineIntent,
         SaveTimeLineIntent,

@@ -52,6 +52,8 @@ public:
 
     static ILogSource *createLogSourceFromType(QString type, QObject* eventHandler);
 
+    virtual QString getSimpleDesc() = 0;
+
 public:
     virtual QJsonValue saveToJson();
     virtual void loadFromJson(const QJsonValue &jo);

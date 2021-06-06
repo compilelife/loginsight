@@ -24,6 +24,7 @@ UserControl::UserControl()
     ADD_ACTION(GoForwardIntent, "right", "前进", "Ctrl+]");
     ADD_ACTION(FilterIntent, "filter", "过滤", "Ctrl+L");
     ADD_ACTION(OpenFileIntent, "open", "打开本地文件...", "Ctrl+O");
+    ADD_ACTION1(CloseTabIntent, "关闭当前标签页", "Ctrl+W");
     ADD_ACTION(LocateLineIntent, "locate", "跳转到行", "Ctrl+G");
     ADD_ACTION(CopyTimeLineIntent, "clipboard", "复制时间线到粘贴板", "Ctrl+S");
     ADD_ACTION(SaveTimeLineIntent, "export", "导出时间线到文件", "Ctrl+Shift+S");

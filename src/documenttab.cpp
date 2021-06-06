@@ -20,6 +20,9 @@
 #include <QJsonArray>
 #include <QInputDialog>
 #include <QFileDialog>
+#include <QProgressBar>
+#include <QLabel>
+#include <QProgressDialog>
 
 DocumentTab::DocumentTab()
     : QWidget(nullptr)
@@ -114,7 +117,7 @@ void DocumentTab::connectLogEdit(LogEdit* edit)
             auto log = edit->getLog();
 
             auto sourceLine = log->toRootLine(lineNum);
-            auto text = log->readLine(sourceLine);
+            auto text = log->rootLog()->readLine(sourceLine);
             mTimeLine->addNode(sourceLine, text);
         });
 
@@ -180,17 +183,20 @@ void DocumentTab::modalLongOp(shared_ptr<LongtimeOperation> op, QString hint)
 void DocumentTab::onSubLogCreated(shared_ptr<SubLog> subLog)
 {
     if (!subLog->availRange().isValid()) {
-        QMessageBox::warning(this, "过滤结果", "没有过滤到任何匹配行");
-        return;
+        if (QMessageBox::Ok
+                != QMessageBox::warning(this, "过滤结果", "没有过滤到任何匹配行，是否保留过滤窗以监听新的日志", QMessageBox::Ok, QMessageBox::Cancel)) {
+            return;
+        }
     }
 
     auto viewer = new LogViewer(&mFocusManager, true);
 
     auto subEdit = viewer->display();
-    subEdit->setLog(subLog);
 
     connectLogEdit(subEdit);
     appendSubLog(viewer, subLog->getSearchArg().pattern);
+
+    subEdit->setLog(subLog);
 }
 
 void DocumentTab::onFindDone(shared_ptr<ILog> who, SearchResult ret)
@@ -228,6 +234,11 @@ void DocumentTab::onLineEmphasized(shared_ptr<ILog> who, int line, bool isSource
 {
     auto rootLine = who->toRootLine(line);
     auto root = who->rootLog();
+
+    if (!root->availRange().contains(rootLine) || rootLine <= 0) {
+        QMessageBox::warning(this, "跳转错误", "无法跳转到对应行，可能日志已经被刷掉了");
+        return ;
+    }
 
     //从上到下，触发emphasize
     deepEmphasizeLine(root, rootLine, isSource ? who : shared_ptr<ILog>());
@@ -478,6 +489,41 @@ void DocumentTab::setCodec(QString name)
         auto viewer = (LogViewer*)mSubLogTabWidget->widget(i);
         viewer->display()->reload();
     }
+}
+
+void DocumentTab::saveCurSubLog()
+{
+    auto logview = (LogViewer*)mSubLogTabWidget->currentWidget();
+    if (!logview) {
+        QMessageBox::warning(this, "保存过滤结果", "当前没有任何过滤结果");
+        return;
+    }
+
+    auto log = logview->display()->getLog();
+    auto savepath = QFileDialog::getSaveFileName(this, "保存过滤结果");
+    if (savepath.isEmpty())
+        return;
+
+    QFile f;
+    f.setFileName(savepath);
+    if (!f.open(QFile::WriteOnly)) {
+        QMessageBox::critical(nullptr, "保存过滤结果", QString("文件打开失败：%1").arg(savepath));
+        return;
+    }
+
+    QProgressDialog progress;
+    progress.setWindowTitle("导出过滤窗内容");
+    progress.setLabel(new QLabel(QString("正在导出过滤窗内容到：%1,请耐心等候").arg(savepath)));
+    progress.setWindowModality(Qt::WindowModal);
+
+    if (log->saveTo(f, progress)) {
+        QMessageBox::information(nullptr, "保存过滤结果", "保存成功");
+    } else {
+        if (!progress.wasCanceled())
+            QMessageBox::critical(nullptr, "保存过滤结果", "保存失败");
+    }
+
+    f.close();
 }
 
 void DocumentTab::customEvent(QEvent *ev)

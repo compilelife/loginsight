@@ -19,6 +19,11 @@ NewVersionDlg::NewVersionDlg()
         l->setTextFormat(Qt::MarkdownText);
         l->setText(updater.changeLog());
         box->addWidget(l);
+
+        connect(l, &QLabel::linkActivated, [](const QString& link){
+            QUrl url(QString("%1/manual/%2").arg(WEB_PAGE,link));
+            QDesktopServices::openUrl(url);
+        });
     }
 
     {
@@ -27,6 +32,7 @@ NewVersionDlg::NewVersionDlg()
             QDesktopServices::openUrl(QUrl(WEB_DOWNLOAD_URL));
             accept();
         });
+        okBtn->setAutoDefault(true);
         auto cancelBtn = new QPushButton("稍后");
         connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
 

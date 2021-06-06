@@ -10,15 +10,15 @@ MemLog::MemLog()
 
 MemLog::~MemLog()
 {
-    qDebug()<<"~MemLog";
+//    qDebug()<<"~MemLog";
 }
 
-QString MemLog::readLines(int fromLine, int toLine)
+QByteArray MemLog::readRawLines(int fromLine, int toLine)
 {
     if (!mMem)
         return "";
 
-    QString buffer;
+    QByteArray buffer;
 
     //尝试拼接连续的行（下一行的from是上一行的to+1)，以合并rawRead调用，提高速度
     auto beginLine = getLineByteRange(fromLine);
@@ -51,13 +51,9 @@ void MemLog::addLines(const QVector<qint64> &newBreaks)
     mLineBreaks.append(newBreaks);//FIXME: 效率优化
 }
 
-void MemLog::rawRead(qint64 from, qint64 to, QString &out)
+void MemLog::rawRead(qint64 from, qint64 to, QByteArray &out)
 {
-    out.append(
-                mSource->getCodec()->toUnicode(
-                    QByteArray::fromRawData((char*)mMem+from, to-from+1)
-                    )
-                );
+    out.append(QByteArray::fromRawData((char*)mMem+from, to-from+1));
 }
 
 QPair<qint64,qint64> MemLog::getLineByteRange(int line)

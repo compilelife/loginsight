@@ -81,7 +81,11 @@ void WelcomePage::showEvent(QShowEvent *)
     auto box = new QGridLayout;
     box->setMargin(30);
 
-    box->addWidget(buildActionsArea("启动", {UserControl::OpenFileIntent, UserControl::OpenClipboardIntent}), 0, 0);
+    box->addWidget(buildActionsArea("启动", {
+                                        UserControl::OpenFileIntent,
+                                        UserControl::OpenClipboardIntent,
+                                        UserControl::OpenProcessIntent,
+                                    }), 0, 0);
     box->setRowMinimumHeight(1, 50);
     box->addWidget(buildRecentArea("文件", "recentFile", SLOT(doOpenFile(const QString&))), 2, 0);
     box->setRowMinimumHeight(3, 50);

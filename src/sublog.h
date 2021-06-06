@@ -12,6 +12,7 @@ public:
 
 public:
     QString readLines(int from, int to) override;
+    QByteArray readRawLines(int from, int to) override;
     Range availRange() override;
 
     int fromParentLine(int line) override;
@@ -20,6 +21,8 @@ public:
     SearchArg getSearchArg();
 
     bool onParentRangeChanged(Range before, Range after) override;
+
+    bool saveTo(QFile& path, QProgressDialog& progess) override;
 
 private:
     SearchArg mSearchArg;

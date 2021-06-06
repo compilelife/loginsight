@@ -6,6 +6,8 @@
 #include <list>
 #include <QJsonValue>
 #include "longtimeoperation.h"
+#include <QFile>
+#include <QProgressDialog>
 
 using namespace std;
 
@@ -75,7 +77,8 @@ public:
     virtual ~ILog(){}
 
 public:
-    virtual QString readLines(int from, int to) = 0;
+    virtual QString readLines(int from, int to);
+    virtual QByteArray readRawLines(int from, int to) = 0;
     virtual Range availRange() = 0;
 
     virtual int fromParentLine(int){return -1;}
@@ -100,6 +103,10 @@ public:
     }
 
     void post(BaseEvent* ev);
+
+    QString type();
+
+    virtual bool saveTo(QFile&, QProgressDialog&) {return false;};
 
 public:
     QString getType(){return mType;}

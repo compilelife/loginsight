@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QDir>
 #include <QDateTime>
+#include <QMessageBox>
 
 static void createDefaultSettings()
 {
@@ -50,6 +51,14 @@ static void createDefaultSettings()
         config.setValue("register", "");
     }
 
+    if (!keys.contains("dynamicLogLimit")) {
+        config.setValue("dynamicLogLimit", 30);
+    }
+
+    if (!keys.contains("closeTabPrompt")) {
+        config.setValue("closeTabPrompt", true);
+    }
+
     config.sync();
 }
 
@@ -73,9 +82,30 @@ static void myMessageHandler(QtMsgType type, const QMessageLogContext& context, 
     gLogFile.flush();
 }
 
+class MyApplication : public QApplication
+{
+public:
+    MainWindow* mainWnd;
+
+    MyApplication(int &argc, char **argv)
+        : QApplication(argc, argv)
+    {
+    }
+
+    bool event(QEvent *event) override
+    {
+        if (event->type() == QEvent::FileOpen && mainWnd) {
+            QFileOpenEvent *openEvent = static_cast<QFileOpenEvent *>(event);
+            mainWnd->doOpenFile(openEvent->file());
+        }
+
+        return QApplication::event(event);
+    }
+};
+
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    MyApplication a(argc, argv);
     QCoreApplication::setOrganizationName("compilelife");
     QCoreApplication::setOrganizationDomain("compilelife.com");
     QCoreApplication::setApplicationName("loginsight");
@@ -92,9 +122,6 @@ int main(int argc, char *argv[])
 
     auto idealCpuCount = QThread::idealThreadCount();
     qDebug()<<"cpu count: "<<idealCpuCount;
-    if (idealCpuCount >= 3) {
-        QThreadPool::globalInstance()->setMaxThreadCount(2);
-    }
 
     createDefaultSettings();
 
@@ -106,6 +133,7 @@ int main(int argc, char *argv[])
         w.doOpenFile(argv[1]);
     }
 
+    a.mainWnd = &w;
     auto ret =  a.exec();
 
     gLogFile.close();

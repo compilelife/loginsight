@@ -101,11 +101,20 @@ void MainWindow::openFile()
 
 void MainWindow::closeDocumentTab(int index)
 {
-    auto tabText = mTabWidget->tabText(index);
-    auto btn = QMessageBox::warning(this,
-                                    "关闭日志", QString("确认要关闭标签页【%1】吗？").arg(tabText),
-                                    QMessageBox::Ok,
-                                    QMessageBox::Cancel);
+    if (index <0 || index >= mTabWidget->count()) {
+        return;
+    }
+
+    QSettings config;
+    int btn = QMessageBox::Ok;
+    if (config.value("closeTabPrompt").toBool()) {
+        auto tabText = mTabWidget->tabText(index);
+        btn = QMessageBox::warning(this,
+                                        "关闭日志", QString("确认要关闭标签页【%1】吗？").arg(tabText),
+                                        QMessageBox::Ok,
+                                        QMessageBox::Cancel);
+    }
+
     if (btn == QMessageBox::Ok) {
         doCloseDocumentTab(index);
     }
@@ -152,14 +161,14 @@ void MainWindow::doOpenFile(const QString &path)
     shared_ptr<FileSource> log(new FileSource(tab));
     log->setFileName(path);
     tab->init(log);
-    tab->setName(path);
+    tab->setName(log->getSimpleDesc());
 
     if (!log->open()) {
         QMessageBox::critical(this, "无法打开文件", QString("%1打开失败").arg(path));
         return;
     }
 
-    appendDocumentTab(tab, path);
+    appendDocumentTab(tab);
 
     mRecentFile.add(path);
 }
@@ -216,7 +225,7 @@ void MainWindow::loadFromJson(const QJsonObject &o)
     for (auto&& tabObj : o["tabs"].toArray()) {
         auto tab = new DocumentTab();
         if (tab->loadFromJson(tabObj)) {
-            appendDocumentTab(tab, tab->getName());
+            appendDocumentTab(tab);
         }
     }
 }
@@ -239,6 +248,10 @@ void MainWindow::bindUserControls()
 {
     auto a = UserControl::instance();
     connect(a.actionFor(UserControl::OpenFileIntent), &QAction::triggered, this, &MainWindow::openFile);
+    connect(a.actionFor(UserControl::CloseTabIntent), &QAction::triggered, [this]{
+        auto index = mTabWidget->currentIndex();
+        this->closeDocumentTab(index);
+    });
     connect(a.actionFor(UserControl::UsageIntent), &QAction::triggered, []{
         QDesktopServices::openUrl(QUrl("http://www.loginsight.top/manual/"));
     });
@@ -354,10 +367,9 @@ QMenu* MainWindow::buildFileMenu()
 {
     auto menu = new QMenu("文件");
 
-    menu->addAction(UserControl::instance().actionFor(UserControl::OpenFileIntent));
-    menu->addAction("关闭当前文档", [this]{
-        closeDocumentTab(mTabWidget->currentIndex());
-    });
+    auto& actions = UserControl::instance();
+    menu->addAction(actions.actionFor(UserControl::OpenFileIntent));
+    menu->addAction(actions.actionFor(UserControl::CloseTabIntent));
     menu->addAction("打开工程...", this, &MainWindow::loadPrj);
     menu->addAction("保存工程...", this, &MainWindow::savePrj);
 
@@ -371,6 +383,9 @@ QMenu* MainWindow::buildFileMenu()
         });
     }
     menu->addMenu(codecMenu);
+
+    menu->addSeparator();
+
 
     menu->addSeparator();
 
@@ -409,27 +424,21 @@ QMenu *MainWindow::buildInsightMenu()
     return menu;
 }
 
-int MainWindow::appendDocumentTab(DocumentTab *tab, const QString &title)
+int MainWindow::appendDocumentTab(DocumentTab *tab)
 {
-    auto count = mTabWidget->count();
-    if (mTabWidget->count() >= 1) {
-        for (int i = 0; i < count; i++) {
-            doCloseDocumentTab(i);
-        }
-    }
-
-    auto index = mTabWidget->addTab(tab, title);
+    auto index = mTabWidget->addTab(tab, tab->getName());
     mTabWidget->setCurrentIndex(index);
 
-    mCenterWidget->setCurrentWidget(mTabWidget);
-    hasDocEnableActions();
-
+    if (mTabWidget->count() == 1) {
+        mCenterWidget->setCurrentWidget(mTabWidget);
+        hasDocEnableActions();
+    }
     return index;
 }
 
 DocumentTab *MainWindow::currentDocument()
 {
-    return (DocumentTab*)mTabWidget->widget(0);
+    return (DocumentTab*)mTabWidget->currentWidget();
 }
 
 QMenu* MainWindow::buildBuyMenu()

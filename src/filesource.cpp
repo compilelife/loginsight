@@ -4,6 +4,8 @@
 #include "events.h"
 #include <QPair>
 #include <QtConcurrent>
+#include <QFileInfo>
+#include <QMessageBox>
 
 FileSource::FileSource(QObject* eventHandler)
     :ILogSource(eventHandler, "file")
@@ -50,6 +52,11 @@ void FileSource::close()
     doClose();
 }
 
+QString FileSource::getSimpleDesc()
+{
+    return QFileInfo(mFile.fileName()).fileName();
+}
+
 QJsonValue FileSource::saveToJson()
 {
     auto o = ILogSource::saveToJson().toObject();
@@ -66,50 +73,30 @@ void FileSource::loadFromJson(const QJsonValue &o)
 void FileSource::parse()
 {
     mParseTask = QtConcurrent::run([this]{
-        auto chunkSize = 20*1024*1024;//20M一个块，2G，
-
-        QVector<QPair<qint64,qint64>> taskRanges;
-        qint64 offset = 0;
-        while (offset + chunkSize <= mFile.size()) {
-            taskRanges.push_back({offset, offset + chunkSize - 1});
-            offset += chunkSize;
+        auto size = mFile.size();
+        if (size >= 512*1024*1024L) {
+            post(new ErrorEvent([]{
+                QMessageBox::warning(nullptr, "打开文件", "当前是开源版本，打开超过500M的文件可能速度较慢。\n大文件的多线程加速仅专业版可用");
+            }));
         }
-        if (offset + chunkSize > mFile.size()) {
-            taskRanges.push_back({offset, mFile.size()-1});
-        }
-        mLoadOp->setProgressMin(0);
-        mLoadOp->setProgressMax(taskRanges.size());
+        QVector<qint64> lines;
+        lines.reserve(210000);//20M按一行100字符，估计21w行
 
-        function<QVector<qint64>(QPair<qint64,qint64>)> mapFunc = [this](QPair<qint64,qint64> r) {
-            QVector<qint64> lines;
-            lines.reserve(210000);//20M按一行100字符，估计21w行，空间不够的话，每次再分配1w行
-
-//            qDebug()<<r;
-            auto from = r.first;
-            auto to = r.second;
-
-            for (auto i = from; i <= to && mRunning; i++) {
-                auto c = mMem[i];
-                if (c == 0) {
-                    mMem[i] = ' ';
-                } else if (c == '\n') {
-                    lines.push_back(i);
-                    if (lines.size() >= lines.capacity()) {
-                        lines.reserve(lines.size() + 10000);
-                    }
+        for (auto i = 0; i < size && mRunning; i++) {
+            auto c = mMem[i];
+            if (c == 0) {
+                mMem[i] = ' ';//修复一些错误的日志，其中包含了二进制的0，这会意外导致字符串中断
+            } else if (c == '\n') {
+                lines.push_back(i);
+                if (lines.size() >= lines.capacity()) {
+                    post(new LogChangeEvent(mLog, [this, lines]{mLog->addLines(lines);}));
+                    lines.clear();
                 }
             }
+        }
 
-            mLoadOp->publishProgress();
-            return lines;
-        };
-
-        auto rets = QtConcurrent::mapped(taskRanges, mapFunc);
-
-        for (auto i = 0; i < taskRanges.size() && mRunning; i++) {
-            auto ret = rets.resultAt(i);
-//            qDebug()<<"post "<<i;
-            post(new LogChangeEvent(mLog, [this, ret]{mLog->addLines(ret);}));
+        if (!lines.isEmpty()) {
+            post(new LogChangeEvent(mLog, [this, lines]{mLog->addLines(lines);}));
         }
 
         mLoadOp->done();

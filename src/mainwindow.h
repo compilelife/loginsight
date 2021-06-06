@@ -53,7 +53,7 @@ private:
     QMenu* buildBuyMenu();
 
 private:
-    int appendDocumentTab(DocumentTab* tab, const QString& title);
+    int appendDocumentTab(DocumentTab* tab);
     DocumentTab* currentDocument();
 
 private:

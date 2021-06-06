@@ -25,6 +25,8 @@ public:
 
     shared_ptr<ILog> getLog() override {return mLog;}
 
+    QString getSimpleDesc() override;
+
 public:
     QJsonValue saveToJson() override;
     void loadFromJson(const QJsonValue &o) override;

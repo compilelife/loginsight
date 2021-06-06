@@ -112,8 +112,13 @@ void LogEdit::setLog(std::shared_ptr<ILog> presenter)
         if (!range.isValid())//还没有数据
             return;
 
+        qDebug()<<"update external range to "<<range.from<<","<<range.to;
         updateExternalScrollRange(range);
-        load(1);
+        if (mMode == LogEdit::WatchMode) {
+            mExternalBar->setValue(mExternalBar->maximum());
+        } else {
+            load(1);
+        }
     } else {
         clear();
     }
@@ -160,28 +165,37 @@ void LogEdit::onLogRangeChanged()
         } else {
             //如果完全没有交集，则load(avai range. from)
             firstVisibleLineNumber = availRange.from;
-            load(availRange.from);
+            if (availRange.isValid()) {
+                load(availRange.from);
+            } else {
+                clear();
+            }
         }
     } else {
-        auto availRange = mLog->availRange();
-        auto to = availRange.to;
-        auto from = to - 2 * mViewPortMaxLineCnt;
-        if (from < availRange.from)
-            from = availRange.from;
+        if (availRange.isValid()) {
+            auto to = availRange.to;
+            auto from = to - 2 * mViewPortMaxLineCnt;
+            if (from < availRange.from)
+                from = availRange.from;
 
-        mBufferRange.from = from;
-        mBufferRange.to = to;
+            mBufferRange.from = from;
+            mBufferRange.to = to;
 
-        unBindInternalScroll();
+            unBindInternalScroll();
 
-        auto horiValue = horizontalScrollBar()->value();
-        setPlainText(mLog->readLines(from, to));
-        horizontalScrollBar()->setValue(horiValue);
+            auto horiValue = horizontalScrollBar()->value();
+//            qDebug()<<mLog->type()<<",set plain text:"<<from<<","<<to;
+            setPlainText(mLog->readLines(from, to));
+            horizontalScrollBar()->setValue(horiValue);
 
-        verticalScrollBar()->setValue(verticalScrollBar()->maximum());
-        firstVisibleLineNumber = blockNumberToPresenter(firstVisibleBlock().blockNumber());
+            verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+            firstVisibleLineNumber = blockNumberToPresenter(firstVisibleBlock().blockNumber());
 
-        bindInternalScroll();
+            bindInternalScroll();
+        } else {
+//            qDebug()<<mLog->type()<<",clear";
+            clear();
+        }
     }
 
     unBindExternalScroll();
@@ -208,6 +222,8 @@ void LogEdit::reload()
 void LogEdit::load(int preloadCenterLine, int firstVisibleLineNumber)
 {
     auto availRange = mLog->availRange();
+    if (!availRange.isValid())
+        return;
 
     auto from = preloadCenterLine - PRELOAD_COUNT/2;
     if (from < availRange.from)
@@ -266,11 +282,11 @@ void LogEdit::handleInternalScroll(int)
 
 void LogEdit::handleExternalScroll(int value)
 {
-    auto blockNum = presenterNumberToBlock(value);
-    if (blockNum == firstVisibleBlock().blockNumber())
-        return;
-
     if (mBufferRange.contains(value)) {
+        auto blockNum = presenterNumberToBlock(value);
+        if (blockNum == firstVisibleBlock().blockNumber())
+            return;
+
         unBindInternalScroll();
         setVertialScrollbarByBlockNum(presenterNumberToBlock(value));
         bindInternalScroll();

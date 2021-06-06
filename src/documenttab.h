@@ -56,6 +56,7 @@ public slots:
     void find(SearchArg arg, bool forward);
     void filter();
     void setCodec(QString name);
+    void saveCurSubLog();
 
 protected:
     void customEvent(QEvent* ev) override;

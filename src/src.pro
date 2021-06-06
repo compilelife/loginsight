@@ -98,6 +98,7 @@ FORMS += \
 
 macx {
 ICON = Icon.icns
+QMAKE_INFO_PLIST = Info.plist
 }
 
 win32 {
