@@ -41,6 +41,7 @@ DocumentTab::DocumentTab()
         }
 
         loadTagListWithCurrentLogEdit(currentLogEdit());
+        updateHistoryBtn(currentLogEdit());
     });
 
     mLogViewer = new LogViewer(&mFocusManager, true);
@@ -58,6 +59,7 @@ DocumentTab::DocumentTab()
 
     hsplitter->addWidget(mLogSplitter);
     mTimeLine = new TimeLine;
+    mTimeLine->hide();
     hsplitter->addWidget(mTimeLine);
     connect(mTimeLine, &TimeLine::nodeSelected, [this](TimeNode* node){
         auto rootLog = mLogViewer->display()->getLog();
@@ -85,6 +87,9 @@ void DocumentTab::connectLogEdit(LogEdit* edit)
     //taglist
     connect(edit->highlighter(), &Highlighter::onPatternAdded, [](HighlightPattern p){
         UserControl::instance().tagList()->addTag(p.key, p.color);
+    });
+    connect(edit->history(), &History::posChanged, [edit, this]{
+        updateHistoryBtn(edit);
     });
 
     //emphasize
@@ -167,6 +172,28 @@ void DocumentTab::connectLogEdit(LogEdit* edit)
         menu->exec(point);
     }
     );
+}
+
+void DocumentTab::updateHistoryBtn(LogEdit *edit)
+{
+    auto actions = UserControl::instance();
+    auto history = edit->history();
+    actions.actionFor(UserControl::GoBackwardIntent)->setEnabled(history->availableBackwardCount()>0);
+    actions.actionFor(UserControl::GoForwardIntent)->setEnabled(history->availableFowardCount()>0);
+}
+
+void DocumentTab::doPauseResumeLogSource()
+{
+    auto action = UserControl::instance().actionFor(UserControl::PauseSourceIntent);
+    if (mLogSource->isPaused()) {
+        action->setText("暂停日志源");
+        action->setIcon(QIcon(":/res/img/pause.png"));
+        mLogSource->resume();
+    } else {
+        action->setText("恢复日志源");
+        action->setIcon(QIcon(":/res/img/resume.png"));
+        mLogSource->pause();
+    }
 }
 
 void DocumentTab::modalLongOp(shared_ptr<LongtimeOperation> op, QString hint)
@@ -324,6 +351,18 @@ void DocumentTab::connectUserControls()
     CONNECT1(UserControl::CopyTimeLineIntent, mTimeLine, &TimeLine::exportToClipboard);
     CONNECT1(UserControl::SaveTimeLineIntent, this, &DocumentTab::exportTimeLineToImage);
     CONNECT1(UserControl::ClearTimeLineIntent, mTimeLine, &TimeLine::clear);
+    CONNECT1(UserControl::PauseSourceIntent, this, &DocumentTab::doPauseResumeLogSource);
+    auto action = actions.actionFor(UserControl::PauseSourceIntent);
+    if (mLogSource->isPaused()) {
+        action->setText("恢复日志源");
+        action->setIcon(QIcon(":/res/img/resume.png"));
+    } else {
+        action->setText("暂停日志源");
+        action->setIcon(QIcon(":/res/img/pause.png"));
+    }
+    updateHistoryBtn(currentLogEdit());
+
+    actions.actionFor(UserControl::PauseSourceIntent)->setEnabled(!mLogSource->isFinished());
 
 
     //taglist
@@ -561,6 +600,11 @@ void DocumentTab::customEvent(QEvent *ev)
         break;
     }
     case evSourceReady: {
+        ev->accept();
+        break;
+    }
+    case evSourceFinish:{
+        UserControl::instance().actionFor(UserControl::PauseSourceIntent)->setEnabled(false);
         ev->accept();
         break;
     }

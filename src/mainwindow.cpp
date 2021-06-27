@@ -208,12 +208,22 @@ void MainWindow::doCloseDocumentTab(int index)
 
 void MainWindow::noDocDisableActions()
 {
-
+    auto actions = UserControl::instance().actionsDisableWhenNoDoc();
+    for (auto a : actions) {
+        a->setEnabled(false);
+    }
+    UserControl::instance().searchBar()->setEnabled(false);
+    mCodecMenu->setEnabled(false);
 }
 
 void MainWindow::hasDocEnableActions()
 {
-
+    auto actions = UserControl::instance().actionsDisableWhenNoDoc();
+    for (auto a : actions) {
+        a->setEnabled(true);
+    }
+    UserControl::instance().searchBar()->setEnabled(true);
+    mCodecMenu->setEnabled(true);
 }
 
 void MainWindow::loadFromJson(const QJsonObject &o)
@@ -259,6 +269,7 @@ void MainWindow::bindUserControls()
         auto shortcuts = UserControl::instance().getShortcutHint();
         QMessageBox::information(nullptr, "快捷键", shortcuts);
     });
+    connect(a.actionFor(UserControl::SaveProjectIntent), &QAction::triggered, this, &MainWindow::savePrj);
 }
 
 void MainWindow::buildTabWidget()
@@ -271,6 +282,8 @@ void MainWindow::buildTabWidget()
             mLastDocument->disconnectUserControls();
             mLastDocument = nullptr;
         }
+
+        hasDocEnableActions();
 
         auto doc = currentDocument();
         if (doc) {
@@ -292,6 +305,7 @@ void MainWindow::buildToolbars()
     bar->addAction(UserControl::instance().actionFor(UserControl::FilterIntent));
     bar->addAction(UserControl::instance().actionFor(UserControl::GoBackwardIntent));
     bar->addAction(UserControl::instance().actionFor(UserControl::GoForwardIntent));
+    bar->addAction(UserControl::instance().actionFor(UserControl::PauseSourceIntent));
     addToolBar(bar);
 
     //<==timelineBar==>
@@ -371,7 +385,7 @@ QMenu* MainWindow::buildFileMenu()
     menu->addAction(actions.actionFor(UserControl::OpenFileIntent));
     menu->addAction(actions.actionFor(UserControl::CloseTabIntent));
     menu->addAction("打开工程...", this, &MainWindow::loadPrj);
-    menu->addAction("保存工程...", this, &MainWindow::savePrj);
+    menu->addAction(actions.actionFor(UserControl::SaveProjectIntent));
 
     auto codecMenu = new QMenu("编码");
     auto supportedCodec = QTextCodec::availableCodecs();
@@ -383,6 +397,7 @@ QMenu* MainWindow::buildFileMenu()
         });
     }
     menu->addMenu(codecMenu);
+    mCodecMenu=codecMenu;
 
     menu->addSeparator();
 
@@ -421,6 +436,8 @@ QMenu *MainWindow::buildInsightMenu()
     menu->addAction(actions.actionFor(UserControl::GoBackwardIntent));
     menu->addAction(actions.actionFor(UserControl::GoForwardIntent));
     menu->addAction(actions.actionFor(UserControl::LocateLineIntent));
+    menu->addSeparator();
+    menu->addAction(actions.actionFor(UserControl::PauseSourceIntent));
     return menu;
 }
 
@@ -431,7 +448,6 @@ int MainWindow::appendDocumentTab(DocumentTab *tab)
 
     if (mTabWidget->count() == 1) {
         mCenterWidget->setCurrentWidget(mTabWidget);
-        hasDocEnableActions();
     }
     return index;
 }
@@ -447,18 +463,12 @@ QMenu* MainWindow::buildBuyMenu()
     auto gotoDownload = []{
         QDesktopServices::openUrl(QUrl(WEB_DOWNLOAD_URL));
     };
-
     menu->addAction("下载试用", gotoDownload);
 
     auto gotoWeb = []{
         QDesktopServices::openUrl(QUrl(WEB_PAGE));
     };
-    auto intro = new QMenu("特性介绍");
-    intro->addAction("多标签页支持", gotoWeb);
-    intro->addAction("多过滤窗/嵌套过滤支持", gotoWeb);
-    intro->addAction("多线程加速", gotoWeb);
-
-    menu->addMenu(intro);
+    menu->addAction("特性介绍", gotoWeb);
 
     return menu;
 }

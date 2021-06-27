@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include "ilog.h"
-#include <QLineEdit>
+#include <QComboBox>
 #include <QToolButton>
 #include <QCheckBox>
 #include <QStringListModel>
@@ -15,7 +15,7 @@ public:
     explicit SearchBar(QWidget *parent = nullptr);
 
 private:
-    QLineEdit* buildKeywordEdit();
+    QComboBox *buildKeywordCombo();
     QToolButton* buildForwardBtn();
     QToolButton* buildBackwardBtn();
 
@@ -31,7 +31,7 @@ signals:
     void searchRequest(SearchArg arg, bool forward);
 
 private:
-    QLineEdit* mKeywordEdit;
+    QComboBox* mKeywordCombo;
     QToolButton* mBackwardBtn;
     QToolButton* mForwardBtn;
     QCheckBox* mCaseSensitiveCheckBox;

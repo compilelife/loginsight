@@ -101,6 +101,7 @@ void FileSource::parse()
 
         mLoadOp->done();
         post(new SourceReadyEvent);
+        post(new SourceFinishEvent);
     });
 }
 

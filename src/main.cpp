@@ -9,6 +9,9 @@
 #include <QDir>
 #include <QDateTime>
 #include <QMessageBox>
+#ifdef UTEST
+#include "../test/testmain.h"
+#endif
 
 static void createDefaultSettings()
 {
@@ -125,6 +128,10 @@ int main(int argc, char *argv[])
 
     createDefaultSettings();
 
+
+#ifdef UTEST
+    testmain();
+#endif
 
     MainWindow w;
     w.setWindowTitle("Loginsight");

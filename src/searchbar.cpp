@@ -9,8 +9,9 @@ SearchBar::SearchBar(QWidget *parent) : QWidget(parent)
     auto box = new QHBoxLayout;
     box->setMargin(0);
 
-    mKeywordEdit = buildKeywordEdit();
-    box->addWidget(mKeywordEdit);
+    mKeywordCombo = buildKeywordCombo();
+    box->addWidget(mKeywordCombo);
+    box->setStretch(0, 1);
 
     mForwardBtn = buildForwardBtn();
     box->addWidget(mForwardBtn);
@@ -31,7 +32,7 @@ SearchBar::SearchBar(QWidget *parent) : QWidget(parent)
     mCaseSensitiveCheckBox->setChecked(caseSentive);
 }
 
-QLineEdit *SearchBar::buildKeywordEdit()
+QComboBox *SearchBar::buildKeywordCombo()
 {
     auto completer = new QCompleter;
     completer->setCaseSensitivity(Qt::CaseSensitive);
@@ -39,9 +40,10 @@ QLineEdit *SearchBar::buildKeywordEdit()
     connect(completer, SIGNAL(highlighted(const QString &)), this, SLOT(fill(const QString &)));
     connect(completer, SIGNAL(activated(const QString &)), this, SLOT(fill(const QString &)));
 
-    auto edit = new QLineEdit;
+    auto edit = new QComboBox;
+    edit->setEditable(true);
     edit->setCompleter(completer);
-    connect(edit, &QLineEdit::returnPressed, this, &SearchBar::buildSearchRequest);
+    connect(edit, QOverload<int>::of(&QComboBox::activated), this, &SearchBar::buildSearchRequest);
 
     return edit;
 }
@@ -64,7 +66,7 @@ QToolButton *SearchBar::buildBackwardBtn()
 
 void SearchBar::fill(const QString &keyword)
 {
-    mKeywordEdit->setText(keyword);
+    mKeywordCombo->setEditText(keyword);
     strongFocus();
 }
 
@@ -83,18 +85,19 @@ void SearchBar::setSearchForward(bool searchForward)
 void SearchBar::strongFocus()
 {
     //TODO: 用动画强调
-    mKeywordEdit->setFocus();
+    mKeywordCombo->setFocus();
+    mKeywordCombo->showPopup();
 }
 
 void SearchBar::buildSearchRequest()
 {
-    if (mKeywordEdit->text().isEmpty())
+    if (mKeywordCombo->currentText().isEmpty())
         return;
 
     SearchArg arg;
     arg.caseSensitive = mCaseSensitiveCheckBox->isChecked();
     arg.regex = mUseRegexCheckBox->isChecked();
-    arg.pattern = mKeywordEdit->text();
+    arg.pattern = mKeywordCombo->currentText();
     emit searchRequest(arg, mSearchForward);
 
     if(QString::compare(arg.pattern, QString("")) != 0) {
@@ -104,8 +107,6 @@ void SearchBar::buildSearchRequest()
             mCompleterModel.setStringList(candidates);
         }
     }
-
-    mKeywordEdit->selectAll();//方便搜索新的关键字
 }
 
 void SearchBar::forwardBtnClicked()

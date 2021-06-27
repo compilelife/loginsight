@@ -54,6 +54,10 @@ public:
 
     virtual QString getSimpleDesc() = 0;
 
+    bool isPaused(){return mPaused;}
+
+    bool isFinished(){return mFinished;}
+
 public:
     virtual QJsonValue saveToJson();
     virtual void loadFromJson(const QJsonValue &jo);
@@ -66,8 +70,13 @@ public:
             mCtrlCond.wait(&mCtrlMutex);
         }
 
+        if ((EventsType)ev->type() == evSourceFinish) {
+            mFinished = true;
+        }
+
         qApp->postEvent(mEventHandler, ev);
     }
+
 
 protected:
     shared_ptr<LongtimeOperation> mLoadOp;
@@ -78,6 +87,7 @@ private:
     QMutex mCtrlMutex;
     QWaitCondition mCtrlCond;
     bool mPaused{false};
+    bool mFinished{false};
     QString mType;
 };
 

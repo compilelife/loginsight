@@ -13,8 +13,11 @@
         <file>img/logo.png</file>
         <file>img/open.png</file>
         <file>img/right.png</file>
-        <file>img/support.png</file>
         <file>img/up.png</file>
         <file>img/zhihu.png</file>
+        <file>img/pause.png</file>
+        <file>img/resume.png</file>
+        <file>img/eye.png</file>
+        <file>img/sync.png</file>
     </qresource>
 </RCC>

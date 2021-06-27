@@ -102,6 +102,8 @@ void TimeLine::addNode(int lineNum, const QString &text) {
     connect(node, SIGNAL(selected(TimeNode*)), this, SIGNAL(nodeSelected(TimeNode*)));
 
     highlightItem(node);
+
+    show();
 }
 
 void TimeLine::exportToImage(const QString& path)
@@ -125,6 +127,8 @@ void TimeLine::clear()
         scene()->removeItem(node);
     }
     mNodes.clear();
+
+    hide();
 }
 
 void TimeLine::deleteNode(TimeNode *node)
@@ -137,6 +141,9 @@ void TimeLine::deleteNode(TimeNode *node)
     }
 
     fitLine();
+
+    if (mNodes.isEmpty())
+        hide();
 }
 
 void TimeLine::addNode(TimeNode *node)

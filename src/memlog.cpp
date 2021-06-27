@@ -15,10 +15,10 @@ MemLog::~MemLog()
 
 QByteArray MemLog::readRawLines(int fromLine, int toLine)
 {
-    if (!mMem)
-        return "";
-
     QByteArray buffer;
+
+    if (!mMem)
+        return buffer;
 
     //尝试拼接连续的行（下一行的from是上一行的to+1)，以合并rawRead调用，提高速度
     auto beginLine = getLineByteRange(fromLine);

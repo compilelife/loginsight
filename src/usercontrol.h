@@ -28,6 +28,9 @@ public:
         HighlightIntent,
         UsageIntent,
         ShortcutIntent,
+        PauseSourceIntent,
+        ExportSubLogIntent,
+        SaveProjectIntent,
     };
 private:
     UserControl();
@@ -57,8 +60,13 @@ public:
 
     static UserControl& instance();
 
+    QVector<QAction*> actionsDisableWhenNoDoc(){
+        return mNodocDisbaleActions;
+    }
+
 private:
     QMap<Intent, QAction*> mActions;
+    QVector<QAction*> mNodocDisbaleActions;
     SearchBar* mSearchBar;
     TagListWidget* mTagList;
 };

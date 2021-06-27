@@ -15,7 +15,8 @@ enum EventsType{
     evSubLogCreated,
     evEmphasizeLine,
     evFindDone,
-    evSourceReady,
+    evSourceReady,//ready后可以执行filter动作
+    evSourceFinish,//finish后表示不会再产生新的日志，也就不能再暂停日志了
 };
 
 typedef function<void()> EventAction;
@@ -84,5 +85,7 @@ DEFINE_EVENT2(FindDone, shared_ptr<ILog>, who, SearchResult, ret);
 DEFINE_EVENT1(Error, EventAction, cleanup);
 
 DEFINE_EVENT(SourceReady);
+
+DEFINE_EVENT(SourceFinish);
 
 #endif // EVENTS_H

@@ -43,14 +43,14 @@ LogEdit *LogViewer::display()
 QWidget *LogViewer::buildSwitchModeButton()
 {
     auto btn = new QToolButton;
-    btn->setIcon(QIcon(":/res/img/locate.png"));
     btn->setChecked(false);
     btn->setToolTip("当前是review模式，点击切换");
     btn->setCheckable(true);
     btn->setMaximumSize(18,18);
     btn->setMinimumSize(18,18);
     btn->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    btn->setStyleSheet("QToolButton{background-color:#00FFFFFF;} QToolButton:checked{background-color:blue;}");
+    btn->setIcon(QIcon(":/res/img/sync.png"));
+    btn->setStyleSheet("QToolButton{background-color:#00FFFFFF;}");
 
     connect(btn, &QToolButton::clicked, [this](bool checked){
         mLogEdit->setMode(checked ? LogEdit::WatchMode : LogEdit::ReviewMode);
@@ -59,9 +59,11 @@ QWidget *LogViewer::buildSwitchModeButton()
     connect(mLogEdit, &LogEdit::onModeChanged, [btn](LogEdit::Mode newMode){
        if (newMode == LogEdit::WatchMode) {
            btn->setChecked(true);
+           btn->setIcon(QIcon(":/res/img/sync.png"));
            btn->setToolTip("当前是watch模式，点击切换");
        } else {
            btn->setChecked(false);
+           btn->setIcon(QIcon(":/res/img/eye.png"));
            btn->setToolTip("当前是review模式，点击切换");
        }
     });

@@ -74,8 +74,10 @@ private:
     LogEdit* findLogEditByLog(const shared_ptr<ILog>& log);
     void loadTagListWithCurrentLogEdit(LogEdit* edit);
     void connectLogEdit(LogEdit* edit);
+    void updateHistoryBtn(LogEdit* edit);
 
 private:
+    void doPauseResumeLogSource();
     void modalLongOp(shared_ptr<LongtimeOperation> op, QString hint);
     void onSubLogCreated(shared_ptr<SubLog> subLog);
     void onFindDone(shared_ptr<ILog> who, SearchResult ret);
@@ -94,7 +96,6 @@ private:
     TimeLine* mTimeLine;
     QString mName;
     unique_ptr<LoadingPhase> mLoadingPharse;
-
 };
 
 #endif // DOCUMENTTAB_H

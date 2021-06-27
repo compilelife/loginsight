@@ -7,6 +7,7 @@
 #include <QStackedWidget>
 #include "usercontrol.h"
 #include "recent.h"
+#include <QVector>
 
 class MainWindow : public QMainWindow
 {
@@ -63,5 +64,6 @@ private:
     QStackedWidget* mCenterWidget;
     Recent mRecentFile{"recentFile", 5};
     Recent mRecentPrj{"recentPrj", 5};
+    QMenu* mCodecMenu;
 };
 #endif // MAINWINDOW_H
