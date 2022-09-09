@@ -18,7 +18,9 @@ http://www.loginsight.top/manual/changelog.html
 
 本开源代码可用于学习、编译、二次开发，但禁止用于任何商业用途。
 
-本开源代码不含专业版的功能，敬请谅解
+本工程是Loginsight的界面部分，含交互逻辑。核心功能在`bin/core`，目前无开源计划。
+
+github上的bin/core对应开源版的核心功能，如果您已购买专业版的Loginsight，则可以将专业版的bin/core拷贝到本工程bin目录下，即可开发调试专业版功能的界面部分功能。
 
 # 鸣谢
 
