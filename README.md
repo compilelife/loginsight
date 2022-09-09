@@ -5,7 +5,7 @@ loginsight致力于打造一款通用的日志分析利器
 ![preview](https://z3.ax1x.com/2021/05/24/gxZ9s0.png)
 
 # 专业版内测计划
-截至2023-01-01前，点击这个[专业版下载试用地址](​mianbaoduo.com/o/bread/YZmYkpts)下载，并在试用期间发现问题、提出建议，并发给我，将获取免费的专业版密钥！
+截至2023-01-01前，点击这个[专业版下载试用地址](https://mianbaoduo.com/o/bread/YZmYkpts)下载，并在试用期间发现问题、提出建议，并发给我，将获取免费的专业版密钥！
 
 提交到邮箱：compilelife@163.com
 
