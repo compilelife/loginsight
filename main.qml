@@ -34,6 +34,17 @@ ApplicationWindow {
       MenuItem {action: actions.open}
       MenuItem {action: actions.openProcess}
       MenuItem {action: actions.openClipboard}
+      Menu {
+        title: "最近文件"
+        id: recentMenu
+        function _fillItems(recents) {
+          while(items.length > 0)
+              removeItem(items[0])
+          recents.forEach(function(url){
+            addItem(url).triggered.connect(()=>_doOpenFileOrPrj(url))
+          })
+        }
+      }
       MenuSeparator{}
       MenuItem {action: actions.saveProject}
       MenuItem {action: actions.exportLog}
@@ -224,6 +235,8 @@ ApplicationWindow {
     App.setMain(this)
     App.setSettings(settings.settings)
 
+    recentMenu._fillItems(App.settings.recents)
+
     showMaximized()
     actions.updateSessionActions(false)
 
@@ -296,8 +309,30 @@ ApplicationWindow {
     })
   }
 
+  function storeSettings() {
+    NativeHelper.writeToFile(NativeHelper.settingsPath(), JSON.stringify(App.settings))
+  }
+
+  function _updateRecents(url) {
+    const recents = App.settings.recents
+    //控制最大长度
+    if (recents.length > 10)
+      recents.shift()
+    //已存在，则移动最前
+    const oldIndex = recents.indexOf(url)
+    if (oldIndex > 0) {
+      recents.splice(oldIndex)
+    }
+    recents.unshift(url)
+    storeSettings()
+    recentMenu._fillItems(recents)
+  }
+
   function openFileOrPrj() {
-    openDlg.requestOpenFile('选择要打开的日志文件或工程', _doOpenFileOrPrj)
+    openDlg.requestOpenFile('选择要打开的日志文件或工程', function(url){
+      _updateRecents(url)
+      _doOpenFileOrPrj(url)
+    })
   }
 
   function _doOpenProcess({process, cache}) {

@@ -23,7 +23,8 @@ Dialogs.Dialog {
                             },
                             updater: {
                               autocheck: true
-                            }
+                            },
+                            recents: []
                           })
 
   Column {
@@ -106,7 +107,7 @@ Dialogs.Dialog {
   }
 
   onApply: {
-    NativeHelper.writeToFile(NativeHelper.settingsPath(), JSON.stringify(settings))
+    App.main.storeSettings()
     confirmRelauch.open()
   }
 }

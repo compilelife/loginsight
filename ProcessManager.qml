@@ -120,7 +120,7 @@ ColumnLayout {
       ret.push(model.get(i))
     }
     App.settings.processManager.records = ret
-    NativeHelper.writeToFile(NativeHelper.settingsPath(), JSON.stringify(App.settings))
+    App.main.storeSettings()
   }
 
   function appendRecord() {
