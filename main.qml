@@ -9,6 +9,7 @@ import QtQuick.Dialogs 1.3
 import './app.js' as App
 import './QuickPromise/promise.js' as Q
 import './coredef.js' as CoreDef
+import './constants.js' as C
 
 ApplicationWindow {
   width: 1000
@@ -271,7 +272,9 @@ ApplicationWindow {
             registerFeedBackDlg.open()
           }
         } else if (msg.rstate === CoreDef.RSOpenSource) {
-          otherMenu.addItem('开源版本')
+          otherMenu.addItem('开源版本，点击试用专业版').triggered.connect(function(){
+            Qt.openUrlExternally(C.WEB_DOWNLOAD_URL)
+          })
         } else if (msg.rstate === CoreDef.RSRegistered) {
           otherMenu.addItem('已购买!')
         }
