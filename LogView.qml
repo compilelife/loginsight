@@ -227,6 +227,11 @@ Rectangle {
           curFocusIndex = index
         })
     }
+    onVisibleChanged: {//FIXME：以下代码是为了在range改变的时候能够生效到range（还不知qml的哪个机制导致这里自动更新失败）
+      if (visible) {
+        range = logModel.range
+      }
+    }
   }
 
   Keys.onPressed: {
@@ -298,6 +303,7 @@ Rectangle {
   }
 
   function updateRange(r) {
+    console.info('update range to ', JSON.stringify(r))
     logModel.range = r
     logModel.count = r.end - r.begin + 1
     indicatorMeasure.text = r.end
