@@ -5,11 +5,13 @@ import QtQuick.Dialogs 1.3
 
 Item {
   property string lastestVersion: C.VERSION
+  property string changeLog: ''
 
   property Dialog goDownloadDlg : Dialog{
     standardButtons: StandardButton.Ok |StandardButton.Cancel
     Text {
-      text: `下载地址: <a href="${C.WEB_DOWNLOAD_URL}">${C.WEB_DOWNLOAD_URL}</a>，现在前往？`
+      text: `# 新版本 ${lastestVersion}\n${changeLog}\n[点击下载](${C.WEB_DOWNLOAD_URL})`
+      textFormat: Text.MarkdownText
       onLinkActivated: {
         Qt.openUrlExternally(C.WEB_DOWNLOAD_URL)
       }
@@ -26,6 +28,7 @@ Item {
         if (xhr.readyState == 4 && xhr.status == 200) {
           const info = JSON.parse(xhr.responseText)
           lastestVersion = info.version
+          changeLog = info.change
 
           console.info(`current version: ${C.VERSION}, remote version：${info.version}`)
           if (C.isVersionBigger(info.version, C.VERSION)) {

@@ -24,7 +24,11 @@ Dialog {
       textFormat: TextEdit.RichText
       text: ''
       onLinkActivated: {
-        Qt.openUrlExternally(C.WEB_DOWNLOAD_URL)
+        console.info('download')
+        if (link === 'download')
+          Qt.openUrlExternally(C.WEB_DOWNLOAD_URL)
+        else
+          App.main.updater.goDownloadDlg.open()
       }
     }
 
@@ -34,7 +38,7 @@ Dialog {
         App.main.updater.checkNewVersion().then(function(hasNewVersion){
           if (hasNewVersion) {
             newVersion = App.main.updater.lastestVersion
-            downloadHint.text = `最新版本：${newVersion}, <a href="#">点击下载</a>`
+            downloadHint.text = `最新版本：${newVersion}, <a href="download">点击下载</a>, <a href="detail"> 了解详情 </a>`
           } else {
             downloadHint.text = '已经是最新版本'
           }
