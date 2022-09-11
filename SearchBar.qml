@@ -82,4 +82,12 @@ Item {
     search(keyword, reverse, _updateIsContinue(keyword, reverse))
     patternBox.addCurToCompleter()
   }
+
+  function openWith(keyword){
+    visible = true
+    patternBox.curText = keyword
+    patternBox.isCaseSense = true
+    patternBox.isRegex = false
+    requestSearch()
+  }
 }

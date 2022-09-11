@@ -60,7 +60,7 @@ Item {
         root.filter({pattern: keyword})
       }
       onSearch: {
-        root.search({pattern: keyword})
+        currentLogView().searchAction(keyword)
       }
     }
 

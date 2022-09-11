@@ -192,10 +192,14 @@ Rectangle {
     anchors.top: parent.top
     anchors.right: parent.right
     onSearch: {
-      let searchPos = _lastSearchPos
+      let searchPos = getSearchPos()
       if (isContinue && _lastSearchPos) {
-        if (!reverse)
-          searchPos.fromChar += searchPos.len
+        //这里有个bug，因为只判断line，所以如果是鼠标定位到同一行的其它位置，无法检测为新位置开始搜索
+        if (searchPos.fromLine === _lastSearchPos.fromLine) {
+          searchPos = _lastSearchPos
+          if (!reverse)
+            searchPos.fromChar += searchPos.len
+        }
       }
 
       session.search({pattern: keyword, caseSense: isCaseSense, regex: isRegex, reverse}, searchPos)
@@ -209,8 +213,8 @@ Rectangle {
   }
 
   FilterDialog {
-    id: filterDialog
     anchors.centerIn: parent
+    id: filterDialog
     visible: false
     onAccepted: {
       session.filter(getFilterArgs())
@@ -502,8 +506,12 @@ Rectangle {
     filterDialog.visible = true
   }
 
-  function searchAction() {
-    searchBar.visible = true
+  function searchAction(keyword=null) {
+    if (keyword) {
+      searchBar.openWith(keyword)
+    } else {
+      searchBar.visible = true
+    }
   }
 
   function gotoAction() {
