@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.4
 import './app.js' as App
+import './coredef.js' as CoreDef
 
 Item {
   property var sessionActions: [
@@ -23,6 +24,11 @@ Item {
   function updateSessionActions(hasSession) {
     const enable = hasSession
     for (const action of sessionActions) {
+      if (App.registerState === CoreDef.RSOpenSource
+          && nonOpenSourceAction.indexOf(action) >= 0) {
+        continue
+      }
+
       action.enabled = enable
     }
   }

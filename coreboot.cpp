@@ -37,6 +37,7 @@ CoreBoot::CoreBoot(QObject *parent)
 void CoreBoot::startLocal() {
     NativeHelper native;
     mProcess.setProgram(native.getBinDir()+"/"+native.exeNativeName("core"));
+    qInfo()<<mProcess.program();
     mProcess.start();
 }
 

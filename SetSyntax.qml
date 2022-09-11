@@ -1,11 +1,12 @@
 
-import QtQuick 2.0
+import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 1.4
 import QtQuick.Controls 2.15 as QC2
 import QtQml.Models 2.15
 import './app.js' as App
 import './coredef.js' as CoreDef
+import './QuickPromise/promise.js' as Q
 
 ColumnLayout {
   id: root
@@ -48,24 +49,32 @@ ColumnLayout {
       Layout.alignment: Qt.AlignTop
       delegate: LogLine {
         width: viewRoot.width
-        model: previewLines.get(index)
+        model: _prepareLineModel(previewLines.get(index))
         lineNumWidth: 30
         isViewChecked: true
         session: ({syntaxSegConfig: getSegConfig(), highlights:[], textCodec})
         isFocusLine: viewRoot.currentIndex === index
         onFocusLine: viewRoot.currentIndex = lineIndex
+        function _prepareLineModel(o) {//FIXME: segs直接赋给logline报错：Unable to assign QQmlListModel to QVector<QVariantMap>
+          const {content, index} = o
+          const segs = []
+          for(let i = 0; i < o.segs.count; i++) {
+            const {length, offset} = o.segs.get(i)
+            segs.push({length, offset})
+          }
+          return {content, index, segs}
+        }
       }
     }
   }
 
   ListModel {
     id: previewLines
-    dynamicRoles: true
     function init(lines) {
       clear()
       let index = 0
       for (const line of lines) {
-        append({index: index++, content: line.content, segs: null})
+        append({index: index++, content: line.content, segs: line.segs})
       }
     }
   }
@@ -92,11 +101,16 @@ ColumnLayout {
                                           lines
                                         })
       .then(function(reply){
+        const patched = []
         for (let i = 0; i < previewLines.count; i++) {
-          previewLines.setProperty(i, 'segs', reply.segs[i])
+          //FIXME: previewLines.setProperty(i, "segs", reply.segs[i])不生效
+          const {content, index} = previewLines.get(i)
+          const l = {content, index, segs: reply.segs[i]}
+          previewLines.set(i, l)
         }
-        //FIXME: 上面的setProperty后，界面没刷新，下面两行起到“刷新”的作用
-        viewRoot.model = null
+        //FIXME: 界面不刷新，只能用这几行“强制刷新”
+        //linux/macos有效，Linux不生效
+        viewRoot.model = []
         viewRoot.model = previewLines
       })
   }

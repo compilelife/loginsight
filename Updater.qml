@@ -30,7 +30,7 @@ Item {
           lastestVersion = info.version
           changeLog = info.change
 
-          console.info(`current version: ${C.VERSION}, remote version：${info.version}`)
+          console.info(`current version: ${C.VERSION}, remote version: ${info.version}`)
           if (C.isVersionBigger(info.version, C.VERSION)) {
             resolve(true)
           }else {
