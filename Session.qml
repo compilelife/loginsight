@@ -161,7 +161,7 @@ Item {
     }
 
     onAccepted: {
-      if (setSyntax.pattern.length === 0)
+      if (setSyntax.pattern.length === 0 ||  setSyntax.segs.length === 0)
         return
       core.sendMessage(CoreDef.CmdSetLineSegment, {
                                                 pattern: textCodec.toLogByte(setSyntax.pattern),
