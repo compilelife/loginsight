@@ -66,7 +66,7 @@ Rectangle {
   LogViewContextMenu {
     id: menu
     session: root.session
-    logview: parent
+    logview: root
   }
 
   Text {
@@ -569,6 +569,12 @@ Rectangle {
         logModel.range = reply.range
         show(logModel.range.end, {placeAt: 'bottom'})
       })
+  }
+
+  function addCurLineToTimeLine() {
+    const line = logModel.dataAt(curFocusIndex)
+    if (line)
+      session.addToTimeLine(line)
   }
 
   function onSave() {

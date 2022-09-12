@@ -85,6 +85,7 @@ ApplicationWindow {
     }
     Menu {
       title: "时间线"
+      MenuItem {action: actions.addToTimeLine}
       MenuItem {action: actions.clearTimeLine}
       MenuItem {action: actions.shotTimeLine}
     }
@@ -117,6 +118,7 @@ ApplicationWindow {
         ToolButton{action: actions.goBack}
         ToolButton{action: actions.goForward}
         QC2.ToolSeparator{}
+        ToolButton{action: actions.addToTimeLine}
         ToolButton{action: actions.clearTimeLine}
         ToolButton{action: actions.shotTimeLine}
         QC2.ToolSeparator{}

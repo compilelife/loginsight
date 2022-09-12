@@ -52,5 +52,6 @@
         <file>TryCountDown.qml</file>
         <file>images/logo.png</file>
         <file>Feedback.qml</file>
+        <file>images/addto.png</file>
     </qresource>
 </RCC>

@@ -22,7 +22,9 @@ Menu {
     text: '清除高亮'
     onTriggered: session.highlightBar.clear()
   }
-  MenuSeparator{}
+  MenuSeparator{
+    visible: hasSeletion
+  }
   MenuItem {
     visible: hasSeletion
     text: '高亮'
@@ -30,10 +32,18 @@ Menu {
   }
   MenuItem {
     visible: hasSeletion
+    text: '查找'
+    onTriggered: logview.searchAction()
+  }
+
+  MenuItem {
+    visible: hasSeletion
     text: '过滤'
     onTriggered: session.filter({pattern: selectText})
   }
-  MenuSeparator{}
+  MenuSeparator{
+    visible: hasSeletion
+  }
   MenuItem {
     visible: hasSeletion
     text: '拷贝'

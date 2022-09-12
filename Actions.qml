@@ -67,8 +67,15 @@ Item {
   property Action goTo:  Action {
     text: '跳转'
     iconSource: 'qrc:/images/locate.png'
-    shortcut: 'ctrl + g'
+    shortcut: 'ctrl+g'
     onTriggered: App.currentLogView.gotoAction()
+  }
+
+  property Action addToTimeLine: Action {
+    text: '添加到时间线'
+    shortcut: 'ctrl+t'
+    iconSource: 'qrc:/images/addto.png'
+    onTriggered: App.currentLogView.addCurLineToTimeLine()
   }
 
   property Action clearTimeLine:  Action {
