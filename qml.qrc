@@ -51,5 +51,6 @@
         <file>BuyDlg.qml</file>
         <file>TryCountDown.qml</file>
         <file>images/logo.png</file>
+        <file>Feedback.qml</file>
     </qresource>
 </RCC>

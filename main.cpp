@@ -31,8 +31,18 @@ static void myMessageHandler(QtMsgType type, const QMessageLogContext& context, 
     gLogFile.flush();
 }
 
-void prepareMyDir() {
+static void prepareMyDir() {
     QDir::home().mkdir(".loginsight");
+}
+
+static void backupLog(NativeHelper& native) {
+    QFile f(native.logPath());
+    if (!f.exists())
+        return;
+
+    QFile(native.logBackupPath()).remove();
+
+    f.copy(native.logBackupPath());
 }
 
 int main(int argc, char *argv[])
@@ -49,7 +59,11 @@ int main(int argc, char *argv[])
 
     app.setWindowIcon(QIcon(":/images/logo.png"));
 
-    auto logPath = QDir::tempPath()+QDir::separator()+"loginsight.log";
+    prepareMyDir();
+    NativeHelper native;
+
+    backupLog(native);
+    auto logPath = native.logPath();
     gLogFile.setFileName(logPath);
     if (gLogFile.open(QIODevice::WriteOnly)) {
         qInfo()<<"logfile at: "<<logPath;
@@ -58,7 +72,7 @@ int main(int argc, char *argv[])
         qWarning()<<"can't not open "<<logPath;
     }
 
-    prepareMyDir();
+
 
     QQmlApplicationEngine engine;
     qmlRegisterType<CoreBoot>("com.cy.CoreBoot", 1, 0, "CoreBoot");

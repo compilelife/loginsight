@@ -93,6 +93,7 @@ ApplicationWindow {
       id: otherMenu
       MenuItem {action: actions.settings}
       MenuItem {action: actions.about}
+      MenuItem {action: actions.feedback}
     }
   }
 
@@ -228,6 +229,7 @@ ApplicationWindow {
 
   property BuyDlg buyDlg: BuyDlg {}
   property AboutDlg aboutDlg: AboutDlg {}
+  property Feedback feedBack: Feedback{}
   property Updater updater: Updater{}
   property MessageDialog msgDlg: MessageDialog{}
 

@@ -104,6 +104,11 @@ Item {
      onTriggered: App.currentSession.showSyntaxDlg()
   }
 
+  property Action feedback: Action {
+    text: '联系作者'
+    onTriggered: App.main.feedBack.open()
+  }
+
   property Action settings: Action {
     text: '设置'
     onTriggered: App.main.showSettings()

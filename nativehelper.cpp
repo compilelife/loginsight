@@ -86,6 +86,16 @@ QString NativeHelper::myDir()
     return QDir::home().filePath(".loginsight");
 }
 
+QString NativeHelper::logPath()
+{
+    return myDir() + QDir::separator() + "log.txt";
+}
+
+QString NativeHelper::logBackupPath()
+{
+    return myDir() + QDir::separator() + "log.backup.txt";
+}
+
 QString NativeHelper::uniqueId()
 {
     return QSysInfo::machineUniqueId();
