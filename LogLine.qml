@@ -45,10 +45,12 @@ Item {
       Rectangle {
         id: indicator
         width: lineNumWidth + 4
-        height: content.height + App.settings.logView.lineSpacing
+        height: content.height
         color: isViewChecked ? '#49b2f6' : 'grey'
         Text {
           width: parent.width
+          anchors.top: parent.top
+          anchors.topMargin: App.settings.logView.lineSpacing/2+1
           horizontalAlignment: Text.AlignLeft
           text: String(model.index + 1)
           wrapMode: Text.NoWrap
@@ -61,6 +63,7 @@ Item {
         textFormat: TextEdit.PlainText //highlighter set offset on rich text has strange offset
 //        readOnly: true //comment this line to show cursor
         selectByMouse: true
+        textMargin: App.settings.logView.lineSpacing/2
         width: root.width - indicator.width - parent.spacing
         text: model.content
         wrapMode: Text.WrapAnywhere
