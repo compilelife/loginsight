@@ -507,6 +507,13 @@ Rectangle {
   }
 
   function searchAction(keyword=null) {
+    if (!keyword) {
+      const curline = _getLogLine(curFocusIndex)
+      if (curline) {
+        keyword = curline.getSelectedText()
+      }
+    }
+
     if (keyword) {
       searchBar.openWith(keyword)
     } else {

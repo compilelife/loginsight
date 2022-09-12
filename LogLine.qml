@@ -130,4 +130,13 @@ Item {
     const fromChar = session.textCodec.toLogOffset(_content.text, _content.cursorPosition)
     return {fromLine: model.index, fromChar}
   }
+
+  function getSelectedText() {
+    let selected = _content.selectedText
+    if (selected.length === 0) {
+      _content.selectWord()
+      selected = _content.selectedText
+    }
+    return selected
+  }
 }
