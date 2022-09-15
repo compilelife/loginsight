@@ -18,7 +18,8 @@ Item {
 
   property var nonOpenSourceAction: [
     openProcess,
-    setSyntax
+    setSyntax,
+    exportLog
   ]
 
   function updateSessionActions(hasSession) {
