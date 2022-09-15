@@ -23,7 +23,7 @@ Item {
         ready()
       }
       else{
-        coreErrDlg.showError('引擎异常中断, 请重启')
+        coreErrDlg.showError('引擎异常中断, 需要重启', '引擎断开')
       }
     }
 
@@ -42,12 +42,13 @@ Item {
     id: coreErrDlg
     visible: false
     standardButtons: StandardButton.Ok
-    title: '引擎异常'
+    title: '执行错误'
 
     property var then: null
-    function showError(content) {
+    function showError(content, headTitle = '执行错误') {
       coreErrDlg.text = content
       coreErrDlg.visible = true
+      coreErrDlg.title = headTitle
     }
 
     onVisibleChanged: {
@@ -189,7 +190,7 @@ Item {
             delete pendings[msgObj.id]
           }
         }
-        coreErrDlg.showError(msgObj.why)
+        coreErrDlg.showError(msgObj.why, '执行错误')
       }
 
       if (msgObj.state === CoreDef.StateFuture) {
