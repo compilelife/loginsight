@@ -7,7 +7,7 @@ Item {
   height: highlights.count > 0 ? 20 : 0
 
   signal search(string keyword)
-  signal filter(string keyword)
+  signal filter(string keyword, bool reverse)
   signal changed()
 
   function getHighlights() {
@@ -93,7 +93,11 @@ Item {
     }
     MenuItem{
       text: '过滤'
-      onTriggered: filter(currentItem().keyword)
+      onTriggered: filter(currentItem().keyword, false)
+    }
+    MenuItem{
+      text: '反转过滤'
+      onTriggered: filter(currentItem().keyword, true)
     }
   }
 

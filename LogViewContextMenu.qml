@@ -41,6 +41,11 @@ Menu {
     text: '过滤'
     onTriggered: session.filter({pattern: selectText})
   }
+  MenuItem {
+    visible: hasSeletion
+    text: '反转过滤'
+    onTriggered: session.filter({pattern: selectText, reverse: true})
+  }
   MenuSeparator{
     visible: hasSeletion
   }

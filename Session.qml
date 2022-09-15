@@ -57,7 +57,7 @@ Item {
         invalidate()
       }
       onFilter: {
-        root.filter({pattern: keyword})
+        root.filter({pattern: keyword, reverse})
       }
       onSearch: {
         currentLogView().searchAction(keyword)
@@ -224,6 +224,7 @@ Item {
                                      logId: curLog.logId,
                                      caseSense: true,
                                      regex: false,
+                                     reverse: false
                                    }, param)
         core.sendModalMessage(CoreDef.CmdFilter, filterArg)
             .then(msg=>{
