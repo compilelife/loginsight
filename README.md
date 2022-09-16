@@ -5,7 +5,7 @@ loginsight致力于打造一款通用的日志分析利器
 ![preview](https://z3.ax1x.com/2021/05/24/gxZ9s0.png)
 
 # 专业版内测计划
-截至2023-01-01前，点击这个[专业版下载试用地址](https://mianbaoduo.com/o/bread/YZmYkpts)下载，并在试用期间发现问题、提出建议，并发给我，将获取免费的专业版密钥！
+截至2023-01-01前，点击这个[专业版下载试用地址](https://www.123pan.com/s/w9c0Vv-s3qxH)下载，并在试用期间发现问题、提出建议，并发给我，将获取免费的专业版密钥！
 
 提交到邮箱：compilelife@163.com
 
@@ -33,11 +33,15 @@ loginsight致力于打造一款通用的日志分析利器
 
 # 下载
 
-[下载地址](https://mianbaoduo.com/o/bread/YZmYkpts)
+[下载地址](https://www.123pan.com/s/w9c0Vv-s3qxH)
+
+上述地址是专业版的二进制下载地址（可试用）
+
+如果想使用开源版的，请自行编译
 
 # 更新日志
 
-> 下述链接是专业版更新日志；开源版更新会比专业版慢几个月，或者某些功能没有
+> 下述链接是专业版更新日志；(开源版某些功能没有。开源版以实际运行效果为准）
 
 http://www.loginsight.top/manual/changelog.html
 
@@ -57,7 +61,7 @@ github上的bin/core对应开源版的核心功能，如果您已购买专业版
 
 如果该项目对您有帮助，可通过以下方式贡献，以保持项目持续开发：
 
-1. 购买专业版: [Windows](https://mianbaoduo.com/o/bread/YZibl55q)，[Mac](https://mianbaoduo.com/o/bread/YZibmZpx)，[Linux](https://mianbaoduo.com/o/bread/YZibmZtp)
-2. 点击右上的star
+1. 购买专业版: [Windows](https://mianbaoduo.com/o/bread/YZibl55q)，[Mac](https://mianbaoduo.com/o/bread/YZibmZpx)，[Linux](https://mianbaoduo.com/o/bread/YZibmZtp)，[全平台](https://mianbaoduo.com/o/bread/YZibmZtw)
+2. 点击右上角的star
 3. 推荐给更多的人
 4. 提出您宝贵的建议, 欢迎提issue/pull request
