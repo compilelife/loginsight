@@ -65,3 +65,5 @@ github上的bin/core对应开源版的核心功能，如果您已购买专业版
 2. 点击右上角的star
 3. 推荐给更多的人
 4. 提出您宝贵的建议, 欢迎提issue/pull request
+
+**mac m1 支持受限！！急需您的帮助**：[众筹入口](https://mianbaoduo.com/o/bread/Y5eXm5xp)
