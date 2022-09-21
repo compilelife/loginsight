@@ -99,6 +99,10 @@ QString NativeHelper::logBackupPath()
 
 QVector<QString> NativeHelper::listFiles(QString dir, QString filter)
 {
+#ifdef Q_OS_WIN
+    if (dir.startsWith('/'))
+        dir = dir.mid(1);
+#endif
     auto files = QDir(dir).entryList(QStringList(filter), QDir::Files, QDir::Time);
     QVector<QString> ret;
     std::copy(files.begin(), files.end(), std::back_inserter(ret));

@@ -7,13 +7,14 @@ import QtQml.Models 2.15
 import './app.js' as App
 import './coredef.js' as CoreDef
 import './QuickPromise/promise.js' as Q
+import './util.js' as Util
 
 ColumnLayout {
   id: root
   spacing: 10
   property alias pattern: patternBox.text
   property var segs: getSegConfig()
-  property alias lines: previewLines
+  property var previewLines: []
   property var textCodec: null
 
   RowLayout {
@@ -42,41 +43,33 @@ ColumnLayout {
     }
     ListView {
       id: viewRoot
-      model: previewLines
       Layout.fillWidth: true
       height: parent.height
+      model: previewLines
       clip: true
       Layout.alignment: Qt.AlignTop
       delegate: LogLine {
         width: viewRoot.width
-        model: _prepareLineModel(previewLines.get(index))
+        model: previewLines[index]
         lineNumWidth: 30
         isViewChecked: true
         session: ({syntaxSegConfig: getSegConfig(), highlights:[], textCodec})
         isFocusLine: viewRoot.currentIndex === index
         onFocusLine: viewRoot.currentIndex = lineIndex
-        function _prepareLineModel(o) {//FIXME: segs直接赋给logline报错：Unable to assign QQmlListModel to QVector<QVariantMap>
-          const {content, index} = o
-          const segs = []
-          for(let i = 0; i < o.segs.count; i++) {
-            const {length, offset} = o.segs.get(i)
-            segs.push({length, offset})
-          }
-          return {content, index, segs}
-        }
+      }
+      function refresh() {//不知道为啥直接更新previewLines无效
+        model = Util.copyArray(previewLines)
       }
     }
   }
 
-  ListModel {
-    id: previewLines
-    function init(lines) {
-      clear()
-      let index = 0
-      for (const line of lines) {
-        append({index: index++, content: line.content, segs: line.segs})
-      }
+  function init(lines) {
+    previewLines = []
+    let index = 0
+    for (const line of lines) {
+      previewLines.push({index: index++, content: line.content})
     }
+    viewRoot.refresh()
   }
 
   function previewSyntax() {
@@ -91,8 +84,8 @@ ColumnLayout {
     }
 
     const lines = []
-    for (let i = 0; i < previewLines.count; i++) {
-      lines.push(textCodec.toLogByte(previewLines.get(i).content))
+    for (let i = 0; i < previewLines.length; i++) {
+      lines.push(textCodec.toLogByte(previewLines[i].content))
     }
 
     App.currentSession.core.sendMessage(CoreDef.CmdTestSyntax,
@@ -101,17 +94,10 @@ ColumnLayout {
                                           lines
                                         })
       .then(function(reply){
-        const patched = []
-        for (let i = 0; i < previewLines.count; i++) {
-          //FIXME: previewLines.setProperty(i, "segs", reply.segs[i])不生效
-          const {content, index} = previewLines.get(i)
-          const l = {content, index, segs: reply.segs[i]}
-          previewLines.set(i, l)
+        for (let i = 0; i < previewLines.length; i++) {
+          previewLines[i].segs = reply.segs[i]
         }
-        //FIXME: 界面不刷新，只能用这几行“强制刷新”
-        //linux/macos有效，Linux不生效
-        viewRoot.model = []
-        viewRoot.model = previewLines
+        viewRoot.refresh()
       })
   }
 

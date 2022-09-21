@@ -156,7 +156,7 @@ Item {
     }
 
     function show() {
-      setSyntax.lines.init(rootLogView.getTopLines(30))
+      setSyntax.init(rootLogView.getTopLines(30))
       visible = true
     }
 

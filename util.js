@@ -9,3 +9,7 @@ function merge(old, newOne) {
   }
   return old
 }
+
+function copyArray(arr) {
+  return [].concat(arr)
+}
