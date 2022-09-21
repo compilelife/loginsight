@@ -3,14 +3,15 @@ import QtQuick.Controls 2.15
 
 TabButton {
   property string title: ''
-  signal closed
+  signal closed()
+
+  width: implicitWidth
 
   contentItem: Row {
     property string txtColor: checked ? 'black' : 'white'
 
     Text {
-      id: txt
-      text: title+'  '
+      text: title+' '
       verticalAlignment: Text.AlignVCenter
       height: parent.height
       color: parent.txtColor
@@ -22,14 +23,12 @@ TabButton {
       color: parent.txtColor
       MouseArea {
         anchors.fill: parent
-        onClicked: {
-          closed()
-        }
+        onClicked: closed()
       }
     }
   }
 
   background: Rectangle {
-    color: checked ? 'white' : 'grey'
+    color: checked ? 'white' : '#a0a0a0'
   }
 }
