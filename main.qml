@@ -33,6 +33,7 @@ ApplicationWindow {
     Menu {
       title: "文件"
       MenuItem {action: actions.open}
+      MenuItem {action: actions.openMulti }
       MenuItem {action: actions.openProcess}
       MenuItem {action: actions.openClipboard}
       Menu {
@@ -41,8 +42,11 @@ ApplicationWindow {
         function _fillItems(recents) {
           while(items.length > 0)
               removeItem(items[0])
-          recents.forEach(function(url){
-            addItem(url).triggered.connect(()=>_doOpenFileOrPrj(url))
+          recents.forEach(function(openAction){
+            if (!openAction.action)//低版本使用的是字符串，直接过滤掉
+              return
+            addItem(_userTextOfOpenAction(openAction))
+              .triggered.connect(()=>_replayOpenAction(openAction))
           })
         }
       }
@@ -167,13 +171,22 @@ ApplicationWindow {
       handler = func
       title = hint
       selectExisting = true
+      selectFolder = false
       nameFilters = ['*']
+      open()
+    }
+    function requestOpenDir(hint, func) {
+      handler = func
+      title = hint
+      selectExisting = true
+      selectFolder = true
       open()
     }
     function requestSaveFile(hint, filter, func) {
       handler = func
       title = hint
       selectExisting = false
+      selectFolder = false
       nameFilters = filter
       open()
     }
@@ -207,6 +220,19 @@ ApplicationWindow {
       }
 
       _doOpenProcess(args)
+    }
+  }
+
+  OpenMultiFilesDlg{
+    id: openMultiFilesDlg
+    onOpenFiles: {
+      const name = dir.substring(dir.lastIndexOf('/')+1)
+      _updateRecents({action: 'openMulti', arg: filelist, name})
+      _doOpenMulti(filelist, name)
+    }
+    function openWith(path) {
+      dir = path
+      open()
     }
   }
 
@@ -246,8 +272,6 @@ ApplicationWindow {
     actions.updateSessionActions(false)
 
     pm.initRecords()
-
-
 
     if (App.settings.updater.autocheck)
       updater.checkNewVersion().then(function(hasNewVersion){
@@ -316,28 +340,54 @@ ApplicationWindow {
     })
   }
 
+  function _doOpenMulti(filelist, name) {
+    const session = addSession(name)
+    session.name = name
+
+    return Q.promise(function(resolve,reject){
+      session.coreReady.connect(function () {
+            session.openMulti(filelist, name).then(function(){
+              resolve()
+            }, function () {
+              delSession(session)
+              reject()
+            })
+          })
+    })
+  }
+
+  function openMulti(filelist,name) {
+    openDlg.requestOpenDir('选择要打开的文件夹', function(url){
+      openMultiFilesDlg.openWith(url)
+    })
+  }
+
   function storeSettings() {
     NativeHelper.writeToFile(NativeHelper.settingsPath(), JSON.stringify(App.settings))
   }
 
-  function _updateRecents(url) {
+  function _isSameOpenAction(a1, a2) {
+    return a1.action === a2.action && a1.arg === a2.arg && a1.name === a2.name
+  }
+
+  function _updateRecents(openAction) {
     const recents = App.settings.recents
     //控制最大长度
     if (recents.length > 10)
       recents.shift()
     //已存在，则移动最前
-    const oldIndex = recents.indexOf(url)
-    if (oldIndex > 0) {
-      recents.splice(oldIndex)
+    const oldIndex = recents.findIndex(it=>_isSameOpenAction(it, openAction))
+    if (oldIndex >= 0) {
+      recents.splice(oldIndex, 1)
     }
-    recents.unshift(url)
+    recents.unshift(openAction)
     storeSettings()
     recentMenu._fillItems(recents)
   }
 
   function openFileOrPrj() {
     openDlg.requestOpenFile('选择要打开的日志文件或工程', function(url){
-      _updateRecents(url)
+      _updateRecents({action: 'open', arg: url})
       _doOpenFileOrPrj(url)
     })
   }
@@ -439,20 +489,34 @@ ApplicationWindow {
     })
   }
 
+  function _replayOpenAction({action,arg,name}) {
+    let ret = null
+    if (action === 'open')
+      ret = _doOpenFileOrPrj(arg, name)
+//    else if (action === 'openProcess') //restore open process has no meanings
+//      ret = _doOpenProcess(arg)
+    else if (action === 'openMulti')
+      ret = _doOpenMulti(arg, name)
+    return ret
+  }
+
+  function _userTextOfOpenAction({action,arg,name}) {
+    if (action === 'open')
+      return arg
+    else if (action === 'openMulti')
+      return '...'+arg[0]
+    else
+      return name
+  }
+
   function _doLoadSession(root, index) {
     if (index >= root.sessions.length)
       return Q.resolved()
 
     const sessionCfg = root.sessions[index]
     //FIXME: 这里main依赖了sessionCfg的具体实现，需要重构
-    const {action, arg} = sessionCfg.openArg
-
-    let ret = null
-    if (action === 'open')
-      ret = _doOpenFileOrPrj(arg)
-//    else if (action === 'openProcess') //restore open process has no meanings
-//      ret = _doOpenProcess(arg)
-    else
+    let ret = _replayOpenAction(sessionCfg.openArg)
+    if (ret === null)
       toast.show('未知的会话', action, arg)
 
     if (ret) {

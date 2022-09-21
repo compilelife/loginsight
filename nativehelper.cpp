@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QDebug>
 #include <QSysInfo>
+#include <algorithm>
 
 NativeHelper::NativeHelper(QObject *parent)
     : QObject{parent}
@@ -94,6 +95,14 @@ QString NativeHelper::logPath()
 QString NativeHelper::logBackupPath()
 {
     return myDir() + QDir::separator() + "log.backup.txt";
+}
+
+QVector<QString> NativeHelper::listFiles(QString dir, QString filter)
+{
+    auto files = QDir(dir).entryList(QStringList(filter), QDir::Files, QDir::Time);
+    QVector<QString> ret;
+    std::copy(files.begin(), files.end(), std::back_inserter(ret));
+    return ret;
 }
 
 QString NativeHelper::uniqueId()

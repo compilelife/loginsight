@@ -138,7 +138,7 @@ Rectangle {
       position: _lineIndexToPosition(curIndex)
       size: 0.05
       stepSize: 1 / logModel.count
-      policy: ScrollBar.AsNeeded
+      policy: ScrollBar.AlwaysOn
       anchors.top: parent.top
       anchors.right: parent.right
       anchors.bottom: parent.bottom

@@ -192,6 +192,17 @@ Item {
         delete logMap[logId]
     }
 
+    function openMulti(files, name) {
+      openArg = {action: 'openMulti', arg: files, name}
+      const encodeFiles = files.map(function(file){return NativeHelper.encodePath(file)})
+      return core.sendModalMessage(CoreDef.CmdOpenMultiFile,
+                                   {files: encodeFiles})
+          .then(msg=>{
+              rootLogView.initLogModel(msg.logId, msg.range)
+              _onLogAdded(msg.logId, rootLogView)
+          })
+    }
+
     function openFile(path) {
       openArg = {action: 'open', arg: path}
         return core.sendModalMessage(CoreDef.CmdOpenFile,

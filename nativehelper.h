@@ -23,6 +23,7 @@ public:
     Q_INVOKABLE QVector<QString> supportCodecs();
     Q_INVOKABLE QString logPath();
     Q_INVOKABLE QString logBackupPath();
+    Q_INVOKABLE QVector<QString> listFiles(QString dir, QString filter);
 public:
     QString getBinDir();
     QString exeNativeName(QString name);

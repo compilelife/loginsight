@@ -53,5 +53,7 @@
         <file>images/logo.png</file>
         <file>Feedback.qml</file>
         <file>images/addto.png</file>
+        <file>OpenMultiFilesDlg.qml</file>
+        <file>images/question.png</file>
     </qresource>
 </RCC>

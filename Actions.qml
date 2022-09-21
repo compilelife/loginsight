@@ -40,6 +40,12 @@ Item {
     onTriggered: App.main.openFileOrPrj()
   }
 
+  property Action openMulti: Action {
+    text: '打开文件夹'
+    shortcut: 'ctrl+shift+o'
+    onTriggered: App.main.openMulti()
+  }
+
   property Action openProcess: Action {
     text: '打开外部程序'
     onTriggered: App.main.openProcess()
