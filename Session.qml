@@ -54,7 +54,7 @@ Item {
       width: parent.width
       onChanged: {
         highlights = getHighlights()
-        invalidate()
+        invalidate(true)
       }
       onFilter: {
         root.filter({pattern: keyword, reverse})
