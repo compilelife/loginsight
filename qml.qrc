@@ -55,5 +55,6 @@
         <file>images/addto.png</file>
         <file>OpenMultiFilesDlg.qml</file>
         <file>images/question.png</file>
+        <file>images/copy-lines.png</file>
     </qresource>
 </RCC>

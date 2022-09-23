@@ -380,6 +380,9 @@ Item {
       if (curLog){
         App.main.userSaveFile('选择日志导出路径', ['*'], function(path){
           core.sendModalMessage(CoreDef.CmdExportLog, {
+                                  all: true,
+                                  from: 0,
+                                  to: 0,
                                   logId: curLog.logId,
                                   path: NativeHelper.encodePath(path)})
             .then(function(){
@@ -387,5 +390,23 @@ Item {
             })
         })
       }
+    }
+
+    function copyLines(from, to) {
+      const curLog = currentLogView()
+      const path = NativeHelper.tempPath('loginsight-copy-lines')
+      core.sendModalMessage(CoreDef.CmdExportLog, {
+                              from,
+                              to ,
+                              all:false,
+                              logId:curLog.logId,
+                              path: NativeHelper.encodePath(path)
+                            })
+        .then(function(){
+          if (NativeHelper.clipboardSetFileContent(path, textCodec.name))
+            App.showToast('复制成功')
+          else
+            App.showToast('复制失败')
+        })
     }
 }

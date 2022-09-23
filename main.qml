@@ -85,6 +85,7 @@ ApplicationWindow {
       MenuItem {action: actions.goBack}
       MenuItem {action: actions.goForward}
       MenuSeparator{}
+      MenuItem {action: actions.copyLines}
       MenuItem {action: actions.setSyntax}
     }
     Menu {
@@ -115,6 +116,7 @@ ApplicationWindow {
       Row {
         Layout.alignment: Qt.AlignRight
         ToolButton{action: actions.followLog}
+        ToolButton{action: actions.copyLines}
         QC2.ToolSeparator{}
         ToolButton{action: actions.search}
         ToolButton{action: actions.filter}

@@ -8,6 +8,8 @@
 #include <QDebug>
 #include <QSysInfo>
 #include <algorithm>
+#include <QDateTime>
+#include <QTextCodec>
 
 NativeHelper::NativeHelper(QObject *parent)
     : QObject{parent}
@@ -25,6 +27,27 @@ void NativeHelper::clipboardSetText(const QString &txt)
     qApp->clipboard()->setText(txt);
 }
 
+bool NativeHelper::clipboardSetFileContent(const QString &path, const QString& codecName)
+{
+    QFile f(path);
+    if (!f.open(QIODevice::ReadOnly)) {
+        return false;
+    }
+
+    auto content = f.readAll();
+    f.close();
+
+    auto codec = QTextCodec::codecForName(codecName.toLocal8Bit());
+    qApp->clipboard()->setText(codec->toUnicode(content));
+
+    return true;
+}
+
+QString NativeHelper::tempPath(const QString &filename)
+{
+    return QDir::temp().filePath(filename);
+}
+
 QString NativeHelper::writeClipboardToTemp()
 {
     auto content = qApp->clipboard()->text();
@@ -33,7 +56,7 @@ QString NativeHelper::writeClipboardToTemp()
         return "";
     }
 
-    auto path = QDir::temp().filePath("loginsight-clipboard.txt");
+    auto path = QDir::temp().filePath(QString("loginsight-clipboard-%1.txt").arg(QDateTime::currentDateTime().toTime_t()));
 
     QFile f(path);
     if (!f.open(QIODevice::WriteOnly)) {

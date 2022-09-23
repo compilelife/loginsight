@@ -13,13 +13,17 @@ Item {
     shotTimeLine,
     setSyntax,
     followLog,
-    saveProject
+    saveProject,
+    copyLines,
+    exportLog
   ]
 
   property var nonOpenSourceAction: [
     openProcess,
+    openMulti,
     setSyntax,
-    exportLog
+    copyLines,
+    exportLog,
   ]
 
   function updateSessionActions(hasSession) {
@@ -140,6 +144,30 @@ Item {
       else
         iconSource = 'qrc:/images/play.png'
       App.currentSession.setFollowLog(checked)
+    }
+  }
+
+  property Action copyLines: Action {
+    text: '复制多行'
+    checkable: true
+    shortcut: 'ctrl+shift+c'
+    iconSource: 'qrc:/images/copy-lines.png'
+    property int fromLineIndex: -1
+    function chooseLine(line) {
+      if (!checked) return
+      if (fromLineIndex < 0) {
+        fromLineIndex = line
+        App.showToast('请选择结束行')
+      } else {
+        App.currentSession.copyLines(fromLineIndex, line)
+        checked = false
+      }
+    }
+    onCheckedChanged: {
+      if (checked) {
+        fromLineIndex = -1
+        App.showToast('将复制多行，请选择开始行')
+      }
     }
   }
 

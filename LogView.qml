@@ -114,6 +114,8 @@ Rectangle {
           onFocusLine: {
             root.checked = true
             curFocusIndex = lineIndex
+            //FIXME: 解耦
+            App.actions.copyLines.chooseLine(lineIndex)
           }
         }
       }
