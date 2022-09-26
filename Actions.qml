@@ -15,7 +15,8 @@ Item {
     followLog,
     saveProject,
     copyLines,
-    exportLog
+    exportLog,
+    addToTimeLine
   ]
 
   property var nonOpenSourceAction: [
