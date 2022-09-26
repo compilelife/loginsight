@@ -1,6 +1,6 @@
 .pragma library
 
-const VERSION = 'v3.0.1'
+const VERSION = 'v3.1.0'
 function getNumVersion(v) {
   return v.substring(1).split('.').map(v=>parseInt(v))
 }
