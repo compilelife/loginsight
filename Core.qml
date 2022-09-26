@@ -88,7 +88,7 @@ Item {
           sendMessage(CoreDef.CmdQueryPromise, {pid: longOpDlg.waitPromiseId})
             .then(function(msg){
 //              console.log(`[${tag}]`,'timer', longOpDlg.waitId)
-              progressBar.value = msg.progress
+              progressBar.value = Math.max(msg.progress, progressBar.value+1)
               longOpDlg.visible = true
             })
         }
