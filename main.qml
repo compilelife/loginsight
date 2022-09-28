@@ -1,24 +1,26 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtWebSockets 1.15
-import QtQuick.Controls 2.15 as QC2
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import QtQuick.Controls 1.4
-import QtQuick.Controls.Styles 1.4
 import QtQuick.Dialogs 1.3
 import './app.js' as App
 import './QuickPromise/promise.js' as Q
 import './coredef.js' as CoreDef
 import './constants.js' as C
+import QtQuick.Controls 1.4 as QC1
+import QtQuick.Controls.Universal 2.12
 
-ApplicationWindow {
+QC1.ApplicationWindow {
   width: 1000
   height: 700
+  id: root
 
   visible: true
   title: qsTr("LogInsight")
 
   property alias toast: _toast
+  property MainMenuBar mainMenu: MainMenuBar{id: mainMenu}
 
   property Core core: Core {
     onReady: initRegister()
@@ -28,115 +30,36 @@ ApplicationWindow {
     id: actions
   }
 
-  menuBar: MenuBar {
-    id: menubar
-    Menu {
-      title: "文件"
-      MenuItem {action: actions.open}
-      MenuItem {action: actions.openMulti }
-      MenuItem {action: actions.openProcess}
-      MenuItem {action: actions.openClipboard}
-      Menu {
-        title: "最近文件"
-        id: recentMenu
-        function _fillItems(recents) {
-          while(items.length > 0)
-              removeItem(items[0])
-          recents.forEach(function(openAction){
-            if (!openAction.action)//低版本使用的是字符串，直接过滤掉
-              return
-            addItem(_userTextOfOpenAction(openAction))
-              .triggered.connect(()=>_replayOpenAction(openAction))
-          })
-        }
-      }
-      MenuSeparator{}
-      MenuItem {action: actions.saveProject}
-      MenuItem {action: actions.exportLog}
-      MenuSeparator{}
-      MenuItem {action: actions.close}
-      MenuSeparator{}
-      Menu {
-        title: '编码'
-        ExclusiveGroup{
-          id: eg
-        }
-        Component.onCompleted: {
-          for (const codec of NativeHelper.supportCodecs()) {
-            const action = addItem(codec)
-            action.triggered.connect(function(){
-              const session = currentSession()
-              if (!session)
-                return
-              session.textCodec.name = codec
-              session.invalidate(true)
-            })
-            eg.bindCheckable(action)
-          }
-        }
-      }
-    }
-    Menu {
-      title: "检视"
-      MenuItem {action: actions.filter}
-      MenuItem {action: actions.search}
-      MenuSeparator{}
-      MenuItem {action: actions.goTo}
-      MenuItem {action: actions.goBack}
-      MenuItem {action: actions.goForward}
-      MenuSeparator{}
-      MenuItem {action: actions.copyLines}
-      MenuItem {action: actions.setSyntax}
-    }
-    Menu {
-      title: "时间线"
-      MenuItem {action: actions.addToTimeLine}
-      MenuItem {action: actions.clearTimeLine}
-      MenuItem {action: actions.shotTimeLine}
-    }
-    Menu {
-      title: "其它"
-      id: otherMenu
-      MenuItem {action: actions.settings}
-      MenuItem {action: actions.about}
-      MenuItem {action: actions.feedback}
-    }
-  }
+  menuBar: mainMenu
 
-  toolBar: ToolBar {
-    height: toolbtns.height
-    RowLayout {
-      id: toolbtns
-      width: parent.width
-      QC2.TabBar {
-        contentHeight: 30
-        currentIndex: -1
-        id: tabBar
-      }
-      Row {
-        Layout.alignment: Qt.AlignRight
-        ToolButton{action: actions.followLog}
-        ToolButton{action: actions.copyLines}
-        QC2.ToolSeparator{}
-        ToolButton{action: actions.search}
-        ToolButton{action: actions.filter}
-        ToolButton{action: actions.goTo}
-        ToolButton{action: actions.goBack}
-        ToolButton{action: actions.goForward}
-        QC2.ToolSeparator{}
-        ToolButton{action: actions.addToTimeLine}
-        ToolButton{action: actions.clearTimeLine}
-        ToolButton{action: actions.shotTimeLine}
-        QC2.ToolSeparator{}
-        TryCountDown{id: tryCountDown; visible: false}
-      }
+  RowLayout {
+    id: head
+    width: parent.width
+    FlatToolButton {
+      action1: actions.tinyMenu
+    }
+    TabBar {
+      id: tabBar
+      contentHeight: 30
+      Layout.fillWidth: true
+      currentIndex: -1
+      background: Rectangle{color: 'transparent'}
+    }
+    MainToolbar {
+      id: toolBar
     }
   }
 
   StackLayout {
     id: sessions
     currentIndex: tabBar.currentIndex
-    anchors.fill: parent
+    anchors{
+      top: head.bottom
+      left: contentItem.left
+      right: contentItem.right
+      bottom: contentItem.bottom
+    }
+
     onCountChanged: {
       handleCurrentItemChanged()
     }
@@ -268,7 +191,7 @@ ApplicationWindow {
     App.setMain(this)
     App.setSettings(settings.settings)
 
-    recentMenu._fillItems(App.settings.recents)
+    mainMenu.loadSettings()
 
     showMaximized()
     actions.updateSessionActions(false)
@@ -294,21 +217,20 @@ ApplicationWindow {
       .then(function(msg) {
         App.setRegisterInfo(msg.rstate, msg.left)
         _updateActionsOnRegisterState(msg.rstate)
-        if (msg.rstate === CoreDef.RSTry || msg.rstate === CoreDef.RSTryEnd) {
-          otherMenu.addItem('').action = actions.register
-          tryCountDown.visible = true
-          if (msg.rstate === CoreDef.RSTryEnd) {
-            registerFeedBackDlg.text = '试用结束，主要功能将受限或异常\n请尽快购买或使用开源版本'
-            registerFeedBackDlg.open()
-          }
-        } else if (msg.rstate === CoreDef.RSOpenSource) {
-          otherMenu.addItem('开源版本，点击试用专业版').triggered.connect(function(){
-            Qt.openUrlExternally(C.WEB_DOWNLOAD_URL)
-          })
-        } else if (msg.rstate === CoreDef.RSRegistered) {
-          otherMenu.addItem('已购买!')
+
+        mainMenu.handleRegisterState(msg.rstate)
+
+        if (msg.rstate === CoreDef.RSTry || msg.rstate === CoreDef.RSTryEnd)
+          toolBar.tryCountDown.visible = true
+        if (msg.rstate === CoreDef.RSTryEnd) {
+          registerFeedBackDlg.text = '试用结束，主要功能将受限或异常\n请尽快购买或使用开源版本'
+          registerFeedBackDlg.open()
         }
       })
+  }
+
+  function popTinyMenuBar() {
+    mainMenu.tinyMenuBar.popup()
   }
 
   function _updateActionsOnRegisterState(state) {
@@ -384,7 +306,7 @@ ApplicationWindow {
     }
     recents.unshift(openAction)
     storeSettings()
-    recentMenu._fillItems(recents)
+    mainMenu.updateRecents()
   }
 
   function openFileOrPrj() {
@@ -491,7 +413,7 @@ ApplicationWindow {
     })
   }
 
-  function _replayOpenAction({action,arg,name}) {
+  function replayOpenAction({action,arg,name}) {
     let ret = null
     if (action === 'open')
       ret = _doOpenFileOrPrj(arg, name)
@@ -502,7 +424,7 @@ ApplicationWindow {
     return ret
   }
 
-  function _userTextOfOpenAction({action,arg,name}) {
+  function userTextOfOpenAction({action,arg,name}) {
     if (action === 'open')
       return arg
     else if (action === 'openMulti')
@@ -531,9 +453,7 @@ ApplicationWindow {
     return Q.rejected('一些会话无法还原')
   }
 
-  MessageDialog {
-    id: registerFeedBackDlg
-  }
+  property MessageDialog registerFeedBackDlg: MessageDialog{}
 
   function doRegister(orderId) {
     core.sendMessage(CoreDef.CmdDoRegister, {orderId})

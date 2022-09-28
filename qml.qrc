@@ -56,5 +56,11 @@
         <file>OpenMultiFilesDlg.qml</file>
         <file>images/question.png</file>
         <file>images/copy-lines.png</file>
+        <file>MainMenu.qml</file>
+        <file>MainToolbar.qml</file>
+        <file>FlatToolButton.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>MainMenuBar.qml</file>
+        <file>images/menu.png</file>
     </qresource>
 </RCC>

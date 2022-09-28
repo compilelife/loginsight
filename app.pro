@@ -1,4 +1,4 @@
-QT += quick websockets widgets network
+QT += quick websockets widgets network quickcontrols2
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -52,3 +52,5 @@ msvc {
     QMAKE_CFLAGS += /utf-8
     QMAKE_CXXFLAGS += /utf-8
 }
+
+DISTFILES +=

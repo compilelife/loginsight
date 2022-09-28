@@ -24,7 +24,8 @@ Dialogs.Dialog {
                             updater: {
                               autocheck: true
                             },
-                            recents: []
+                            recents: [],
+                            showMenuBar: true
                           })
 
   Column {

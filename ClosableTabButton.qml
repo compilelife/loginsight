@@ -7,28 +7,22 @@ TabButton {
 
   width: implicitWidth
 
-  contentItem: Row {
-    property string txtColor: checked ? 'black' : 'white'
+  background: Rectangle {color: checked ? 'white' : 'transparent'}
 
+  contentItem: Row {
     Text {
       text: title+' '
       verticalAlignment: Text.AlignVCenter
       height: parent.height
-      color: parent.txtColor
     }
     Text {
-      text: 'X '
+      text: ' X'
       verticalAlignment: Text.AlignVCenter
       height: parent.height
-      color: parent.txtColor
       MouseArea {
         anchors.fill: parent
         onClicked: closed()
       }
     }
-  }
-
-  background: Rectangle {
-    color: checked ? 'white' : '#a0a0a0'
   }
 }

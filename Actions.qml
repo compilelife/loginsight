@@ -196,4 +196,23 @@ Item {
     text: '导出日志'
     onTriggered: App.currentSession.exportLog()
   }
+
+  property Action tinyMenu: Action {
+    text: '菜单'
+    iconSource: 'qrc:/images/menu.png'
+    onTriggered: {
+      App.main.popTinyMenuBar()
+    }
+  }
+
+  property Action toggleMenuBar: Action {
+    checkable: true
+    text: '菜单栏'
+    onCheckedChanged: {
+      App.settings.showMenuBar = checked
+      App.main.storeSettings()
+
+      App.main.mainMenu.setVisible(checked)
+    }
+  }
 }

@@ -87,9 +87,12 @@ Item {
                 width: parent.width
                 SplitView.preferredHeight: 300
                 visible: tabBar.count > 0
+                spacing: 0
                 TabBar {
                     id: tabBar
-                    contentHeight: 26
+                    contentHeight: 30
+                    Layout.preferredWidth: parent.width
+                    background: Rectangle{color: 'transparent'}
                 }
                 StackLayout {
                     id: holder

@@ -103,6 +103,7 @@ Item {
     function startWait(id) {
       waitId = id
       enabled = true
+      progressBar.value = 0
     }
 
     function finishWait() {
