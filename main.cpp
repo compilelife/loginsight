@@ -10,6 +10,7 @@
 #include "nativehelper.h"
 #include "textcodec.h"
 #include <QIcon>
+#include <QTranslator>
 
 QFile gLogFile;
 static const QString gLevels[] = {"Debg", "Warn", "Err-", "Err+", "Info", "Syst"};
@@ -45,6 +46,7 @@ static void backupLog(NativeHelper& native) {
     f.copy(native.logBackupPath());
 }
 
+
 int main(int argc, char *argv[])
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
@@ -58,6 +60,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("loginsight");
 
     app.setWindowIcon(QIcon(":/images/logo.png"));
+
+    QTranslator trans;
+    trans.load("qtbase_zh_CN");
+    app.installTranslator(&trans);
 
     prepareMyDir();
     NativeHelper native;

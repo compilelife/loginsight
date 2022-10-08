@@ -1,6 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.15
 import './app.js' as App
 
 ColumnLayout {
@@ -10,8 +10,8 @@ ColumnLayout {
   TextField {
     id: processText
     Layout.preferredWidth: root.width
-//    width: 1000//parent.width
-    placeholderText: '请输入要启动的程序名称（全路径），多个参数已空格分割'
+    placeholderText: '请输入要启动的程序名称（全路径），多个参数以空格分割'
+    selectByMouse: true
   }
   RowLayout {
     spacing: 10
@@ -20,9 +20,10 @@ ColumnLayout {
     }
     SpinBox {
       id: cacheSpin
-      minimumValue: 2
-      maximumValue: 10000
+      from: 2
+      to: 10000
       value: 100
+      editable: true
     }
     Text {
       text: '块 (一个块200k)'

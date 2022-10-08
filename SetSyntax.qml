@@ -1,8 +1,7 @@
 
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
-import QtQuick.Controls 1.4
-import QtQuick.Controls 2.15 as QC2
+import QtQuick.Controls 2.15
 import QtQml.Models 2.15
 import './app.js' as App
 import './coredef.js' as CoreDef
@@ -21,6 +20,7 @@ ColumnLayout {
     TextField {
       id: patternBox
       Layout.fillWidth: true
+      selectByMouse: true
     }
     Button {
       text: '预览'
@@ -74,12 +74,12 @@ ColumnLayout {
 
   function previewSyntax() {
     if (syntaxSegs.model.count === 0) {
-      App.showToast('请点击“添加字段”添加与正则表达式捕获相同数量的字段')
+      App.showToast('请点击“添加字段”添加与正则表达式捕获相同数量的字段', 'error')
       return
     }
 
     if (pattern.length === 0) {
-      App.showToast('请输入格式语法的正则表达式')
+      App.showToast('请输入格式语法的正则表达式', 'error')
       return
     }
 

@@ -1,18 +1,18 @@
 import QtQuick 2.15
-import QtQuick.Dialogs 1.2
+import QtQuick.Dialogs 1.2 as Dlg
 import QtQuick.Layouts 1.15
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.15
 
-Dialog {
+Dlg.Dialog {
   property string dir: ''
   property var filenamesByTime: []
 
   signal openFiles(var filelist)
 
-  width: 500
+  width: 700
   height: 500
 
-  standardButtons: StandardButton.Open | StandardButton.Cancel
+  standardButtons: Dlg.StandardButton.Open | Dlg.StandardButton.Cancel
 
   onDirChanged: {
     filenamesByTime = NativeHelper.listFiles(dir, '*')
@@ -30,9 +30,10 @@ Dialog {
       Text{text: `正在打开目录：${dir}`; Layout.fillWidth: true}
       TextField {
         id: suffixField
+        selectByMouse: true
         text: ''
         placeholderText: '日志后缀'
-        width: 50
+        Layout.minimumWidth: 100
         onTextChanged: {
           resort()
         }

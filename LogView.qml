@@ -98,7 +98,7 @@ Rectangle {
       Repeater {
         id: content
         //max line count correspond to list.height, may or may not
-        model: Math.round(list.height / (indicatorMeasure.height + App.settings.logView.lineSpacing))
+        model: Math.round(list.height / (indicatorMeasure.height + App.settings.logView.lineSpacing/2 + 1))
         LogLine {
           width: list.width
           model: logModel.dataAt(curIndex + index)
@@ -215,9 +215,7 @@ Rectangle {
   }
 
   FilterDialog {
-    anchors.centerIn: parent
     id: filterDialog
-    visible: false
     onAccepted: {
       session.filter(getFilterArgs())
     }
@@ -225,7 +223,6 @@ Rectangle {
 
   GotoDialog {
     id: gotoDialog
-    visible: false
     range: logModel.range
     onAccepted: {
       show(index, {placeAt: 'middle', remember: true})

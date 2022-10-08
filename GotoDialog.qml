@@ -1,34 +1,41 @@
 import QtQuick 2.0
-import QtQuick.Controls 1.4
-import QtQuick.Dialogs 1.2
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.12
 
 Dialog {
   property var range: ({begin: 0, end: 0})
-  property int index: valueBox.value - 1
+  property int index: 0
 
-  width: 400
-  height: 100
+  x: (parent.width - width)/2
 
-  standardButtons: StandardButton.Ok | StandardButton.Cancel
-  title: '跳转到……'
-
-  Column {
-      spacing: 10
-      width: parent.width
-      Text {
-        text: `请输入行号： ${range.begin+1} - ${range.end+1}`
+   ColumnLayout {
+     spacing: 10
+      TextField {
+        id: lineField
+        implicitWidth: 400
+        selectByMouse: true
+        onAccepted: commit()
       }
-      SpinBox {
-        id: valueBox
-        width: parent.width
-        property int realValue: value - 1
-        minimumValue: range.begin + 1
-        maximumValue: range.end + 1
-        onEditingFinished: accepted()
+      Label {
+        text: `请输入要跳转到的行号，介于${range.begin+1}到${range.end+1}之间`
       }
     }
 
-  function setIndex(index) {
-    valueBox.value = index + 1
+   onVisibleChanged: {
+     if (visible)
+       lineField.forceActiveFocus()
+   }
+
+   function commit() {
+     index = parseInt(lineField.text) - 1
+     if (index < range.begin || index > range.end)
+        return
+     accept()
+   }
+
+  function setIndex(v) {
+    lineField.text = `${v + 1}`
+    lineField.selectAll()
+    index = v
   }
 }

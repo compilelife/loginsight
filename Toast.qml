@@ -1,33 +1,55 @@
 import QtQuick 2.0
-import QtGraphicalEffects 1.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.12
+import QtGraphicalEffects 1.0
 
 Rectangle {
   property string message: ''
-  width: content.width + 40
+  id: root
+  width: content.width + 10
   height: 40
-  radius: 20
-  color: '#e0000000'
-  anchors {
-    horizontalCenter: parent.horizontalCenter
-    bottom: parent.bottom
-    bottomMargin: 20
-  }
+  color: '#e0ff0000'
 
-  Text {
+  RowLayout {
     id: content
-    text: message
-    font.pixelSize: 14
-    color: 'white'
-    wrapMode: Text.NoWrap
-    anchors.centerIn: parent
+    height: parent.height
+    spacing: 20
+
+    Text {
+      id: txt
+      Layout.leftMargin: 10
+      text: message
+      color: 'white'
+      wrapMode: Text.NoWrap
+    }
+
+    Button {
+      id: btn
+      text: '知道了'
+      contentItem: Text {
+        text: parent.text
+        verticalAlignment: Text.AlignVCenter
+        font.pixelSize: 14
+        color: 'white'
+      }
+      onClicked: root.visible = false
+    }
   }
 
-  function show(txt, duration=2000) {
+  function show(txt, type='info', duration=2000) {
     message = txt
     visible = true
 
-    hideTimer.interval = duration
-    hideTimer.running = true
+    color = type === 'info' ? '#e04CAF50' : '#e0ff0000'
+
+    if (duration > 0) {
+      btn.visible = false
+      hideTimer.running = false
+      hideTimer.interval = duration
+      hideTimer.running = true
+    } else {
+      btn.visible = true
+    }
   }
 
   Timer {

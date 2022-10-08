@@ -3,6 +3,7 @@ import QtQuick.Controls 1.4
 import './app.js' as App
 import './coredef.js' as CoreDef
 import './constants.js' as C
+import QtQml 2.15
 
 Menu {
   Menu {
@@ -48,18 +49,22 @@ Menu {
     MenuSeparator {}
     Menu {
       title: '编码'
-      Repeater {
-        model: NativeHelper.supportCodecs()
-        delegate: MenuItem {
-          text: modelData
-          onTriggered: {
-            const session = App.currentSession
-            if (!session)
-              return
-            session.textCodec.name = text
-            session.invalidate(true)
-          }
-        }
+      id: textCodecMenu
+      MenuItem {
+        text: 'UTF-8'
+        onTriggered: textCodecMenu.changeTextCodec(text)
+      }
+      MenuItem {
+        text: 'GBK'
+        onTriggered: textCodecMenu.changeTextCodec(text)
+      }
+
+      function changeTextCodec(name) {
+        const session = App.currentSession
+        if (!session)
+          return
+        session.textCodec.name = name
+        session.invalidate(true)
       }
     }
   }
@@ -105,6 +110,7 @@ Menu {
     title: "其它"
     id: otherMenu
     MenuItem {
+      visible: Qt.platform.os !== 'osx'
       action: actions.toggleMenuBar
     }
     MenuItem {

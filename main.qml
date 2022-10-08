@@ -3,13 +3,14 @@ import QtQuick.Window 2.15
 import QtWebSockets 1.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import QtQuick.Dialogs 1.3
 import './app.js' as App
 import './QuickPromise/promise.js' as Q
 import './coredef.js' as CoreDef
 import './constants.js' as C
 import QtQuick.Controls 1.4 as QC1
 import QtQuick.Controls.Universal 2.12
+import QtQml 2.15
+import QtQuick.Dialogs 1.2
 
 QC1.ApplicationWindow {
   width: 1000
@@ -36,11 +37,12 @@ QC1.ApplicationWindow {
     id: head
     width: parent.width
     FlatToolButton {
+      visible: Qt.platform.os !== 'osx'
       action1: actions.tinyMenu
     }
     TabBar {
       id: tabBar
-      contentHeight: 30
+      contentHeight: 32
       Layout.fillWidth: true
       currentIndex: -1
       background: Rectangle{color: 'transparent'}
@@ -128,6 +130,11 @@ QC1.ApplicationWindow {
   Toast {
     id: _toast
     visible: false
+    anchors {
+      horizontalCenter: parent.horizontalCenter
+      top: parent.top
+      topMargin: 35
+    }
   }
 
   Dialog {
@@ -146,6 +153,11 @@ QC1.ApplicationWindow {
 
       _doOpenProcess(args)
     }
+  }
+
+  ErrorDlg {
+    id: errDlg
+    anchors.centerIn: parent
   }
 
   OpenMultiFilesDlg{
@@ -180,11 +192,16 @@ QC1.ApplicationWindow {
     }
   }
 
+  Updater {id: _updater}
+
+  Keys.onPressed:  {
+
+  }
+
   property BuyDlg buyDlg: BuyDlg {}
   property AboutDlg aboutDlg: AboutDlg {}
   property Feedback feedBack: Feedback{}
-  property Updater updater: Updater{}
-  property MessageDialog msgDlg: MessageDialog{}
+  property alias updater: _updater
 
   Component.onCompleted: {
     App.setActions(actions)
@@ -201,11 +218,18 @@ QC1.ApplicationWindow {
     if (App.settings.updater.autocheck)
       updater.checkNewVersion().then(function(hasNewVersion){
         if (hasNewVersion) {
-          updater.goDownloadDlg.open()
+          updater.open()
         }
       })
 //    _doOpenFileOrPrj('/tmp/test.log')
 //    _doOpenProcess('while true;do echo `date`;sleep 1;done')
+  }
+
+  function showError(message, title, handler) {
+    errDlg.message = message
+    errDlg.title = title
+    errDlg.oneShotHandler = handler
+    errDlg.open()
   }
 
   function initRegister() {
@@ -223,8 +247,7 @@ QC1.ApplicationWindow {
         if (msg.rstate === CoreDef.RSTry || msg.rstate === CoreDef.RSTryEnd)
           toolBar.tryCountDown.visible = true
         if (msg.rstate === CoreDef.RSTryEnd) {
-          registerFeedBackDlg.text = '试用结束，主要功能将受限或异常\n请尽快购买或使用开源版本'
-          registerFeedBackDlg.open()
+          App.showError('试用结束，主要功能将受限或异常\n请尽快购买或使用开源版本')
         }
       })
   }
@@ -298,7 +321,7 @@ QC1.ApplicationWindow {
     const recents = App.settings.recents
     //控制最大长度
     if (recents.length > 10)
-      recents.shift()
+      recents.pop()
     //已存在，则移动最前
     const oldIndex = recents.findIndex(it=>_isSameOpenAction(it, openAction))
     if (oldIndex >= 0) {
@@ -415,6 +438,7 @@ QC1.ApplicationWindow {
 
   function replayOpenAction({action,arg,name}) {
     let ret = null
+    _updateRecents({action,arg,name})
     if (action === 'open')
       ret = _doOpenFileOrPrj(arg, name)
 //    else if (action === 'openProcess') //restore open process has no meanings
@@ -439,7 +463,7 @@ QC1.ApplicationWindow {
 
     const sessionCfg = root.sessions[index]
     //FIXME: 这里main依赖了sessionCfg的具体实现，需要重构
-    let ret = _replayOpenAction(sessionCfg.openArg)
+    let ret = replayOpenAction(sessionCfg.openArg)
     if (ret === null)
       toast.show('未知的会话', action, arg)
 
@@ -453,17 +477,14 @@ QC1.ApplicationWindow {
     return Q.rejected('一些会话无法还原')
   }
 
-  property MessageDialog registerFeedBackDlg: MessageDialog{}
-
   function doRegister(orderId) {
     core.sendMessage(CoreDef.CmdDoRegister, {orderId})
       .then(function(msg){
         if (msg.ok) {
-          registerFeedBackDlg.text = '注册成功，请重启程序'
+          App.showToast('注册成功! 请重启程序。', 'info', -1)
         } else {
-          registerFeedBackDlg.text = '注册失败：'+msg.info
+          App.showError('注册失败：'+msg.info)
         }
-        registerFeedBackDlg.open()
       })
   }
 }

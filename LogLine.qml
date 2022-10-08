@@ -46,7 +46,7 @@ Item {
         id: indicator
         width: lineNumWidth + 4
         height: content.height
-        color: isViewChecked ? '#49b2f6' : 'grey'
+        color: isViewChecked ? '#49b2f6' : '#757575'
         Text {
           width: parent.width
           anchors.top: parent.top
@@ -70,7 +70,11 @@ Item {
         font {
           family: App.settings.logView.font.family
           pixelSize: App.settings.logView.font.size
-          underline: isFocusLine
+        }
+        //TODO: 移动到与TextEdit平级，来实现“底色效果”
+        Rectangle {
+          anchors.fill: parent
+          color: isFocusLine ? '#30AFAFAF' : 'transparent'
         }
 
         MouseArea{
@@ -133,10 +137,10 @@ Item {
 
   function getSelectedText() {
     let selected = _content.selectedText
-    if (selected.length === 0) {
-      _content.selectWord()
-      selected = _content.selectedText
-    }
+//    if (selected.length === 0) {
+//      _content.selectWord()
+//      selected = _content.selectedText
+//    }
     return selected
   }
 }

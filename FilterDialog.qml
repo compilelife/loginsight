@@ -1,23 +1,23 @@
 import QtQuick 2.0
- import QtQuick.Controls 2.15
-import QtQuick.Controls 1.4 as QC1
+import QtQuick.Controls 2.15
 
 Dialog {
   id: root
-  width: 450
-  height: 150
-  focus: true
+  x: (parent.width - width)/2
 
-  standardButtons: Dialog.Ok | Dialog.Cancel
-  title: '过滤'
-  contentItem: Row{
+  Row{
     spacing: 10
     PatternBox {
       id: patternBox
+      onAccept: root.accept()
     }
-    QC1.CheckBox {
+    CheckBox {
       id: reverseCheckBox
       text: '反转过滤'
+    }
+    Button {
+      text: '过滤'
+      onClicked: root.accept()
     }
   }
 

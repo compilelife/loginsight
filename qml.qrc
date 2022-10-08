@@ -62,5 +62,11 @@
         <file>qtquickcontrols2.conf</file>
         <file>MainMenuBar.qml</file>
         <file>images/menu.png</file>
+        <file>images/error.png</file>
+        <file>ErrorDlg.qml</file>
+        <file>images/linux.png</file>
+        <file>images/macos.png</file>
+        <file>images/windows.png</file>
+        <file>images/all.png</file>
     </qresource>
 </RCC>

@@ -6,6 +6,7 @@ import com.cy.CoreBoot 1.0
 import "./coredef.js" as CoreDef
 import QtQuick.Dialogs 1.3
 import './util.js' as Util
+import './app.js' as App
 
 Item {
   property var pendings: ({})
@@ -23,7 +24,7 @@ Item {
         ready()
       }
       else{
-        coreErrDlg.showError('引擎异常中断, 需要重启', '引擎断开')
+        App.showError('引擎异常中断, 需要重启', 'core')
       }
     }
 
@@ -36,26 +37,6 @@ Item {
 
   Component.onDestruction: {
     boot.stop()
-  }
-
-  MessageDialog {
-    id: coreErrDlg
-    visible: false
-    standardButtons: StandardButton.Ok
-    title: '执行错误'
-
-    property var then: null
-    function showError(content, headTitle = '执行错误') {
-      coreErrDlg.text = content
-      coreErrDlg.visible = true
-      coreErrDlg.title = headTitle
-    }
-
-    onVisibleChanged: {
-      if (!coreErrDlg.visible && then) {
-        then()
-      }
-    }
   }
 
   //耗时操作超200ms后显示
@@ -191,7 +172,7 @@ Item {
             delete pendings[msgObj.id]
           }
         }
-        coreErrDlg.showError(msgObj.why, '执行错误')
+        App.showError(msgObj.why, 'core')
       }
 
       if (msgObj.state === CoreDef.StateFuture) {

@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.15
 
 // 文本输入区 | 大小写敏感 | 正则表达式
 Row {
@@ -22,6 +22,7 @@ Row {
     currentIndex: -1
     model: ListModel {}
     textRole: 'keyword'
+    selectTextByMouse: true
     onActivated: {
       const data = model.get(currentIndex)
       if (data) {

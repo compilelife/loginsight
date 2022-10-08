@@ -1,12 +1,12 @@
 import QtQuick 2.0
-import QtQuick.Dialogs 1.2
-import QtQuick.Controls 1.4
+import QtQuick.Dialogs 1.2 as Dlg
+import QtQuick.Controls 2.15
 import './app.js' as App
 import QtQuick.Layouts 1.12
 
-Dialog {
+Dlg.Dialog {
   id: root
-  standardButtons: StandardButton.Ok | StandardButton.Cancel
+  standardButtons: Dlg.StandardButton.Ok | Dlg.StandardButton.Cancel
   Column {
     spacing: 5
     RowLayout {
@@ -16,15 +16,60 @@ Dialog {
       }
       TextField {
         id: orderIdText
+        selectByMouse: true
         Layout.fillWidth: true
       }
     }
     Text {
       text: '设备ID：' + NativeHelper.uniqueId()
+      color: 'gray'
     }
     Text {
-      text: '<a href="https://mianbaoduo.com/o/bread/YZibl55q">windows购买地址</a> <a href="https://mianbaoduo.com/o/bread/YZibmZpx">mac购买地址</a> <a href="https://mianbaoduo.com/o/bread/YZibmZtp">linux购买地址</a> <a href="https://mianbaoduo.com/o/bread/YZibmZtw">全平台购买地址</a>'
+      text: '按所需运行的平台点击下方按钮进入购买页面：'
       onLinkActivated: Qt.openUrlExternally(link)
+    }
+    RowLayout {
+      spacing: 10
+      Button{
+        icon{
+          source: 'qrc:/images/windows.png'
+          color: 'transparent'
+          width: 48
+          height: 48
+        }
+        flat: true
+        onClicked: Qt.openUrlExternally('https://mianbaoduo.com/o/bread/YZibl55q')
+      }
+      Button{
+        icon{
+          source: 'qrc:/images/macos.png'
+          color: 'transparent'
+          width: 48
+          height: 48
+        }
+        flat: true
+        onClicked: Qt.openUrlExternally('https://mianbaoduo.com/o/bread/YZibmZpx')
+      }
+      Button{
+        icon{
+          source: 'qrc:/images/linux.png'
+          color: 'transparent'
+          width: 48
+          height: 48
+        }
+        flat: true
+        onClicked: Qt.openUrlExternally('https://mianbaoduo.com/o/bread/YZibmZtp')
+      }
+      Button{
+        icon{
+          source: 'qrc:/images/all.png'
+          color: 'transparent'
+          width: 48
+          height: 48
+        }
+        flat: true
+        onClicked: Qt.openUrlExternally('https://mianbaoduo.com/o/bread/YZibmZtw')
+      }
     }
   }
   onAccepted: {

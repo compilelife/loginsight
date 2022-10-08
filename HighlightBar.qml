@@ -3,7 +3,7 @@ import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 import './gencolor.js' as GenColor
 
-Item {
+Rectangle {
   height: highlights.count > 0 ? 20 : 0
 
   signal search(string keyword)
@@ -34,6 +34,8 @@ Item {
       barMenu.popup()
     }
   }
+
+  color: 'white'
 
   ListModel {
     id: highlights

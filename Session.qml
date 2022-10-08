@@ -136,16 +136,6 @@ Item {
         }
     }
 
-  MessageDialog {
-    id: errTip
-    standardButtons: MessageDialog.Ok
-    function display(title, detail) {
-      errTip.title = title
-      errTip.text = detail
-      errTip.visible = true
-    }
-  }
-
   Dialog {
     id: setSyntaxDlg
     title: '格式语法'

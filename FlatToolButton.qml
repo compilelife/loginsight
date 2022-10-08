@@ -10,7 +10,7 @@ Button {
   enabled: action1.enabled
   icon.source: action1.iconSource
   onClicked: action1.trigger(this)
-  implicitHeight: 30
+  implicitHeight: 32
   implicitWidth: implicitHeight
   ToolTip {
     text: action1.text

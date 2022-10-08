@@ -1,23 +1,37 @@
 import QtQuick 2.0
 import './constants.js' as C
 import './QuickPromise/promise.js' as Q
-import QtQuick.Dialogs 1.3
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.12
 
-Item {
+Dialog {
   property string lastestVersion: C.VERSION
   property string changeLog: ''
 
-  property Dialog goDownloadDlg : Dialog{
-    standardButtons: StandardButton.Ok |StandardButton.Cancel
-    Text {
-      text: `# 新版本 ${lastestVersion}\n${changeLog}\n[点击下载](${C.WEB_DOWNLOAD_URL})`
-      textFormat: Text.MarkdownText
-      onLinkActivated: {
-        Qt.openUrlExternally(C.WEB_DOWNLOAD_URL)
-      }
+  anchors.centerIn: parent
+
+  header: RowLayout {
+    Label {
+      text: `  新版本 ${lastestVersion}`
     }
-    onAccepted: {
-      Qt.openUrlExternally(C.WEB_DOWNLOAD_URL)
+    Button {
+      text: 'x'
+      Layout.alignment: Qt.AlignRight
+      onClicked: reject()
+    }
+  }
+
+  ColumnLayout {
+    Label {
+      text: changeLog
+    }
+    Button {
+      text: '前往下载'
+      Layout.alignment: Qt.AlignHCenter
+      onClicked: {
+        Qt.openUrlExternally(C.WEB_DOWNLOAD_URL)
+        accept()
+      }
     }
   }
 

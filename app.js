@@ -18,12 +18,6 @@ function setRegisterInfo(state, left) {
   tryLeftSeconds = left
 }
 
-function showMsgDlg(title, text) {
-  main.msgDlg.text = text
-  main.msgDlg.title = title;
-  main.msgDlg.open()
-}
-
 let actions = null
 function setActions(o){actions = o}
 
@@ -37,6 +31,10 @@ function isCurrentSession(o) {return currentSession === o}
 let currentLogView = null
 function setCurrentView(o){currentLogView = o}
 
-function showToast(txt, duration=2000) {
-  main.toast.show(txt, duration)
+function showToast(txt, type="info", duration=2000) {
+  main.toast.show(txt, type, duration)
+}
+
+function showError(message, title = 'Loginsight', handler=null) {
+  main.showError(message, title, handler)
 }

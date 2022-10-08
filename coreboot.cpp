@@ -6,7 +6,7 @@
 CoreBoot::CoreBoot(QObject *parent)
     : QObject{parent}
 {
-    connect(&mProcess, &QProcess::stateChanged, [this](QProcess::ProcessState state){
+    mStateConnection = connect(&mProcess, &QProcess::stateChanged, [this](QProcess::ProcessState state){
         if (state == QProcess::NotRunning) {
             emit stateChanged(false);
         } else if (state == QProcess::Running) {
@@ -42,6 +42,7 @@ void CoreBoot::startLocal() {
 }
 
 void CoreBoot::stop() {
+    disconnect(mStateConnection);
     mProcess.close();
 }
 

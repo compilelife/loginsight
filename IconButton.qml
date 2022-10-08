@@ -8,6 +8,7 @@ Button {
   height: size
   display: AbstractButton.IconOnly
   icon.source: source
+  icon.color: 'transparent'
   flat: true
   padding: 0
 }
