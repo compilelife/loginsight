@@ -62,7 +62,7 @@ Item {
         id: content
         focus:true
         textFormat: TextEdit.PlainText //highlighter set offset on rich text has strange offset
-//        readOnly: true //comment this line to show cursor
+        readOnly: true //comment this line to show cursor
         selectByMouse: true
         textMargin: App.settings.logView.lineSpacing/2
         width: root.width - indicator.width - parent.spacing
@@ -113,9 +113,9 @@ Item {
           if (activeFocus)
             focusLine(model.index)
         }
-        onTextChanged: {//emulate readonly
-          undo()
-        }
+//        onTextChanged: {//emulate readonly
+//          undo()
+//        }
         Keys.onPressed: {
           root.keyDown(event.key)
         }

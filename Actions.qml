@@ -187,6 +187,12 @@ Item {
     onTriggered: App.main.aboutDlg.open()
   }
 
+  property Action help: Action {
+    text: '帮助'
+    shortcut: 'F1'
+    onTriggered: App.main.helpDlg.open()
+  }
+
   property Action register: Action {
     text: '注册'
     onTriggered: App.main.buyDlg.open()

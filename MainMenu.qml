@@ -117,6 +117,10 @@ Menu {
       action: actions.settings
     }
     MenuItem {
+      action: actions.help
+    }
+
+    MenuItem {
       action: actions.about
     }
     MenuItem {

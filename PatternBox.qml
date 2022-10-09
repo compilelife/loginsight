@@ -32,7 +32,10 @@ Row {
         caseSense.checked = caseSense
       }
     }
-    onAccepted: accept()
+    onAccepted: {
+//      console.info('1',currentText,'2', editText,'3', displayText)
+      accept()
+    }
   }
 
     CheckBox {

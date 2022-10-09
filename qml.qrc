@@ -68,5 +68,6 @@
         <file>images/macos.png</file>
         <file>images/windows.png</file>
         <file>images/all.png</file>
+        <file>HelpDlg.qml</file>
     </qresource>
 </RCC>

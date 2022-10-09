@@ -197,12 +197,15 @@ QC1.ApplicationWindow {
   property BuyDlg buyDlg: BuyDlg {}
   property AboutDlg aboutDlg: AboutDlg {}
   property Feedback feedBack: Feedback{}
+  property HelpDlg helpDlg: null
   property alias updater: _updater
 
   Component.onCompleted: {
     App.setActions(actions)
     App.setMain(this)
     App.setSettings(settings.settings)
+
+    helpDlg = Qt.createComponent('qrc:/HelpDlg.qml').createObject()
 
     mainMenu.loadSettings()
 
