@@ -117,6 +117,7 @@ Rectangle {
             //FIXME: 解耦
             App.actions.copyLines.chooseLine(lineIndex)
           }
+          onKeyDown: _handleLineKeyDown(key, model)
         }
       }
     }
@@ -365,6 +366,24 @@ Rectangle {
     }
   }
 
+  function _handleLineKeyDown(key, model) {
+    if (key === Qt.Key_A) {
+      session.addToTimeLine(model)
+    } else if (key === Qt.Key_S) {
+      searchAction()
+    } else if (key === Qt.Key_D) {
+      gotoAction()
+    } else if (key === Qt.Key_F) {
+      filterAction()
+    } else if (key === Qt.Key_T) {
+      session.emphasisLine(model.line)
+    } else if (key === Qt.Key_E) {
+      const word = _getCurSelectWord()
+      if (word)
+        session.highlightBar.add(word)
+    }
+  }
+
   function _getCacheRange(index) {
     const prefer = {
       "begin": index - 50,
@@ -505,12 +524,16 @@ Rectangle {
     filterDialog.visible = true
   }
 
+  function _getCurSelectWord() {
+    const curline = _getLogLine(curFocusIndex)
+    if (curline) {
+      return curline.getSelectedText()
+    }
+  }
+
   function searchAction(keyword=null) {
     if (!keyword) {
-      const curline = _getLogLine(curFocusIndex)
-      if (curline) {
-        keyword = curline.getSelectedText()
-      }
+      keyword = _getCurSelectWord()
     }
 
     if (keyword) {

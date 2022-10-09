@@ -20,6 +20,7 @@ Item {
   signal contextMenu(var model, string select)
   signal focusLine(int lineIndex)
   signal emphasisLine(int line)
+  signal keyDown(int key)
 
   property TextEdit _content: null
   property LineHighlighter _highlighter: null
@@ -114,6 +115,9 @@ Item {
         }
         onTextChanged: {//emulate readonly
           undo()
+        }
+        Keys.onPressed: {
+          root.keyDown(event.key)
         }
       }
     }

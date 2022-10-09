@@ -194,10 +194,6 @@ QC1.ApplicationWindow {
 
   Updater {id: _updater}
 
-  Keys.onPressed:  {
-
-  }
-
   property BuyDlg buyDlg: BuyDlg {}
   property AboutDlg aboutDlg: AboutDlg {}
   property Feedback feedBack: Feedback{}
