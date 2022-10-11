@@ -26,12 +26,18 @@ Menu {
       function fillItems(recents, getText, onAction) {
         while (items.length > 0)
           removeItem(items[0])
-        recents.forEach(function (openAction) {
-          if (!openAction.action)
+        recents.forEach(function (record) {
+          if (!record.action)
             //低版本使用的是字符串，直接过滤掉
             return
-          addItem(getText(openAction))
-              .triggered.connect(() => onAction(openAction))
+
+          const action = Qt.createQmlObject(`import QtQuick.Controls 1.4;
+                                            Action{
+                                              text: "${getText(record)}";
+                                              iconSource: 'qrc:/images/${App.main.openActionType(record)}.png'
+                                            }`, recentMenu, 'recent-action')
+          addItem('').action = action
+          action.triggered.connect(function(){onAction(record)})
         })
       }
     }
@@ -143,5 +149,14 @@ Menu {
   function updateRecents() {
     const recents = App.settings.recents
     recentMenu.fillItems(recents, App.main.userTextOfOpenAction, App.main.replayOpenAction)
+  }
+
+  function getRecentActions() {
+    const ret = []
+    for (let i = 0; i < recentMenu.items.length; i++) {
+      const item = recentMenu.items[i]
+      ret.push(item.action)
+    }
+    return ret
   }
 }

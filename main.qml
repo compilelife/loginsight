@@ -53,33 +53,38 @@ QC1.ApplicationWindow {
   }
 
   StackLayout {
-    id: sessions
-    currentIndex: tabBar.currentIndex
+    id: contentArea
     anchors{
       top: head.bottom
       left: contentItem.left
       right: contentItem.right
       bottom: contentItem.bottom
     }
+    currentIndex: 0
 
-    onCountChanged: {
-      handleCurrentItemChanged()
-    }
-    onCurrentIndexChanged: {
-      if (currentSession()) {
+    StackLayout {
+      id: sessions
+      currentIndex: tabBar.currentIndex
+
+      onCountChanged: {
         handleCurrentItemChanged()
       }
-    }
-
-    function handleCurrentItemChanged() {
-      if (currentIndex >= 0) {
-        App.setCurrentSession(currentSession())
-        currentSession().setAsCurrent()
-      } else {
-        App.setCurrentSession(null)
-        App.setCurrentView(null)
+      onCurrentIndexChanged: {
+        if (currentSession()) {
+          handleCurrentItemChanged()
+        }
       }
-      actions.updateSessionActions(currentIndex >= 0)
+
+      function handleCurrentItemChanged() {
+        if (currentIndex >= 0) {
+          App.setCurrentSession(currentSession())
+          currentSession().setAsCurrent()
+        } else {
+          App.setCurrentSession(null)
+          App.setCurrentView(null)
+        }
+        actions.updateSessionActions(currentIndex >= 0)
+      }
     }
   }
 
@@ -220,8 +225,9 @@ QC1.ApplicationWindow {
           updater.open()
         }
       })
-//    _doOpenFileOrPrj('/tmp/test.log')
-//    _doOpenProcess('while true;do echo `date`;sleep 1;done')
+
+    const welcome = Qt.createComponent('qrc:/Welcome.qml').createObject(contentArea)
+    contentArea.currentIndex = 1
   }
 
   function showError(message, title, handler) {
@@ -454,6 +460,14 @@ QC1.ApplicationWindow {
       return '...'+arg[0]
     else
       return name
+  }
+
+  function openActionType({action, arg}) {
+    if (action === 'open') {
+      return arg.endsWith('.liprj') ? 'project'  : 'file'
+    } else if (action === 'openMulti') {
+      return 'folder'
+    }
   }
 
   function _doLoadSession(root, index) {

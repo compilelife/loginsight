@@ -33,4 +33,8 @@ MenuBar {
       template.items[i].visible = v
     }
   }
+
+  function getRecentActions() {
+    return template.getRecentActions()
+  }
 }

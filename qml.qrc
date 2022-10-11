@@ -69,5 +69,10 @@
         <file>images/windows.png</file>
         <file>images/all.png</file>
         <file>HelpDlg.qml</file>
+        <file>Welcome.qml</file>
+        <file>WelcomeStartButton.qml</file>
+        <file>images/file.png</file>
+        <file>images/folder.png</file>
+        <file>images/project.png</file>
     </qresource>
 </RCC>
