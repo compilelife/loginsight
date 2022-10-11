@@ -16,7 +16,8 @@ Dlg.Dialog {
                                 size: 14,
                                 family: 'monospace'
                               },
-                              lineSpacing: 5
+                              lineSpacing: 5,
+                              defaultEncoding: 'UTF-8'
                             },
                             processManager: {
                               records: []
@@ -25,7 +26,8 @@ Dlg.Dialog {
                               autocheck: true
                             },
                             recents: [],
-                            showMenuBar: true
+                            showMenuBar: true,
+
                           })
 
   ColumnLayout {
@@ -35,7 +37,6 @@ Dlg.Dialog {
     ColumnLayout {
       width: parent.width
       SettingItem {
-        Layout.preferredWidth: parent.width
         hint: '字体:'
         Button {
           id: fontBtn
@@ -46,7 +47,6 @@ Dlg.Dialog {
       }
 
       SettingItem {
-        Layout.preferredWidth: parent.width
         hint: '行间距:'
         SpinBox {
           id: spacingSpin
@@ -56,6 +56,18 @@ Dlg.Dialog {
           Layout.alignment: Qt.AlignRight
           onValueChanged: {
             settings.logView.lineSpacing = value
+          }
+        }
+      }
+
+      SettingItem {
+        hint: '默认编码'
+        ComboBox {
+          id: defaultEncoding
+          model: ['UTF-8', 'GBK']
+          onCurrentIndexChanged: {
+            settings.logView.defaultEncoding = model[currentIndex]
+            console.info(settings.logView.defaultEncoding)
           }
         }
       }
@@ -95,10 +107,12 @@ Dlg.Dialog {
 
     fontBtn.text = `${settings.logView.font.family}  ${settings.logView.font.size}`
     spacingSpin.value = settings.logView.lineSpacing
+    defaultEncoding.currentIndex =  defaultEncoding.model.indexOf(settings.logView.defaultEncoding)
   }
 
   onApply: {
     App.main.storeSettings()
     App.showToast('设置已保存，重启后生效', 'info', -1)
+    close()
   }
 }

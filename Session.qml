@@ -47,6 +47,7 @@ Item {
 
     Component.onCompleted: {
       logExclusive = Qt.createQmlObject('import QtQuick.Controls 1.4; ExclusiveGroup{}', root, 'logExclusive')
+      textCodec.name = App.settings.logView.defaultEncoding
     }
 
     HighlightBar {
