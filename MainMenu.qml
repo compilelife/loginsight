@@ -155,7 +155,8 @@ Menu {
     const ret = []
     for (let i = 0; i < recentMenu.items.length; i++) {
       const item = recentMenu.items[i]
-      ret.push(item.action)
+      if (item.action)
+        ret.push(item.action)
     }
     return ret
   }

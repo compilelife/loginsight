@@ -61,6 +61,7 @@ QC1.ApplicationWindow {
       bottom: contentItem.bottom
     }
     currentIndex: 0
+    onCurrentIndexChanged: console.info('currentIndex', currentIndex)
 
     StackLayout {
       id: sessions
@@ -68,6 +69,7 @@ QC1.ApplicationWindow {
 
       onCountChanged: {
         handleCurrentItemChanged()
+        contentArea.currentIndex = count > 0 ? 0 : 1
       }
       onCurrentIndexChanged: {
         if (currentSession()) {
@@ -228,6 +230,15 @@ QC1.ApplicationWindow {
 
     const welcome = Qt.createComponent('qrc:/Welcome.qml').createObject(contentArea)
     contentArea.currentIndex = 1
+
+    _handleCmdLine()
+  }
+
+  function _handleCmdLine() {
+    const path = Qt.application.arguments[1]
+    if (path) {
+      _doOpenFileOrPrj(path)
+    }
   }
 
   function showError(message, title, handler) {

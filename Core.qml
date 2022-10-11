@@ -166,13 +166,10 @@ Item {
         }
       } else if (msgObj.state === CoreDef.StateFail) {
         const pending = pendings[msgObj.id]
-        if (pending) {
-          coreErrDlg.then = ()=>{
-            pending.reject(msgObj)
-            delete pendings[msgObj.id]
-          }
-        }
-        App.showError(msgObj.why, 'core')
+        App.showError(msgObj.why, 'core', ()=>{
+                        pending.reject(msgObj)
+                        delete pendings[msgObj.id]
+                      })
       }
 
       if (msgObj.state === CoreDef.StateFuture) {
