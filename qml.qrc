@@ -74,5 +74,6 @@
         <file>images/file.png</file>
         <file>images/folder.png</file>
         <file>images/project.png</file>
+        <file>qtbase_zh_CN.qm</file>
     </qresource>
 </RCC>

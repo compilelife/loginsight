@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/images/logo.png"));
 
     QTranslator trans;
-    trans.load("qtbase_zh_CN");
+    trans.load(":/qtbase_zh_CN.qm");
     app.installTranslator(&trans);
 
     prepareMyDir();
