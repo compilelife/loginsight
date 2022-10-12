@@ -13,7 +13,7 @@ import QtQml 2.15
 import QtQuick.Dialogs 1.2
 
 QC1.ApplicationWindow {
-  width: 1000
+  width: 1200
   height: 700
   id: root
 

@@ -78,8 +78,6 @@ int main(int argc, char *argv[])
         qWarning()<<"can't not open "<<logPath;
     }
 
-
-
     QQmlApplicationEngine engine;
     qmlRegisterType<CoreBoot>("com.cy.CoreBoot", 1, 0, "CoreBoot");
     qmlRegisterType<LineHighlighter>("com.cy.LineHighlighter", 1, 0, "LineHighlighter");

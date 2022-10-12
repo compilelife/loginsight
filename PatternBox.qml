@@ -50,7 +50,8 @@ Row {
     }
 
     function addCurToCompleter() {
-      if (curText.length === 0)
+      const text = curText.toString()
+      if (text.length === 0)
           return
 
       const { model } = keywordBox
@@ -60,9 +61,11 @@ Row {
       }
 
       model.append({
-                     "keyword": curText,
+                     "keyword": text,
                      "caseSense": isCaseSense,
                      "regex": isRegex
                    })
+
+      keywordBox.editText = text
     }
 }
