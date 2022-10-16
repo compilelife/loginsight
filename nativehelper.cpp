@@ -56,7 +56,7 @@ QString NativeHelper::writeClipboardToTemp()
         return "";
     }
 
-    auto path = QDir::temp().filePath(QString("loginsight-clipboard-%1.txt").arg(QDateTime::currentDateTime().toTime_t()));
+    auto path = QDir::temp().filePath(QString("loginsight-clipboard-%1.txt").arg(QDateTime::currentDateTime().toMSecsSinceEpoch()));
 
     QFile f(path);
     if (!f.open(QIODevice::WriteOnly)) {

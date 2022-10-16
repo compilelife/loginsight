@@ -1,6 +1,5 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
-import QtWebSockets 1.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import './app.js' as App
@@ -21,7 +20,7 @@ QC1.ApplicationWindow {
   title: qsTr("LogInsight")
 
   property alias toast: _toast
-  property MainMenuBar mainMenu: MainMenuBar{id: mainMenu}
+  property var mainMenu : getMainMenu()
 
   property Core core: Core {
     onReady: initRegister()
@@ -31,7 +30,14 @@ QC1.ApplicationWindow {
     id: actions
   }
 
-  menuBar: mainMenu
+  function getMainMenu() {
+      if (Qt.platform.os === 'osx')
+          return Qt.createComponent("qrc:/MacMainMenuBar.qml").createObject()
+      else
+          return Qt.createComponent("qrc:/MainMenuBar.qml").createObject()
+  }
+
+  menuBar:mainMenu
 
   RowLayout {
     id: head
