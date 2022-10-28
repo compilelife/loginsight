@@ -38,7 +38,7 @@ Dlg.Dialog {
           height: 48
         }
         flat: true
-        onClicked: Qt.openUrlExternally('https://mianbaoduo.com/o/bread/YZibl55q')
+        onClicked: Qt.openUrlExternally('https://mbd.pub/o/bread/YZibl55q')
       }
       Button{
         icon{
@@ -48,7 +48,7 @@ Dlg.Dialog {
           height: 48
         }
         flat: true
-        onClicked: Qt.openUrlExternally('https://mianbaoduo.com/o/bread/YZibmZpx')
+        onClicked: Qt.openUrlExternally('https://mbd.pub/o/bread/YZibmZpx')
       }
       Button{
         icon{
@@ -58,7 +58,7 @@ Dlg.Dialog {
           height: 48
         }
         flat: true
-        onClicked: Qt.openUrlExternally('https://mianbaoduo.com/o/bread/YZibmZtp')
+        onClicked: Qt.openUrlExternally('https://mbd.pub/o/bread/YZibmZtp')
       }
       Button{
         icon{
@@ -68,7 +68,7 @@ Dlg.Dialog {
           height: 48
         }
         flat: true
-        onClicked: Qt.openUrlExternally('https://mianbaoduo.com/o/bread/YZibmZtw')
+        onClicked: Qt.openUrlExternally('https://mbd.pub/o/bread/YZibmZtw')
       }
     }
   }

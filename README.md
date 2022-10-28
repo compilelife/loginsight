@@ -61,9 +61,9 @@ github上的bin/core对应开源版的核心功能，如果您已购买专业版
 
 如果该项目对您有帮助，可通过以下方式贡献，以保持项目持续开发：
 
-1. 购买专业版: [Windows](https://mianbaoduo.com/o/bread/YZibl55q)，[Mac](https://mianbaoduo.com/o/bread/YZibmZpx)，[Linux](https://mianbaoduo.com/o/bread/YZibmZtp)，[全平台](https://mianbaoduo.com/o/bread/YZibmZtw)
+1. 购买专业版: [Windows](https://mbd.pub/o/bread/YZibl55q)，[Mac](https://mbd.pub/o/bread/YZibmZpx)，[Linux](https://mbd.pub/o/bread/YZibmZtp)，[全平台](https://mbd.pub/o/bread/YZibmZtw)
 2. 点击右上角的star
 3. 推荐给更多的人
 4. 提出您宝贵的建议, 欢迎提issue/pull request
 
-**mac m1 支持受限！！急需您的帮助**：[众筹入口](https://mianbaoduo.com/o/bread/Y5eXm5xp)
+**mac m1 支持受限！！急需您的帮助**：[众筹入口](https://mbd.pub/o/bread/Y5eXm5xp)
