@@ -103,8 +103,8 @@ function collectPcStatus() {
     extra: {
       cpu: cpus[0]?.model || '',
       core: os.cpus().length,
-      platform: os.platform,
-      arch: os.arch,
+      platform: os.platform(),
+      arch: os.arch(),
       totalMem: os.totalmem(),
       freeMem: os.freemem(),
     }
