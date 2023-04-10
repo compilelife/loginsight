@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+import config from '../../package.json';
 
 export interface UpdateInfo {
     version: string;
@@ -7,10 +8,10 @@ export interface UpdateInfo {
 }
 
 export const useUpdateStore = defineStore('update', ()=>{
-    const currentVersion = 'v3.2.0'
+    const currentVersion = ref(`v${config.version}`);
     const newVersion = ref<UpdateInfo|null>(null)
     const hasNewVersion = computed(()=>{
-        return newVersion.value && newVersion.value?.version != currentVersion
+        return newVersion.value && newVersion.value?.version != currentVersion.value
     })
 
     async function checkNewVersion() {

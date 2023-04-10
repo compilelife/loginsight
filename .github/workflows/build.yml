@@ -31,5 +31,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: release_on_${{ matrix. os }}
-          path: release/
+          path: release/loginsight_*
           retention-days: 5
