@@ -1,49 +1,26 @@
 loginsight致力于打造一款通用的日志分析利器
 
-详细介绍请移步：[官网](http://www.loginsight.top) 或 [使用文档](http://www.loginsight.top/manual/)
+详细介绍请移步：[官网](http://www.loginsight.top) 
 
-![preview](https://z3.ax1x.com/2021/05/24/gxZ9s0.png)
-
-# 专业版内测计划
-截至2023-01-01前，点击这个[专业版下载试用地址](https://www.123pan.com/s/w9c0Vv-s3qxH)下载，并在试用期间发现问题、提出建议，并发给我，将获取免费的专业版密钥！
-
-提交到邮箱：compilelife@163.com
-
-重复问题、建议只采纳先提出者；
-
-问题格式样板：
-
-```
-问题描述：搜索关键词崩溃
-问题复现步骤：
-1. 打开附件日志
-2. 搜索“xxx”关键词
-3. 快速点击“下一个”
-附件： xxxx日志.log
-```
-
-改进建议，格式样板：
-
-```
-建议：tab标题可编辑
-详细描述：可通过右键点击tab栏，选择编辑，修改tab栏标题
-使用场景（重要）：当打开多个同名的日志文件的时候，无法区分哪个是哪个
-```
-
+[![pp7ekYq.png](https://s1.ax1x.com/2023/04/07/pp7ekYq.png)](https://imgse.com/i/pp7ekYq)
 
 # 下载
 
 [下载地址](https://www.123pan.com/s/w9c0Vv-s3qxH)
 
-上述地址是专业版的二进制下载地址（可试用）
+~~上述地址是专业版的二进制下载地址（可试用）~~
 
-如果想使用开源版的，请自行编译
+~~如果想使用开源版的，请自行编译~~
 
-# 更新日志
+为扩大用户数、收集软件改进信息，限时全功能免费，重新收费时间未定，可能一个月，可能一年。
 
-> 下述链接是专业版更新日志；(开源版某些功能没有。开源版以实际运行效果为准）
+代码将收集包括但不限于如下信息，介意者可下载代码修改：
 
-http://www.loginsight.top/manual/changelog.html
+- 打开的文件大小（内容不收集）
+- 电脑配置（CPU / memory）
+- 何时打开本软件
+
+[更新日志](http://www.loginsight.top/manual/changelog.html)
 
 # 版权声明
 
@@ -61,9 +38,10 @@ github上的bin/core对应开源版的核心功能，如果您已购买专业版
 
 如果该项目对您有帮助，可通过以下方式贡献，以保持项目持续开发：
 
-1. 购买专业版: [Windows](https://mbd.pub/o/bread/YZibl55q)，[Mac](https://mbd.pub/o/bread/YZibmZpx)，[Linux](https://mbd.pub/o/bread/YZibmZtp)，[全平台](https://mbd.pub/o/bread/YZibmZtw)
-2. 点击右上角的star
-3. 推荐给更多的人
-4. 提出您宝贵的建议, 欢迎提issue/pull request
+1. 点击右上角的star
+2. 推荐给更多的人
+3. 提出您宝贵的建议, 欢迎提issue/pull request
 
-**mac m1 支持受限！！急需您的帮助**：[众筹入口](https://mbd.pub/o/bread/Y5eXm5xp)
+# 关于Qt版本
+
+如果你是来学习Qt版本的源码的，它已被转移到了`qt-impl`分支，可clone这个分支
