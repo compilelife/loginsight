@@ -24,10 +24,13 @@ jobs:
 
       - name: Build Release Files
         run: npm run build
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: release_on_${{ matrix. os }}
-          path: release/loginsight_*
+          path: |
+            release/loginsight_*
+            release/loginsight-*
           retention-days: 5
