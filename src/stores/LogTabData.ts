@@ -29,6 +29,7 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
   return createStoreInstance('tab', () => {
     const {defaultEncoding} = useSettingsStore()
     const name = nextTabId()
+    const desc = ref('')
     const highlights = reactive<Array<Highlight>>([]);
     const timeline = reactive(newTimeLineData());
     const backend = backendV;
@@ -245,6 +246,7 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       title,
       name,
       openAction,
+      desc,
 
       toolActions,
       addHighlight,

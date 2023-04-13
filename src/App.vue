@@ -13,7 +13,8 @@
     >
       <template #label>
         <span>
-          <span>{{tab.title}}</span>
+          <ElTooltip v-if="tab.desc" :show-after="1000" :content="tab.desc"><span>{{tab.title}}</span></ElTooltip>
+          <span v-else>{{tab.title}}</span>
           <el-icon 
             class="tabCloseBtn"
             @click.stop="rmTab(tab.name)">
@@ -34,7 +35,7 @@
 <script setup lang="ts">
 
 import { Close } from '@element-plus/icons-vue';
-import { ElTabs } from 'element-plus';
+import { ElTabs, ElTooltip } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref } from 'vue';
 import { useDialogStore } from './stores/dialogs';

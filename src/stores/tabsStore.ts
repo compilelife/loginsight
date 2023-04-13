@@ -12,6 +12,7 @@ import {useCollectStore} from './collect'
 export type TabType = 'log' | 'welcome'
 export interface Tab {
   name: string //唯一标识
+  desc?: string 
   title: string
   type: TabType
 }
@@ -75,6 +76,7 @@ export const useTabsStore = defineStore('tabs', () => {
       collect('openProcess', {
         process: arg.args.process,
       })
+      tabData.desc = arg.args.process
       tabData.openAction = arg
     }
     return tabData
@@ -108,6 +110,7 @@ export const useTabsStore = defineStore('tabs', () => {
     const tabData = await openToNewTab(backend => backend.openFile({ path }), `打开文件中：${path}`, fileName)
     if (tabData) {
       tabData.openAction = action
+      tabData.desc = path
       collect('openFile', {
         fileName,
         lineCount: rangeCount(tabData.rootLogView.range)
@@ -118,7 +121,10 @@ export const useTabsStore = defineStore('tabs', () => {
 
   async function openClipboard() {
     const filePath = await platform.readClipboardToFile()
-    return doOpenFile(filePath, false)
+    const ret = await doOpenFile(filePath, false)
+    if (ret)
+      ret.desc = '粘贴板内容'
+    return ret
   }
 
   async function openFile() {
@@ -157,6 +163,7 @@ export const useTabsStore = defineStore('tabs', () => {
     const tabData = await openToNewTab(backend => backend.openMultiFile(arg.args), `正在打开文件夹: ${arg.name}`, arg.name)
     if (tabData) {
       tabData.openAction = arg
+      tabData.desc = `文件夹: ${arg.name}`
       collect('openFolder', {
         folder: arg.name,
         lineCount: rangeCount(tabData.rootLogView.range),
