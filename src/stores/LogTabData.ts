@@ -98,15 +98,13 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
 
     async function handleRangeChanged() {
       const { ranges } = await backend.syncLogs();
-      ranges.forEach(item => {
+      ranges.forEach(async item => {
         const view = getViewByLogId(item.logId);
         if (!view)
           return;
         const rangeChanged = view.updateLogRange(item.range);
         if (rangeChanged && followLog.value) {
-          const viewPortTopLine = Math.max(item.range.begin, item.range.end - 1);
-          view.jumpTo(viewPortTopLine);
-          view.setCurrentLine(item.range.end);
+          await view.goToBottom()
         }
       });
     }

@@ -56,9 +56,7 @@ function gotoTop(){
 }
 
 function gotoBottom() {
-  const view = tab.activeLogView
-  const bottomIndex = view.range.end
-  view.jumpTo(bottomIndex)
+  tab.activeLogView.goToBottom()
 }
 
 function goBack() {

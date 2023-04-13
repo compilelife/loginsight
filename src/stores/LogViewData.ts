@@ -3,19 +3,22 @@ import { computed } from 'vue';
 import { inRange, isValidRange, rangeCount, updateRange } from '../ipc/platform';
 import { ElMessage } from 'element-plus';
 import { createStoreInstance } from './tabsStore';
+import { storeToRefs } from 'pinia';
+import { useSettingsStore } from './Settings';
 
 
 export type LogViewData = ReturnType<typeof newLogViewData>;
 
 export function newLogViewData(backend: IBackend, titleV: string, log: OpenLogResult) {
 	return createStoreInstance('view', () => {
+		const {logFontSize, lineSpacing} = storeToRefs(useSettingsStore())
+		
 		const logId = log.logId;
 		const openAction = ref<FilterArg>()
 		const range = reactive(log.range);
 		const lineCount = computed(() => rangeCount(range));
 		const curLineIndex = ref(0);
 		const focusLineIndex = ref(0);
-		const displayCount = ref(20);
 		const caching = ref(false);
 		let cache: Line[] = [];
 		const title = ref(titleV);
@@ -23,6 +26,11 @@ export function newLogViewData(backend: IBackend, titleV: string, log: OpenLogRe
 		const selectedWord = ref('');
 		const visibleLastLineIndex = ref(0)
 		const forceRefreshing = ref(false);
+		const calculateLineHeight = ref<(s:string)=>number>()
+		const lineHeight = computed(()=>logFontSize.value * lineSpacing.value)
+		const viewPortHeight = ref(0)
+		const displayCount = computed(()=>Math.round(viewPortHeight.value/lineHeight.value)+1)
+		const cacheLen = computed(()=>Math.max(100, displayCount.value))
 		//上次搜索结果位置(原始字节)
 		const lastSearchResult = ref<SearchResult|null>(null)
 		//当continueSearch为true时，从lastSearchResult的位置继续搜索
@@ -72,8 +80,8 @@ export function newLogViewData(backend: IBackend, titleV: string, log: OpenLogRe
 			caching.value = true;
 
 			const loadRange = {
-				begin: Math.max(range.begin, index - 100),
-				end: Math.min(range.end, index + 100)
+				begin: Math.max(range.begin, index - cacheLen.value),
+				end: Math.min(range.end, index + cacheLen.value)
 			};
 			if (!isValidRange(loadRange)) {
 				ElMessage.warning('预加载的位置非法，可能日志内容为空');
@@ -133,6 +141,43 @@ export function newLogViewData(backend: IBackend, titleV: string, log: OpenLogRe
 			focusLineIndex.value = index;
 		}
 
+		async function pageDown() {
+			jumpTo(visibleLastLineIndex.value)
+		}
+
+		async function bottomTo(index: number) {
+			const minLineIndex = Math.max(index - displayCount.value, range.begin)
+			if (!inRange(cacheRange, minLineIndex) || !inRange(cacheRange, index)) {
+				await preload(minLineIndex, true)
+			}
+
+			let height = 0
+			let targetIndex = minLineIndex
+			// console.log(range.begin, range.end, index, minLineIndex, cacheRange.begin, cacheRange.end)
+			for (let i = index; i >= minLineIndex; i--) {
+				if (calculateLineHeight.value) {
+					height += calculateLineHeight.value(getLine(i).content)
+					// console.log(viewPortHeight.value, height, i)
+					if (height > viewPortHeight.value) {
+						targetIndex = Math.min(index, i+1)
+						break
+					}
+				}
+			}
+
+			await jumpTo(targetIndex)
+			setCurrentLine(index)
+			return targetIndex
+		}
+
+		async function goToBottom() {
+			return bottomTo(range.end)
+		}
+
+		async function pageUp() {
+			bottomTo(curLineIndex.value)
+		}
+
 		return {
 			logId,
 			range,
@@ -150,6 +195,9 @@ export function newLogViewData(backend: IBackend, titleV: string, log: OpenLogRe
 			selectedWord,
 			visibleLastLineIndex,
 			forceRefreshing,
+			calculateLineHeight,
+			lineHeight,
+			viewPortHeight,
 
 			addNavHistory,
 			goBack,
@@ -160,7 +208,10 @@ export function newLogViewData(backend: IBackend, titleV: string, log: OpenLogRe
 			getLines,
 			updateLogRange,
 			setCurrentLine,
-			forceRefreshCache
+			forceRefreshCache,
+			pageDown,
+			pageUp,
+			goToBottom
 		};
 	});
 }

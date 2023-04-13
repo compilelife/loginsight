@@ -14,6 +14,15 @@
         :numWidth="numWidth" 
         :search-result="getSearchResult(i)" 
         :line="getLine(i)" />
+      <LogLine
+        ref="lineHeightMeasure"
+        style="visibility: hidden;"
+        :active="false" 
+        :focused="false"
+        :search-result="null"
+        :num-width="numWidth"
+        :syntax-fields="tab.curSyntax.fields"
+        :line="lineToMeasure"/>
     </ul>
     <ScrollBarByLine :count="data.lineCount" :preload="preload" :onFocused="setActivated" v-model="currentIndex" />
     <LogViewMenu :view="data" ref="contextMenu" />
@@ -22,7 +31,7 @@
 
 <script setup lang="ts">
 
-import { ref, watch, computed, toRef, onMounted, inject , Ref} from 'vue'
+import { ref, watch, computed, toRef, onMounted, inject , Ref, reactive} from 'vue'
 import LogLine from './LogLine.vue';
 import ScrollBarByLine from './ScrollBarByLine.vue';
 import { useElementSize, useTextSelection } from '@vueuse/core'
@@ -37,6 +46,14 @@ import { storeToRefs } from 'pinia';
 const { data } = defineProps<{
   data: LogViewData
 }>()
+
+const lineToMeasure = reactive<Line>({
+  index: 0,
+  line: 0,
+  content: '',
+  segs: []
+})
+const lineHeightMeasure = ref<InstanceType<typeof LogLine>>()
 
 const { preload, getLine } = data
 
@@ -54,6 +71,13 @@ const displayRange = computed(() => {
     return []
   return Array.from({ length: data.displayCount }, (_, i) => currentIndex.value + i)
 })
+
+data.calculateLineHeight = (text: string)=>{
+  if (!lineHeightMeasure.value) return 0
+
+  lineHeightMeasure.value.$el.getElementsByTagName('pre')[0].innerText = text
+  return lineHeightMeasure.value.$el.clientHeight
+}
 
 
 function setActivated() {
@@ -103,7 +127,7 @@ async function onUserScroll(ev: WheelEvent) {
 //可见区域高度变化
 const { height: logViewHeight } = useElementSize(logviewElem)
 watch(logViewHeight, () => {
-  data.displayCount = Math.round(logViewHeight.value / (logFontSize.value * lineSpacing.value)) + 1 //15:font-size, 1.5行间距
+  data.viewPortHeight = logViewHeight.value
 })
 
 //右键菜单
@@ -115,7 +139,7 @@ function onContextMenu(ev: MouseEvent) {
   contextMenu.value?.popup(selectedText.value, ev.pageX, ev.pageY)
 }
 
-//这里delay10ms是为了等待日志行的这行排列完成
+//这里delay10ms是为了等待日志行的折行排列完成
 //FIXME:首次加载后的last line计算不准
 watch([currentIndex, firstLoaded], ()=>setTimeout(() => {
   const lines = logviewElem.value?.getElementsByTagName('li')

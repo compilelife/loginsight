@@ -5,7 +5,7 @@
 	@click="$emit('requestFocus', line.index)"
 	@click.right="$emit('requestFocus', line.index)">
 	<div class="num" :class="numStyle">{{ lineNum }}</div>
-	<pre ref="textNode" class="logText"> {{ line.content }}</pre>
+	<pre ref="textNode" class="logText">{{ line.content }}</pre>
 </li>
 
 </template>

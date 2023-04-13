@@ -28,7 +28,7 @@
 <script lang="ts" setup>
 
 import ToolArea from './ToolArea.vue';
-import {inject,computed, toRef} from 'vue'
+import {inject,computed, toRef, watch} from 'vue'
 import { LogTabData } from "../../stores/LogTabData"
 import {ElSelect, ElOption, ElButton} from 'element-plus'
 import ToggleToolAreaButton from './ToggleToolAreaButton.vue';
@@ -37,6 +37,14 @@ import {Refresh} from "@icon-park/vue-next"
 const tab = inject<LogTabData>('tab')!
 const disableSub = computed(()=>tab.activeSubIndex < 0)
 const followLog = toRef(tab, 'followLog')
+watch(followLog, ()=>{
+  if (!followLog.value)
+    return
+  tab.rootLogView.goToBottom()
+  for (const sub of tab.subLogViews) {
+    sub.goToBottom()
+  }
+})
 
 const view = computed({
   get: ()=>{

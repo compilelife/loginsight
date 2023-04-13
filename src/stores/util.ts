@@ -58,9 +58,9 @@ export function maybeLongOperation(text:string, p: Promise<any>) {
   }, 1000)
 }
 
+const canvas = document.createElement('canvas')
+const context = canvas.getContext('2d')!
 export function measureTextWidth(text:string, font: string) {
-  const canvas = document.createElement('canvas')
-  const context = canvas.getContext('2d')!
   context.font = font
   const ret = context.measureText(text)
   return ret.width

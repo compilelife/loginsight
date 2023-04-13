@@ -83,27 +83,12 @@ export function registerShortcuts() {
     {
       key: 'pagedown',
       desc: '向下翻页',
-      handler: () => {
-        const tab = currentTab.value
-        if (!tab) return
-        const view = tab.activeLogView
-
-        view.jumpTo(view.visibleLastLineIndex)
-      }
+      handler: () => currentTab.value?.activeLogView.pageDown()
     },
     {
       key: 'pageup',
       desc: '向上翻页',
-      handler: () => {
-        const tab = currentTab.value
-        if (!tab) return
-        const view = tab.activeLogView
-        //FIXME: 因为没有记录每行高度，所以往前翻没办法估计准要显示多少行
-        //如果当前视口所有行没折行，而上一个视口有折行，下面的计算方式就会导致一些行被跳过
-        //也许多跳几次来缓存各行高度可以解决，就是视觉上很差劲
-        const visibleLines = view.visibleLastLineIndex - view.curLineIndex
-        view.jumpTo(Math.max(view.curLineIndex - visibleLines, view.range.begin))
-      }
+      handler: () => currentTab.value?.activeLogView.pageUp()
     },
     {
       key: 'ctrl+w, ⌘+w',

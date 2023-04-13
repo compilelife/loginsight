@@ -40,7 +40,7 @@ import { storeToRefs } from 'pinia';
 import { onMounted, ref } from 'vue';
 import { useDialogStore } from './stores/dialogs';
 import { Tab, useTabsStore } from './stores/tabsStore';
-import { nextTabId } from './stores/util';
+import { measureTextWidth, nextTabId } from './stores/util';
 import LogTab from './views/LogTab.vue';
 import WelcomeTab from './views/WelcomeTab.vue';
 import OpenCmdDialog from './views/OpenProcDialog.vue';
