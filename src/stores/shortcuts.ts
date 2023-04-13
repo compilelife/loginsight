@@ -81,6 +81,15 @@ export function registerShortcuts() {
       }
     },
     {
+      key: 'q',
+      desc: '切换日志跟随',
+      handler: () => {
+        const tab = currentTab.value
+        if (!tab) return
+        tab.followLog = !tab.followLog
+      }
+    },
+    {
       key: 'pagedown',
       desc: '向下翻页',
       handler: () => currentTab.value?.activeLogView.pageDown()
