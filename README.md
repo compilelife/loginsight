@@ -1,6 +1,6 @@
 loginsight致力于打造一款通用的日志分析利器
 
-详细介绍请移步：[官网](http://www.loginsight.top) 
+详细介绍请移步：[官网](https://www.loginsight.top) 
 
 [![pp7ekYq.png](https://s1.ax1x.com/2023/04/07/pp7ekYq.png)](https://imgse.com/i/pp7ekYq)
 
@@ -20,7 +20,7 @@ loginsight致力于打造一款通用的日志分析利器
 - 电脑配置（CPU / memory）
 - 何时打开本软件
 
-[更新日志](http://www.loginsight.top/manual/changelog.html)
+[更新日志](https://www.loginsight.top/manual/changelog.html)
 
 # 版权声明
 

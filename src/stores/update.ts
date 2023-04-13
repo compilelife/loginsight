@@ -17,7 +17,7 @@ export const useUpdateStore = defineStore('update', ()=>{
     async function checkNewVersion() {
         let  newVersionResponse: UpdateInfo
         try {
-            const response = await fetch('http://www.loginsight.top/api/web/version');
+            const response = await fetch('https://www.loginsight.top/api/web/version');
             newVersionResponse = await response.json();
         }catch(e) {
             console.error('fetch new version failed', e)

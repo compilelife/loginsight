@@ -13,7 +13,7 @@ export const useCollectStore = defineStore('collect', () => {
     const payload = {
       type, machineId, time, extra
     }
-    fetch('http://www.loginsight.top/api/collect', {
+    fetch('https://www.loginsight.top/api/collect', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
