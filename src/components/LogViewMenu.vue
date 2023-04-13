@@ -1,11 +1,13 @@
 
 <template>
 	<ContextMenu v-model:show="show" :options="options">
-		<ContextMenuItem label="添加到时间线" @click="tab.addFocusedLineToTimeLine"/>
 		<ContextMenuItem label="追踪该行" @click="trackLine" />
+		<ContextMenuItem label="添加到时间线" @click="tab.addFocusedLineToTimeLine"/>
 		<template v-if="hasSelectedWord">
 			<ContextMenuItem label="高亮" @click="addHighlight" />
 			<ContextMenuItem label="复制" @click="copy"/>
+			<ContextMenuItem label="过滤" @click="filter(false)" />
+			<ContextMenuItem label="反过滤" @click="filter(true)" />
 		</template>
 	</ContextMenu>
 </template>
@@ -17,7 +19,7 @@ import { ref, reactive, computed, inject } from 'vue';
 import { newHighlight } from "../stores/Highlight"
 import { LogViewData } from "../stores/LogViewData"
 import { LogTabData } from "../stores/LogTabData"
-import { nextRandHighlightColor } from '../stores/util';
+import { maybeLongOperation, nextRandHighlightColor } from '../stores/util';
 import {platform} from '../ipc/platform'
 
 const { view } = defineProps<{
@@ -53,6 +55,18 @@ function addHighlight() {
 
 function copy() {
 	platform.saveTextToClipboard(selectedWord.value)
+}
+
+function filter(reverse: boolean) {
+	const p = tab.addSubViewByFilter({
+		caseSense: true,
+		regex: false,
+		pattern: selectedWord.value,
+		reverse,
+		logId: tab.activeLogView.logId,
+	})
+
+	maybeLongOperation(`正在过滤关键字：${selectedWord.value}`, p)
 }
 
 defineExpose({ popup })
