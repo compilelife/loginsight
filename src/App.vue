@@ -13,8 +13,10 @@
     >
       <template #label>
         <span>
-          <ElTooltip v-if="tab.desc" :show-after="1000" :content="tab.desc"><span>{{tab.title}}</span></ElTooltip>
-          <span v-else>{{tab.title}}</span>
+          <ElTooltip v-if="tab.desc" :show-after="1000" :content="tab.desc">
+            <EditableLabel v-model="tab.title"/>
+          </ElTooltip>
+          <EditableLabel v-else v-model="tab.title"/>
           <el-icon 
             class="tabCloseBtn"
             @click.stop="rmTab(tab.name)">
@@ -51,6 +53,7 @@ import SyntaxPreviewDialog from './views/SyntaxPreviewDialog.vue';
 import { useDropZone } from '@vueuse/core';
 import { platform } from './ipc/platform';
 import ShortcutDialog from './views/ShortcutDialog.vue';
+import EditableLabel from './components/EditableLabel.vue';
 
 const tabsStore = useTabsStore()
 const {tabs, rmTab, smartOpen} = tabsStore
