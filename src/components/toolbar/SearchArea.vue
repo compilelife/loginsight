@@ -12,9 +12,6 @@
         @select="(item:any)=>selectSuggestion(item)"
         @keyup.enter="tab.search(true)"
         style="width: 150px;" >
-        <template #suffix>
-          <ElIcon @click="clearSearchText"><Close/></ElIcon>
-        </template>
       </ElAutocomplete>
     </template>
     <template #down>
@@ -66,10 +63,6 @@ function fetchSuggestions(queryString: string, cb: Function) {
 
 function clearSearchHighlight() {
   tab.activeLogView.lastSearchResult = null
-}
-
-function clearSearchText() {
-  tab.searchData.pattern = ''
 }
 
 function selectSuggestion(item: SearchHistory) {
