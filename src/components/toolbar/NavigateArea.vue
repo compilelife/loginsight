@@ -39,10 +39,21 @@ import { ConnectionArrow} from '@icon-park/vue-next'
 import { computed, inject, ref } from 'vue';
 import { LogTabData } from '../../stores/LogTabData';
 import { ElInput, ElInputNumber } from 'element-plus';
+import { isValidRange } from '../../ipc/platform';
 
 const tab = inject<LogTabData>("tab")!
-const minLine = computed(()=>tab.activeLogView.range.begin+1)
-const maxLine = computed(()=>tab.activeLogView.range.end+1)
+const minLine = computed(()=>{
+  if (isValidRange(tab.activeLogView.range)) {
+    return tab.activeLogView.range.begin+1
+  }
+  return 0
+})
+const maxLine = computed(()=>{
+  if (isValidRange(tab.activeLogView.range)) {
+    return tab.activeLogView.range.end+1
+  }
+  return 0
+})
 const canGoBack = computed(()=>tab.activeLogView.canGoBack)
 const canGoForward = computed(()=>tab.activeLogView.canGoForward)
 const line = ref(0)
