@@ -1,5 +1,6 @@
 <template>
   <ContextMenu v-model:show="show" :options="options">
+    <ContextMenuItem label="追踪" @click="track"/>
     <ContextMenuGroup label="更改颜色">
       <ContextMenuItem v-for="color in prop.colors" :style="{ 'background-color': color }" class="colorItem"
         @click="curColor = color" :label="color">
@@ -9,7 +10,6 @@
       </ContextMenuItem>
     </ContextMenuGroup>
     <ContextMenuItem label="删除" @click="remove"/>
-    <ContextMenuItem label="追踪" @click="track"/>
   </ContextMenu>
 </template>
   

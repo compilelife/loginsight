@@ -11,7 +11,7 @@
 				placement="top"
 				style="margin-left: 2px;">
 				<el-card shadow="hover" class="timenode" :style="{'border-color': item.color}">
-					<ElScrollbar max-height="5em" class="logtextWrapper">
+					<ElScrollbar max-height="6em" class="logtextWrapper">
 						<pre class="logtext">{{ item.text }}</pre>
 					</ElScrollbar>
 					<el-input v-model="item.comment" />
@@ -20,7 +20,7 @@
 		</el-timeline>
 	</ElScrollbar>
 
-	<TimeLineMenu ref="menu" :colors="safeBgColorForWhiteText"/>
+	<TimeLineMenu ref="menu" :colors="safeColorForWhiteBg"/>
 </template>
 
 <script setup lang="ts">
@@ -29,7 +29,7 @@ import { inject, ref, watch, toRef, Ref } from 'vue';
 import { TimeLineNodeData } from "../stores/TimeLineData"
 import { LogTabData } from "../stores/LogTabData"
 import TimeLineMenu from './TimeLineMenu.vue';
-import {safeBgColorForWhiteText} from '../stores/util'
+import {safeColorForWhiteBg} from '../stores/util'
 import { ElScrollbar, ElTimelineItem } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import { useSettingsStore } from '../stores/Settings';
