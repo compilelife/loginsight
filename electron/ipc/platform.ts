@@ -155,7 +155,7 @@ class Backend implements IBackend , IBackendParcel{
     const buf = iconv.encode(line, this.logEncoding)
     return values.map(({offset, length})=>{
       return {
-        offset: iconv.decode(buf.slice(0, offset+1), this.logEncoding).length,
+        offset: iconv.decode(buf.slice(0, offset), this.logEncoding).length,
         length: iconv.decode(buf.slice(offset, offset+length), this.logEncoding).length
       }
     })
