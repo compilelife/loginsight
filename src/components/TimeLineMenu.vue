@@ -2,12 +2,7 @@
   <ContextMenu v-model:show="show" :options="options">
     <ContextMenuItem label="追踪" @click="track"/>
     <ContextMenuGroup label="更改颜色">
-      <ContextMenuItem v-for="color in prop.colors" :style="{ 'background-color': color }" class="colorItem"
-        @click="curColor = color" :label="color">
-      </ContextMenuItem>
-      <ContextMenuItem class="moreColor" :click-close="false" @click="colorInputRef?.click()">
-        更多颜色 <input ref="colorInputRef" v-model="curColor" type="color">
-      </ContextMenuItem>
+      <ColorMenuItems :colors="colors" v-model="curColor"/>
     </ContextMenuGroup>
     <ContextMenuItem label="删除" @click="remove"/>
   </ContextMenu>
@@ -19,6 +14,7 @@ import { ContextMenu, ContextMenuGroup, ContextMenuItem } from '@imengyu/vue3-co
 import { reactive, toRef, ref, inject } from 'vue';
 import { TimeLineNodeData } from "../stores/TimeLineData"
 import { LogTabData } from "../stores/LogTabData"
+import ColorMenuItems from './ColorMenuItems.vue';
 
 const prop = defineProps<{
   colors: string[]
@@ -27,7 +23,6 @@ const prop = defineProps<{
 const tab = inject<LogTabData>('tab')!
 
 const show = ref(false)
-const colorInputRef = ref<HTMLElement>()
 let curColor = ref('red')
 const options = reactive({
   theme: 'flat',

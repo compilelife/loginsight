@@ -1,18 +1,6 @@
 <template>
 <ContextMenu v-model:show="show" :options="options">
-  <ContextMenuItem 
-    v-for="color in prop.colors"
-    :style="{'background-color': color}"
-    class="colorItem"
-    @click="curColor=color"
-    :label="color">
-  </ContextMenuItem>
-  <ContextMenuItem 
-    class="moreColor" 
-    :click-close="false"
-    @click="colorInputRef?.click()">
-    更多颜色 <input ref="colorInputRef" v-model="curColor" type="color" >
-  </ContextMenuItem>
+  <ColorMenuItems :colors="colors" v-model="curColor"/>
 </ContextMenu>
 </template>
 
@@ -20,13 +8,13 @@
 
 import { ContextMenu, ContextMenuItem } from '@imengyu/vue3-context-menu';
 import { reactive, Ref, ref } from 'vue';
+import ColorMenuItems from './ColorMenuItems.vue';
 
 const prop = defineProps<{
   colors: string[]
 }>()
 
 const show = ref(false)
-const colorInputRef = ref<HTMLElement>()
 let curColor = ref('red')
 const options = reactive({
 	theme: 'flat',
