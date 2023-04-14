@@ -227,6 +227,38 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       ])
     }
 
+    function searchSelectedWord() {
+      const view = activeLogView.value
+      if (view.selectedWord.length === 0) {
+        return toolActions.beginSearch()
+      }
+
+      searchData.pattern = view.selectedWord
+      searchData.caseSense = true
+      searchData.regex = false
+      search(true)
+    }
+
+    function filterSelectedWord() {
+      const view = activeLogView.value
+      if (view.selectedWord.length === 0) {
+        return toolActions.beginFilter()
+      }
+
+      filter({
+        pattern: view.selectedWord,
+        regex: false,
+        caseSense: true,
+        reverse: false,
+        logId: view.logId,
+      })
+
+    }
+
+    function filter(arg: FilterArg) {
+      maybeLongOperation(`正在过滤${arg.pattern}`, addSubViewByFilter(arg))
+    }
+
     return {
       highlights,
       timeline,
@@ -257,6 +289,9 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       toggleLogEncoding,
       search,
       refresh,
+      searchSelectedWord,
+      filter,
+      filterSelectedWord
     };
   });
 }

@@ -42,7 +42,7 @@ export function registerShortcuts() {
     {
       key: 's, ctrl+f, ⌘+f',
       desc: '搜索当前日志视图',
-      handler: () => currentTab.value?.toolActions.beginSearch()
+      handler: () => currentTab.value?.searchSelectedWord()
     },
     {
       key: 'd, ctrl+g, ⌘+g',
@@ -52,7 +52,7 @@ export function registerShortcuts() {
     {
       key: 'f',
       desc: '过滤',
-      handler: () => currentTab.value?.toolActions.beginFilter()
+      handler: () => currentTab.value?.filterSelectedWord()
     },
     {
       key: 't',

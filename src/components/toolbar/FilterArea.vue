@@ -83,14 +83,14 @@ function beginFilter(revert: boolean) {
 }
 
 function doFilter() {
-  const p = tab.addSubViewByFilter({
+  tab.filter({
     caseSense: caseSense.value,
     regex: regex.value,
     pattern: pattern.value,
     logId: 0,
     reverse: revertFilter.value
   })
-  maybeLongOperation('过滤中', p)
+  
   showFilterForm.value = false
 }
 

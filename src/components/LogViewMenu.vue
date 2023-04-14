@@ -58,15 +58,13 @@ function copy() {
 }
 
 function filter(reverse: boolean) {
-	const p = tab.addSubViewByFilter({
+	tab.filter({
 		caseSense: true,
 		regex: false,
 		pattern: selectedWord.value,
 		reverse,
 		logId: tab.activeLogView.logId,
 	})
-
-	maybeLongOperation(`正在过滤关键字：${selectedWord.value}`, p)
 }
 
 defineExpose({ popup })

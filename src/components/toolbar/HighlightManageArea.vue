@@ -53,14 +53,13 @@ function onFilter() {
   if (!curItem)
     return
 
-  const p = tab.addSubViewByFilter({
+  tab.filter({
     caseSense:true,
     regex: false,
     pattern: curItem!.keyword,
     reverse: false,
     logId: tab.activeLogView.logId,
   })
-  maybeLongOperation(`正在过滤关键字：${curItem!.keyword}`, p)
 }
 
 function showMenu(ev: MouseEvent, item: Highlight) {
