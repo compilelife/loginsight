@@ -5,6 +5,7 @@ import { dispatcher } from '../ipc/dispatcher'
 import { platform } from '../ipc/platform'
 import { machineIdSync } from 'node-machine-id'
 import os from 'node:os'
+import config from '../../package.json';
 
 // The built directory structure
 //
@@ -107,6 +108,7 @@ function collectPcStatus() {
       arch: os.arch(),
       totalMem: os.totalmem(),
       freeMem: os.freemem(),
+      version: config.version
     }
   }
   fetch('https://www.loginsight.top/api/collect', {
