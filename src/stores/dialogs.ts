@@ -4,6 +4,7 @@ import OpenProcDialog from "../views/OpenProcDialog.vue";
 import OpenFolderDialog from "../views/OpenFolderDialog.vue";
 import SettingsDlgVue from "../views/SettingsDlg.vue";
 import SyntaxPreviewDialogVue from "../views/SyntaxPreviewDialog.vue";
+import SyntaxManageDialog from "../views/SyntaxManageDialog.vue";
 import { LogTabData } from "./LogTabData";
 import ShortcutDialog from '../views/ShortcutDialog.vue'
 
@@ -13,6 +14,7 @@ export const useDialogStore = defineStore('dialogs', ()=>{
   const refToSettingsDlg = ref<InstanceType<typeof SettingsDlgVue>>()
   const refToSyntaxDlg = ref<InstanceType<typeof SyntaxPreviewDialogVue>>()
   const refToShortcutDlg = ref<InstanceType<typeof ShortcutDialog>>()
+  const refToSyntaxManagerDlg = ref<InstanceType<typeof SyntaxManageDialog>>()
 
   function showOpenProcDlg() {
     return refToOpenProcDlg.value!.show()
@@ -34,17 +36,23 @@ export const useDialogStore = defineStore('dialogs', ()=>{
     refToShortcutDlg.value!.show()
   }
 
+  function showSyntaxManagerDlg() {
+    return refToSyntaxManagerDlg.value!.show()
+  }
+
   return {
     refToOpenProcDlg,
     refToOpenFolderDlg,
     refToSettingsDlg,
     refToSyntaxDlg,
     refToShortcutDlg,
+    refToSyntaxManagerDlg,
 
     showOpenProcDlg,
     showOpenFolderDlg,
     showSettingsDlg,
     showSyntaxDlg,
-    showShortcutDlg
+    showShortcutDlg,
+    showSyntaxManagerDlg
   }
 })

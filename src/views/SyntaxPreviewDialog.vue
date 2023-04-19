@@ -9,6 +9,14 @@
         v-model="pattern"
         placeholder="输入正则表达式，使用捕获创建字段"/>
       <ElButton type="primary" @click="onPreview">预览</ElButton>
+      <ElPopover :visible="visbilityOfSyntaxName">
+        <ElInput size="small" placeholder="输入规则名称" v-model="syntaxName" style="margin-bottom: 10px;"/>
+        <ElButton type="primary" size="small" @click="onSave">确定</ElButton>
+        <ElButton size="small" @click="visbilityOfSyntaxName = false">取消</ElButton>
+        <template #reference>
+          <ElButton @click="visbilityOfSyntaxName = true">保存</ElButton>
+        </template>
+      </ElPopover>
       <ElButton @click="onManage">管理</ElButton>
     </div>
     <div class="row2">
@@ -50,7 +58,7 @@
 
 
       <!-- 日志预览 -->
-      <ElScrollbar class="previewLogView">
+      <ElScrollbar class="previewLogView" ref="refLogPreview">
         <LogLine v-for="(line,index) in lines"
           :line="line"
           :key="tab?.name+'-'+line.line"
@@ -77,9 +85,9 @@
 </template>
 
 <script setup lang="ts">
-import { ElButton, ElDialog, ElInput, ElTableColumn, ElTable, ElConfigProvider, ElMessage, ElScrollbar } from 'element-plus';
+import { ElButton, ElDialog, ElInput, ElTableColumn, ElTable, ElConfigProvider, ElMessage, ElScrollbar, ElPopover } from 'element-plus';
 import { ref,provide, toRef, reactive, computed, toRaw } from 'vue';
-import {LogTabData, SyntaxField} from '../stores/LogTabData'
+import {LogTabData, Syntax, SyntaxField} from '../stores/LogTabData'
 import { measureTextWidth, nextRandTextColor, safeColorForWhiteBg } from '../stores/util';
 import LogLine from '../components/LogLine.vue';
 import {LineSegType} from '../ipc/platform'
@@ -88,6 +96,9 @@ import PickColorMenu from '../components/PickColorMenu.vue';
 import { storeToRefs } from 'pinia';
 import { useSettingsStore } from '../stores/Settings';
 import { useCollectStore } from '../stores/collect';
+import { useDialogStore } from '../stores/dialogs';
+import { useSyntaxStore } from '../stores/syntax';
+import { table } from 'console';
 
 const lines = reactive<Array<Line>>([])
 
@@ -99,6 +110,11 @@ const {collect} = useCollectStore()
 
 const pattern = ref('')
 const fields = reactive<SyntaxField[]>([])
+
+const visbilityOfSyntaxName = ref(false)
+const syntaxName = ref('')
+
+const refLogPreview = ref<InstanceType<typeof ElScrollbar>|null>(null)
 
 const pickColorMenu = ref<InstanceType<typeof PickColorMenu>>()
 
@@ -114,8 +130,12 @@ function show(curTab: LogTabData, previewLines: Array<Line>) {
   lines.splice(0, lines.length)
   lines.push(...previewLines)
   visible.value = true
-  pattern.value = tab.value!.curSyntax.pattern
-  fields.splice(0, fields.length, ...tab.value!.curSyntax.fields)
+  fillData(tab.value!.curSyntax)
+}
+
+function fillData(syntax: Syntax) {
+  pattern.value = syntax.pattern
+  fields.splice(0, fields.length, ...syntax.fields)
 }
 
 function delField(index: number) {
@@ -137,21 +157,7 @@ async function onConfirm() {
   
   visible.value = false
 
-  await tab.value!.backend.setLineSegment({
-    pattern: pattern.value,
-    caseSense: true,
-    segs: fields.map(field=>({
-      type: LineSegType.Str,
-      name: field.name,
-      extra: {}
-    }))
-  })
-
-  tab.value!.curSyntax = {pattern: pattern.value, fields}
-
-  await tab.value!.refresh()
-
-  collect('setSyntax', toRaw(tab.value!.curSyntax))
+  tab.value?.setSyntax({pattern: pattern.value, fields})
 }
 
 function onCancel() {
@@ -171,8 +177,28 @@ async function onPreview() {
   }
 }
 
-function onManage() {
-  ElMessage.warning('功能开发中')
+function onSave() {
+  if (syntaxName.value.length === 0) {
+    ElMessage.warning('名称不能为空')
+    return
+  }
+
+  useSyntaxStore().addItem({
+    name: syntaxName.value,
+    pattern: pattern.value, 
+    fields,
+    previewLog: refLogPreview.value?.$el.getElementsByTagName('pre')[0].innerHTML ?? ''
+  })
+  visbilityOfSyntaxName.value = false
+  ElMessage.success('保存成功')
+}
+
+async function onManage() {
+  const selectedSyntax = await useDialogStore().showSyntaxManagerDlg()
+  if (selectedSyntax) {
+    fillData(selectedSyntax)
+    onPreview()
+  } 
 }
 
 function showPickColorMenu(ev: MouseEvent, fieldIndex: number) {
@@ -198,7 +224,7 @@ defineExpose({
 }
 .row1 button {
   flex-grow: 0;
-  margin-left: 20px;
+  margin-left: 10px;
 }
 .row2 {
   display: flex;

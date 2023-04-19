@@ -1,5 +1,5 @@
 import { computed, reactive, ref, watch, watchEffect } from 'vue';
-import { inRange } from '../ipc/platform';
+import { LineSegType, inRange } from '../ipc/platform';
 import { ElMessage } from 'element-plus';
 import { createStoreInstance, TabType } from './tabsStore';
 import { Highlight } from "./Highlight";
@@ -9,6 +9,7 @@ import { newSearchData } from './SearchData';
 import { maybeLongOperation, nextTabId } from './util';
 import { RecentItem } from './recents';
 import { useSettingsStore } from './Settings';
+import { useCollectStore } from './collect';
 
 
 export type LogTabData = ReturnType<typeof newLogTabData>;
@@ -50,6 +51,7 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       beginFilter: ()=>{},
       beginJump: ()=>{},
     }
+    const {collect} = useCollectStore()
 
     backend.setLogEncoding(logEncoding.value)
 
@@ -259,6 +261,24 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       maybeLongOperation(`正在过滤${arg.pattern}`, addSubViewByFilter(arg))
     }
 
+    async function setSyntax(syntax: Syntax) {
+      await backend.setLineSegment({
+        pattern: syntax.pattern,
+        caseSense: true,
+        segs: syntax.fields.map(field=>({
+          type: LineSegType.Str,
+          name: field.name,
+          extra: {}
+        }))
+      })
+    
+      curSyntax.value = syntax
+    
+      await refresh()
+    
+      collect('setSyntax', curSyntax.value)
+    }
+
     return {
       highlights,
       timeline,
@@ -291,7 +311,8 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       refresh,
       searchSelectedWord,
       filter,
-      filterSelectedWord
+      filterSelectedWord,
+      setSyntax
     };
   });
 }

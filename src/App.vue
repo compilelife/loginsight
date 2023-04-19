@@ -32,6 +32,7 @@
   <SettingsDlg ref="refToSettingsDlg"/>
   <SyntaxPreviewDialog ref="refToSyntaxDlg"/>
   <ShortcutDialog ref="refToShortcutDlg"/>
+  <SyntaxManageDialog ref="refToSyntaxManagerDlg"/>
 </template>
   
 <script setup lang="ts">
@@ -50,6 +51,7 @@ import OpenFolderDialog from './views/OpenFolderDialog.vue';
 import SettingsDlg from './views/SettingsDlg.vue';
 import { registerShortcuts } from './stores/shortcuts';
 import SyntaxPreviewDialog from './views/SyntaxPreviewDialog.vue';
+import SyntaxManageDialog from './views/SyntaxManageDialog.vue';
 import { useDropZone } from '@vueuse/core';
 import { platform } from './ipc/platform';
 import ShortcutDialog from './views/ShortcutDialog.vue';
@@ -59,7 +61,14 @@ const tabsStore = useTabsStore()
 const {tabs, rmTab, smartOpen} = tabsStore
 
 const dlgStore = useDialogStore()
-const {refToOpenProcDlg, refToOpenFolderDlg, refToSettingsDlg, refToSyntaxDlg, refToShortcutDlg} = storeToRefs(dlgStore)
+const {
+  refToOpenProcDlg, 
+  refToOpenFolderDlg, 
+  refToSettingsDlg, 
+  refToSyntaxDlg, 
+  refToShortcutDlg,
+  refToSyntaxManagerDlg
+} = storeToRefs(dlgStore)
 
 function componentForTab(tab: Tab) {
   return tab.type === 'log' ? LogTab : WelcomeTab

@@ -41,7 +41,14 @@
   <ToolButton label="反过滤" @click="beginFilter(true)">
     <Filter theme="filled" />
   </ToolButton>
-  <ToolButton label="语法" @click="showSyntaxDlg"><Code /></ToolButton>
+  <ElDropdown trigger="click">
+    <ToolButton label="语法"><Code /></ToolButton>
+    <template #dropdown>
+      <ElDropdownItem v-for="item of syntaxs.items"
+        @click="tab.setSyntax(item)">{{ item.name }}</ElDropdownItem>
+      <ElDropdownItem @click="showSyntaxDlg">新增</ElDropdownItem>
+    </template>
+  </ElDropdown>
 </template>
 </template>
 
@@ -52,11 +59,13 @@ import { inject, ref, toRaw, watch,nextTick } from 'vue'
 import { LogTabData } from "../../stores/LogTabData";
 import {Filter, Code} from '@icon-park/vue-next'
 import ToolArea from './ToolArea.vue';
-import { ElButton, ElInput, Instance } from 'element-plus';
+import { ElButton, ElDropdown, ElDropdownItem, ElInput, Instance } from 'element-plus';
 import ToggleToolAreaButton from './ToggleToolAreaButton.vue';
 import {FontSize, Block} from '@icon-park/vue-next'
 import {maybeLongOperation} from '../../stores/util'
 import { useDialogStore } from '../../stores/dialogs';
+import { useSyntaxStore } from '../../stores/syntax';
+import { computed } from '@vue/reactivity';
 
 const tab = inject<LogTabData>('tab')!
 
@@ -76,6 +85,8 @@ watch(inputRef, ()=>{
     }, 10);
   }
 })
+
+const syntaxs = useSyntaxStore()
 
 function beginFilter(revert: boolean) {
   revertFilter.value = revert
