@@ -4,7 +4,12 @@
     width="90%"
     title="语法管理">
     <!-- 表格 -->
-    <el-table border :data="items" @current-change="handleCurrentChange" :highlight-current-row="true">
+    <el-table 
+      border 
+      :data="items" 
+      @current-change="handleCurrentChange" 
+      :highlight-current-row="true"
+      max-height="400">
       <el-table-column prop="name" label="名字">
         <template #default="{row}">
           <el-input v-if="row === curItem && curEditing" 
@@ -13,16 +18,18 @@
           <span v-else>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="pattern" label="匹配规则"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column prop="pattern" label="匹配规则" min-width="200"></el-table-column>
+      <el-table-column label="操作" >
         <template #default="{ row, $index }">
           <el-button type="success" link @click="select(row)">选择</el-button>
-          <el-button  link @click="curEditing=true">重命名</el-button>
-          <el-popconfirm title="确定要删除吗？" @confirm="removeItem($index)">
-            <template #reference>
-              <el-button type="danger" link>删除</el-button>
-            </template>
-          </el-popconfirm>
+          <template v-if="!row.unmodify">
+            <el-button link @click="curEditing=true">重命名</el-button>
+            <el-popconfirm title="确定要删除吗？" @confirm="removeItem($index)">
+              <template #reference>
+                <el-button type="danger" link>删除</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
         </template>
       </el-table-column>
     </el-table>
@@ -36,7 +43,7 @@
 <script setup lang="ts">
 
 import { computed, ref, watch, watchEffect } from 'vue'
-import { ElTable, ElTableColumn, ElButton, ElInput, ElDialog, ElPopconfirm } from 'element-plus'
+import { ElTable, ElTableColumn, ElButton, ElInput, ElDialog, ElPopconfirm, ElText } from 'element-plus'
 import {SyntaxStoreItem, useSyntaxStore} from '../stores/syntax'
 import { storeToRefs } from 'pinia'
 
