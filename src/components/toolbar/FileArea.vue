@@ -48,14 +48,18 @@ const { recents } = useRecents()
 const {collect} = useCollectStore()
 
 async function userSaveProject() {
-  const { canceled, filePath } = await platform.showSaveDialog({
+  let { canceled, filePath } = await platform.showSaveDialog({
     properties: ['openFile'],
     filters: [
       { name: 'project file', extensions: ['liprj'] }
     ]
   })
-  if (canceled)
+  if (canceled || !filePath)
     return
+
+  if (!filePath.endsWith('.liprj')) {
+    filePath += '.liprj'
+  }
 
   const content = saveProject()
   collect('saveProject',{filePath})
@@ -64,6 +68,8 @@ async function userSaveProject() {
 
   if (errorMessage.length > 0) {
     ElMessage.error(errorMessage)
+  }else {
+    ElMessage.success(`项目保存成功：${filePath}`)
   }
 }
 </script>
