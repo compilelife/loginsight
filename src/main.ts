@@ -11,6 +11,8 @@ import 'element-plus/dist/index.css'
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 import ContextMenu from '@imengyu/vue3-context-menu'
 
+import '@vscode/codicons/dist/codicon.css'
+
 const pinia = createPinia()
 
 window.host.ipcCallback(dispatcher.dispatch.bind(dispatcher))

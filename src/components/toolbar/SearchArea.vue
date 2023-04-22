@@ -19,21 +19,26 @@
         <ToggleToolAreaButton 
           v-model="caseSense"
           tooltip="区分大小写">
-          <FontSize />
+          <VscodeIcon name="case-sensitive"/>
         </ToggleToolAreaButton>
         <ToggleToolAreaButton
           v-model="regex"
           tooltip="使用正则表达式">
-          <Block />
+          <VscodeIcon name="regex"/>
+        </ToggleToolAreaButton>
+        <ToggleToolAreaButton
+          v-model="wholeWord"
+          tooltip="全词匹配">
+          <VscodeIcon name="whole-word"/>
         </ToggleToolAreaButton>
         <ToolAreaButton tooltip="下一个匹配项" @trigger="tab.search(true)">
-          <ArrowDown />
+          <VscodeIcon name="arrow-down"/>
         </ToolAreaButton>
         <ToolAreaButton tooltip="上一个匹配项" @trigger="tab.search(false)">
-          <ArrowUp />
+          <VscodeIcon name="arrow-up"/>
         </ToolAreaButton>
         <ToolAreaButton tooltip="清除搜索高亮" @trigger="clearSearchHighlight">
-          <ClearFormat />
+          <VscodeIcon name="clear-all"/>
         </ToolAreaButton>
       </span>
     </template>
@@ -44,17 +49,18 @@
 import ToolArea from './ToolArea.vue';
 import {ElAutocomplete, ElIcon} from 'element-plus'
 import ToolAreaButton from './ToolAreaButton.vue'
-import {ArrowUp, ArrowDown, Block,FontSize, ClearFormat, Close} from '@icon-park/vue-next'
 import { inject, toRef, ref } from 'vue';
 import { LogTabData } from '../../stores/LogTabData';
 import ToggleToolAreaButton from './ToggleToolAreaButton.vue';
 import { SearchHistory } from '../../stores/SearchData';
+import VscodeIcon from '../VscodeIcon.vue';
 
 const tab = inject<LogTabData>('tab')!
 const searchData = tab.searchData
 const caseSense = toRef(searchData, 'caseSense')
 const regex = toRef(searchData, 'regex')
 const pattern = toRef(searchData, 'pattern')
+const wholeWord = toRef(searchData, 'wholeWord')
 const inputRef = ref<InstanceType<typeof ElAutocomplete>>()
 
 function fetchSuggestions(queryString: string, cb: Function) {
@@ -80,3 +86,7 @@ tab.toolActions.beginSearch = ()=>{
 
 </script>
 
+<style scoped>
+.abc::before{
+  content: '\eb7e';
+}</style>

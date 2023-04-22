@@ -194,6 +194,18 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
         ElMessage.warning('未指定搜索词')
         return
       }
+
+      //全词匹配的处理：转换为\b正则匹配
+      let {pattern, regex} = searchData
+      if (searchData.wholeWord) {
+        if (searchData.regex) {
+          pattern = '\\b'+pattern+'\\b'
+        } else {
+          pattern = '\\b'+pattern.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&")+'\\b'
+          regex = true
+        }
+      }
+
       const arg: SearchArg = {
         fromChar: 0,
         fromLine: view.focusLineIndex,
@@ -201,8 +213,8 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
         reverse: !forward,
         toLine: forward ? view.range.end : view.range.begin,
         caseSense: searchData.caseSense,
-        regex: searchData.regex,
-        pattern: searchData.pattern
+        regex: regex,
+        pattern: pattern
       }
       //从光标处连续搜索
       if (view.continueSearch && view.lastSearchResult) {
@@ -284,6 +296,7 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       searchData.pattern = view.selectedWord
       searchData.caseSense = true
       searchData.regex = false
+      searchData.wholeWord = false
       search(true)
     }
 

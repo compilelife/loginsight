@@ -160,4 +160,8 @@ body {
   z-index: 3000 !important;
 }
 
+.toolcodicon {
+  font-size: 18px;
+}
+
 </style>

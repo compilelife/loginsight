@@ -12,19 +12,19 @@
     <template #down>
       <span>
         <ToolAreaButton tooltip="第一行" @trigger="gotoTop">
-          <ArrowUp />
+          <VscodeIcon name="chevron-up"/>
         </ToolAreaButton>
         <ToolAreaButton tooltip="最后一行" @trigger="gotoBottom">
-          <ArrowDown />
+          <VscodeIcon name="chevron-down"/>
         </ToolAreaButton>
         <ToolAreaButton tooltip="回退" @trigger="goBack" :disabled="!canGoBack">
-          <ArrowLeft />
+          <VscodeIcon name="chevron-left"/>
         </ToolAreaButton>
         <ToolAreaButton tooltip="前进" @trigger="goForward" :disabled="!canGoForward">
-          <ArrowRight />
+          <VscodeIcon name="chevron-right"/>
         </ToolAreaButton>
         <ToolAreaButton tooltip="追踪当前行" @trigger="trackCurLine">
-          <ConnectionArrow />
+          <VscodeIcon name="type-hierarchy-sub"/>
         </ToolAreaButton>
       </span>
     </template>
@@ -40,6 +40,7 @@ import { computed, inject, ref } from 'vue';
 import { LogTabData } from '../../stores/LogTabData';
 import { ElInput, ElInputNumber } from 'element-plus';
 import { isValidRange } from '../../ipc/platform';
+import VscodeIcon from '../VscodeIcon.vue';
 
 const tab = inject<LogTabData>("tab")!
 const minLine = computed(()=>{

@@ -17,12 +17,12 @@
         <ToggleToolAreaButton 
           v-model="caseSense"
           tooltip="区分大小写">
-          <FontSize />
+          <VscodeIcon name="case-sensitive"/>
         </ToggleToolAreaButton>
         <ToggleToolAreaButton
           v-model="regex"
           tooltip="使用正则表达式">
-          <Block />
+          <VscodeIcon name="regex"/>
         </ToggleToolAreaButton>
         <ElButton size="small" type="primary" @click="doFilter" text>
           确定
@@ -65,7 +65,7 @@ import {FontSize, Block} from '@icon-park/vue-next'
 import {maybeLongOperation} from '../../stores/util'
 import { useDialogStore } from '../../stores/dialogs';
 import { useSyntaxStore } from '../../stores/syntax';
-import { computed } from '@vue/reactivity';
+import VscodeIcon from '../VscodeIcon.vue';
 
 const tab = inject<LogTabData>('tab')!
 

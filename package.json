@@ -39,6 +39,7 @@
   "dependencies": {
     "@icon-park/vue-next": "^1.4.2",
     "@imengyu/vue3-context-menu": "^1.2.3",
+    "@vscode/codicons": "0.0.32",
     "@vueuse/core": "^9.12.0",
     "element-plus": "^2.2.31",
     "font-measure": "^1.2.2",

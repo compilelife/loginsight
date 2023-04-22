@@ -5,6 +5,7 @@ export interface SearchHistory {
   caseSense: boolean
   regex: boolean
   pattern: string
+  wholeWord: boolean
 }
 
 export function newSearchData() {
@@ -13,6 +14,7 @@ export function newSearchData() {
     const regex = ref(false)
     const history = Array<SearchHistory>()
     const pattern = ref('')
+    const wholeWord = ref(false)
 
     function getSuggestion(word: string) {
       return history.filter(item=>item.pattern.indexOf(word) !== -1)
@@ -24,7 +26,8 @@ export function newSearchData() {
       history.push({
         caseSense: caseSense.value, 
         regex: regex.value, 
-        pattern: pattern.value
+        pattern: pattern.value,
+        wholeWord: wholeWord.value
       })
     }
 
@@ -32,6 +35,7 @@ export function newSearchData() {
       caseSense,
       regex,
       pattern,
+      wholeWord,
 
       getSuggestion,
       saveToHistory
