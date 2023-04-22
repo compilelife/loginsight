@@ -1,6 +1,6 @@
 import { computed, reactive, ref, watch, watchEffect } from 'vue';
 import { LineSegType, inRange } from '../ipc/platform';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { createStoreInstance, TabType } from './tabsStore';
 import { Highlight } from "./Highlight";
 import { newTimeLineData, newTimeLineNodeData, TimeLineData } from "./TimeLineData";
@@ -190,11 +190,16 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
 
     async function search(forward: boolean) {
       const view = activeLogView.value
+      if (searchData.pattern.length === 0) {
+        ElMessage.warning('未指定搜索词')
+        return
+      }
       const arg: SearchArg = {
         fromChar: 0,
         fromLine: view.focusLineIndex,
         logId: view.logId,
         reverse: !forward,
+        toLine: forward ? view.range.end : view.range.begin,
         caseSense: searchData.caseSense,
         regex: searchData.regex,
         pattern: searchData.pattern
@@ -209,16 +214,57 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
 
       searchData.saveToHistory()
       const p = backend.search(arg)
-      maybeLongOperation('搜索中...', p)
+      maybeLongOperation(`搜索${arg.pattern}...`, p)
       const ret = await p
       if (ret.found) {
         view.lastSearchResult = ret
         view.jumpTo(ret.index, true)
       } else {
-        if (forward)
-          ElMessage.warning(`向下搜索到文件结束未找到${arg.pattern}`)
-        else
-          ElMessage.warning(`向上搜索到文件开始未找到${arg.pattern}`)
+        const noop = ()=>{}
+        if (forward) {
+          ElMessageBox.confirm(
+            `从${arg.fromLine+1}行向下搜索到文件末尾，未找到${arg.pattern}，是否从文件头继续搜索？`,
+            '搜索',
+            {
+              type: 'warning',
+              confirmButtonText: '确定',
+              cancelButtonText: '取消'
+            }).then(async()=>{
+              arg.toLine = arg.fromLine;
+              arg.fromLine = view.range.begin;
+              const p = backend.search(arg)
+              maybeLongOperation('从头搜索中...', p)
+              const ret = await p
+              if (ret.found) {
+                view.lastSearchResult = ret
+                view.jumpTo(ret.index, true)
+              } else {
+                ElMessage.warning(`搜索完整个文件，未找到${arg.pattern}`)
+              }
+            }, noop)
+        }
+        else {
+          ElMessageBox.confirm(
+            `从${arg.fromLine+1}行向上搜索到文件开头，未找到${arg.pattern}，是否从文件末尾继续搜索？`,
+            '搜索',
+            {
+              type: 'warning',
+              confirmButtonText: '确定',
+              cancelButtonText: '取消'
+            }).then(async()=>{
+              arg.toLine = arg.fromLine;
+              arg.fromLine = view.range.end;
+              const p = backend.search(arg)
+              maybeLongOperation('从末尾搜索中...', p)
+              const ret = await p
+              if (ret.found) {
+                view.lastSearchResult = ret
+                view.jumpTo(ret.index, true)
+              } else {
+                ElMessage.warning(`搜索完整个文件，未找到${arg.pattern}`)
+              }
+            }, noop)
+        }
       }
     }
 

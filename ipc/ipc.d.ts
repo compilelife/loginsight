@@ -79,6 +79,7 @@ interface SearchArg {
   logId: number
   fromLine: number
   fromChar: number
+  toLine: number
   reverse: boolean
   regex: boolean
   pattern: string
