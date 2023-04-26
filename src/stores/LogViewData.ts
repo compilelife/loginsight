@@ -146,6 +146,8 @@ export function newLogViewData(backend: IBackend, titleV: string, log: OpenLogRe
 		}
 
 		async function bottomTo(index: number) {
+			if (!isValidRange(range))
+				return
 			const minLineIndex = Math.max(index - displayCount.value, range.begin)
 			if (!inRange(cacheRange, minLineIndex) || !inRange(cacheRange, index)) {
 				await preload(minLineIndex, true)
@@ -153,8 +155,9 @@ export function newLogViewData(backend: IBackend, titleV: string, log: OpenLogRe
 
 			let height = 0
 			let targetIndex = minLineIndex
-			// console.log(range.begin, range.end, index, minLineIndex, cacheRange.begin, cacheRange.end)
+			//console.log(range.begin, range.end, index, minLineIndex, cacheRange.begin, cacheRange.end)
 			for (let i = index; i >= minLineIndex; i--) {
+				//console.log('calcualte line height', i, cache)
 				if (calculateLineHeight.value) {
 					height += calculateLineHeight.value(getLine(i).content)
 					// console.log(viewPortHeight.value, height, i)
@@ -176,6 +179,12 @@ export function newLogViewData(backend: IBackend, titleV: string, log: OpenLogRe
 
 		async function pageUp() {
 			bottomTo(curLineIndex.value)
+		}
+
+		function dropCache() {
+			cacheRange.begin = 0
+			cacheRange.end = -1
+			cache = []
 		}
 
 		return {
@@ -211,7 +220,8 @@ export function newLogViewData(backend: IBackend, titleV: string, log: OpenLogRe
 			forceRefreshCache,
 			pageDown,
 			pageUp,
-			goToBottom
+			goToBottom,
+			dropCache
 		};
 	});
 }

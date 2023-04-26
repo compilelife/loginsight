@@ -76,6 +76,9 @@ class Backend implements IBackend {
     this.id = parcel.id
     this.callbackId = `${this.id}-callback`
   }
+  clearLog(arg:{ logId: number }): Promise<void> {
+      return this.invoke('clearLog', arg)
+  }
   exportLog(arg: ExportLogArg): Promise<any> {
     return this.invoke('exportLog', arg)
   }

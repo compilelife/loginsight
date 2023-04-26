@@ -160,6 +160,7 @@ interface IBackend {
   setLineSegment(arg: SetLineSegmentArg): Promise<void>
   openMultiFile(arg: OpenFolderArg): Promise<OpenLogResult>
   exportLog(arg: ExportLogArg): Promise<any>
+  clearLog({logId: number}): Promise<void>
 
   mapOffsetFromLog(line: string, values: LineRegion[]): LineRegion[] | Promise<LineRegion[]>
 }

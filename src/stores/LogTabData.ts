@@ -45,6 +45,7 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
     const curSyntax = ref<Syntax>({ pattern: '', fields: [] })
     const title = computed(() => rootLogView.title)
     const type: TabType = 'log'
+    const canClear = ref(false)
     const openAction = ref<RecentItem>()
     const toolActions = {
       beginSearch: ()=>{},
@@ -338,6 +339,12 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       collect('setSyntax', curSyntax.value)
     }
 
+    function clearLog() {
+      rootLogView.dropCache()
+      subLogViews.forEach(s => s.dropCache())
+      return backend.clearLog({logId: rootLogId})
+    }
+
     return {
       highlights,
       timeline,
@@ -356,6 +363,7 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       name,
       openAction,
       desc,
+      canClear,
 
       toolActions,
       addHighlight,
@@ -371,7 +379,8 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       searchSelectedWord,
       filter,
       filterSelectedWord,
-      setSyntax
+      setSyntax,
+      clearLog
     };
   });
 }

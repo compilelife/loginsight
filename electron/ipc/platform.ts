@@ -125,7 +125,13 @@ class Backend implements IBackend , IBackendParcel{
     dispatcher.registerEx(this.id, 'openProcess', this.openProcess.bind(this))
     dispatcher.registerEx(this.id, 'openMultiFile', this.openMultiFile.bind(this))
     dispatcher.registerEx(this.id, 'exportLog', this.exportLog.bind(this))
+    dispatcher.registerEx(this.id, 'clearLog', this.clearLog.bind(this))
   }
+
+  clearLog(arg:{ logId: number }): Promise<void> {
+    return this.sendToCore('clearLog', arg)
+  }
+
   exportLog(arg: ExportLogArg): Promise<any> {
     arg.path = this.toNativeEncoded(arg.path)
     return this.sendToCore('exportLog', arg)

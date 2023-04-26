@@ -13,6 +13,9 @@
          v-model="followLog">
          <Refresh />
         </ToggleToolAreaButton>
+        <ToolAreaButton tooltip="清除日志" @trigger="tab.clearLog()" v-if="tab.canClear">
+          <VscodeIcon name="trash"/>
+        </ToolAreaButton>
         <ElButton
           text
           size="small"
@@ -33,6 +36,8 @@ import { LogTabData } from "../../stores/LogTabData"
 import {ElSelect, ElOption, ElButton} from 'element-plus'
 import ToggleToolAreaButton from './ToggleToolAreaButton.vue';
 import {Refresh} from "@icon-park/vue-next"
+import ToolAreaButton from './ToolAreaButton.vue'
+import VscodeIcon from '../VscodeIcon.vue';
 
 const tab = inject<LogTabData>('tab')!
 const disableSub = computed(()=>tab.activeSubIndex < 0)

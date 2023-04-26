@@ -78,6 +78,7 @@ export const useTabsStore = defineStore('tabs', () => {
       })
       tabData.desc = arg.args.process
       tabData.openAction = arg
+      tabData.canClear =  true
     }
     return tabData
   }
@@ -140,7 +141,7 @@ export const useTabsStore = defineStore('tabs', () => {
     }
 
     const path = filePaths[0]
-    await doOpenFile(path)
+    return await doOpenFile(path)
   }
 
   async function doOpenFolder(arg: OpenFolderRecentItem | string): Promise<LogTabData|undefined> {

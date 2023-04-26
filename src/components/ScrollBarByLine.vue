@@ -51,6 +51,8 @@ const setProgramScroll = ()=>userScroll = false
 async function _handleScroll() {
     if (userScroll) {
         const targetIndex = mapOffsetToIndex(scrollOffset.value)
+        if (Number.isNaN(targetIndex))
+            return
         console.log('preload', targetIndex)
         await props.preload(targetIndex)
         console.log('update to', targetIndex)

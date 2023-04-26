@@ -75,6 +75,10 @@ const displayRange = computed(() => {
 data.calculateLineHeight = (text: string)=>{
   if (!lineHeightMeasure.value) return 0
 
+  if (text.length === 0) {//就算没内容，也需要占一行
+    text = 'placeholder'
+  }
+
   lineHeightMeasure.value.$el.getElementsByTagName('pre')[0].innerText = text
   return lineHeightMeasure.value.$el.clientHeight
 }
