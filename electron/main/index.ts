@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, MessageChannelMain, WebContents, session, Menu } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, MessageChannelMain, WebContents, session, Menu, dialog } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
 import { dispatcher } from '../ipc/dispatcher'
@@ -75,6 +75,28 @@ async function createWindow() {
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('https:') || url.startsWith('http')) shell.openExternal(url)
     return { action: 'deny' }
+  })
+
+  win.on('close', (e) => {
+    e.preventDefault()//阻止默认行为，一定要有
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'Loginsight',
+      cancelId:2,
+      defaultId: 0,
+      message: '确定要关闭吗？',
+      buttons: ['取消','确定']
+    }).then(result => {
+      if (result.response == 0) {
+        e.preventDefault();		//阻止默认行为，一定要有
+      } else if(result.response == 1) {
+        win = null;
+        //app.quit();	//不要用quit();试了会弹两次
+        app.exit();		//exit()直接关闭客户端，不会执行quit();
+      }
+    }).catch(err => {
+      console.log(err)
+    })
   })
 }
 
