@@ -19,7 +19,7 @@
           <EditableLabel v-else v-model="tab.title"/>
           <el-icon 
             class="tabCloseBtn"
-            @click.stop="rmTab(tab.name)">
+            @click.stop="closeTab(tab.name)">
             <Close />
           </el-icon>
         </span>
@@ -38,7 +38,7 @@
 <script setup lang="ts">
 
 import { Close } from '@element-plus/icons-vue';
-import { ElTabs, ElTooltip } from 'element-plus';
+import { ElMessageBox, ElTabs, ElTooltip } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref } from 'vue';
 import { useDialogStore } from './stores/dialogs';
@@ -89,6 +89,22 @@ onMounted(async()=>{
     return smartOpen(path)
   }
 })
+
+function closeTab(name: string) {
+  ElMessageBox.confirm(
+    `是否要关闭这个日志，所有的分析数据将丢失`,
+    'Loginsight',
+    {
+      confirmButtonText: '关闭',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      rmTab(name)
+    })
+    .catch(() => { })
+}
 
 </script>
 

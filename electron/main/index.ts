@@ -84,7 +84,7 @@ async function createWindow() {
       title: 'Loginsight',
       cancelId:2,
       defaultId: 0,
-      message: '确定要关闭吗？',
+      message: '确定要退出Loginsight吗？',
       buttons: ['取消','确定']
     }).then(result => {
       if (result.response == 0) {
