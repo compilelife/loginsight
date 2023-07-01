@@ -15,7 +15,14 @@ export function newTimeLineNodeData(lineV: number, textV: string) {
 		const color = ref('#337ecc');
 		const key = computed(() => `${lineV + 1}`);
 
-		return { line, color, comment, text, key };
+		return { line, color, comment, text, key ,
+		save: ()=>({
+			line: line.value,
+			color:color.value,
+			comment: comment.value,
+			text: text.value,
+			key: key.value
+		})};
 	});
 }
 

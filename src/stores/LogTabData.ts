@@ -1,4 +1,4 @@
-import { computed, reactive, ref, watch, watchEffect } from 'vue';
+import { computed, reactive, ref, unref, watch, watchEffect } from 'vue';
 import { LineSegType, inRange } from '../ipc/platform';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { createStoreInstance, TabType } from './tabsStore';
@@ -345,6 +345,30 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       return backend.clearLog({logId: rootLogId})
     }
 
+    function save() {
+      return {
+        highlights: highlights.map(v=>v.save()),
+        openAction: unref(openAction!),
+        timeline: {
+          nodes: timeline.nodes.map(v=>v.save())
+        },
+        followLog: followLog.value,
+        logEncoding: logEncoding.value,
+        curSyntax: curSyntax.value,
+        rootLogView: {
+          title: rootLogView.title,
+          curLineIndex: rootLogView.curLineIndex,
+          focusLineIndex: rootLogView.focusLineIndex
+        },
+        subLogViews: subLogViews.map(subLogView => ({
+          title: subLogView.title,
+          curLineIndex: subLogView.curLineIndex,
+          focusLineIndex: subLogView.focusLineIndex,
+          openAction: subLogView.openAction
+        }))
+      }
+    }
+
     return {
       highlights,
       timeline,
@@ -380,7 +404,8 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       filter,
       filterSelectedWord,
       setSyntax,
-      clearLog
+      clearLog,
+      save
     };
   });
 }

@@ -1,6 +1,9 @@
+import { unref } from "vue";
 import { LineSegType } from "../ipc/platform";
 import { LogTabData } from "./LogTabData";
 import { TabType, useTabsStore } from "./tabsStore";
+import { newHighlight } from "./Highlight";
+import { newTimeLineNodeData } from "./TimeLineData";
 
 interface Project {
   version: string;
@@ -10,27 +13,7 @@ interface Project {
 type ProjectTab = ReturnType<typeof saveLogTab>
 
 function saveLogTab(tab: LogTabData) {
-  return {
-    highlights: tab.highlights,
-    openAction: tab.openAction!,
-    timeline: {
-      nodes: tab.timeline.nodes
-    },
-    followLog: tab.followLog,
-    logEncoding: tab.logEncoding,
-    curSyntax: tab.curSyntax,
-    rootLogView: {
-      title: tab.rootLogView.title,
-      curLineIndex: tab.rootLogView.curLineIndex,
-      focusLineIndex: tab.rootLogView.focusLineIndex
-    },
-    subLogViews: tab.subLogViews.map(subLogView => ({
-      title: subLogView.title,
-      curLineIndex: subLogView.curLineIndex,
-      focusLineIndex: subLogView.focusLineIndex,
-      openAction: subLogView.openAction
-    }))
-  }
+  return tab.save()
 }
 
 export function saveProject(): Project {
@@ -50,10 +33,15 @@ export function saveProject(): Project {
 export async function openProject(project: Project) {
   const {openRecentItem} = useTabsStore()
   for (const tab of project.tabs) {
-    const tabData = await openRecentItem(tab.openAction)
+    const tabData = await openRecentItem(tab.openAction!)
     if (tabData) {
-      tabData.highlights.push(...tab.highlights)
-      tabData.timeline.nodes.push(...tab.timeline.nodes)
+      tabData.highlights.push(...tab.highlights.map(v=>newHighlight(v.keyword, v.color)))
+      tabData.timeline.nodes.push(...tab.timeline.nodes.map(v=>{
+        const n = newTimeLineNodeData(v.line, v.text)
+        n.color = v.color
+        n.comment = v.comment
+        return n
+      }))
       tabData.followLog = tab.followLog
       tabData.logEncoding = tab.logEncoding
       tabData.curSyntax = tab.curSyntax

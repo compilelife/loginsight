@@ -61,7 +61,7 @@ function userReleaseMouse() {
 const handleScroll = useThrottleFn(_handleScroll, 50)
 
 async function _handleScroll(ev: { scrollLeft: number, scrollTop: number }) {
-    console.log(ev.scrollTop, userScroll)
+    //console.log(ev.scrollTop, userScroll)
     if (userScroll) {
         const targetIndex = mapOffsetToIndex(ev.scrollTop)
         if (Number.isNaN(targetIndex))
