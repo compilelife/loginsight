@@ -1,6 +1,7 @@
 import { reactive, ref } from 'vue';
 import { computed } from 'vue';
 import { createStoreInstance } from './tabsStore';
+import { ElMessageBox } from 'element-plus';
 
 
 
@@ -45,7 +46,19 @@ export function newTimeLineData() {
 		}
 
 		function clear() {
-			nodes.splice(0, nodes.length);
+			ElMessageBox.confirm(
+				`是否要清空日志线，该操作无法撤销`,
+				'Loginsight',
+				{
+					confirmButtonText: '清空',
+					cancelButtonText: '取消',
+					type: 'warning',
+				}
+			)
+				.then(() => {
+					nodes.splice(0, nodes.length);
+				})
+				.catch(() => { })
 		}
 
 		return {
