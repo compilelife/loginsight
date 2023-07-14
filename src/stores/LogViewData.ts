@@ -181,6 +181,28 @@ export function newLogViewData(backend: IBackend, titleV: string, log: OpenLogRe
 			bottomTo(curLineIndex.value)
 		}
 
+		function goToNextLine() {
+			const targetIndex =  focusLineIndex.value + 1
+			if (targetIndex > range.end)
+				return
+
+			if (targetIndex > visibleLastLineIndex.value)
+				bottomTo(targetIndex)
+			else
+				setCurrentLine(targetIndex)
+		}
+
+		function goToPrevLine() {
+			const targetIndex = focusLineIndex.value - 1
+			if (targetIndex < range.begin)
+				return
+			
+			if (targetIndex < curLineIndex.value)
+				jumpTo(targetIndex)
+			else
+				setCurrentLine(targetIndex)
+		}
+
 		function dropCache() {
 			cacheRange.begin = 0
 			cacheRange.end = -1
@@ -221,7 +243,9 @@ export function newLogViewData(backend: IBackend, titleV: string, log: OpenLogRe
 			pageDown,
 			pageUp,
 			goToBottom,
-			dropCache
+			dropCache,
+			goToNextLine,
+			goToPrevLine
 		};
 	});
 }

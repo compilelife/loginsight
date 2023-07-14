@@ -100,6 +100,16 @@ export function registerShortcuts() {
       handler: () => currentTab.value?.activeLogView.pageUp()
     },
     {
+      key: 'up',
+      desc: '上一行',
+      handler: () => currentTab.value?.activeLogView.goToPrevLine()
+    },
+    {
+      key: 'down',
+      desc: '下一行',
+      handler: () => currentTab.value?.activeLogView.goToNextLine()
+    },
+    {
       key: 'ctrl+w, ⌘+w',
       desc: '关闭当前标签页',
       handler: () => {
