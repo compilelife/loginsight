@@ -43,7 +43,7 @@
 
 <script lang="ts" setup>
 import { useSettingsStore } from '../stores/Settings'
-import { toRef, defineExpose, ref, watchEffect, watch } from 'vue'
+import { toRef, ref, watch } from 'vue'
 import { commonFonts } from '../stores/util';
 import {useUpdateStore} from '../stores/update'
 
