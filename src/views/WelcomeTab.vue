@@ -26,6 +26,9 @@
         <h2>帮助</h2>
         <ul>
           <li>
+            <ElButton link type="primary" @click="()=>register.registerAction()">{{register.hint}}</ElButton>
+          </li>
+          <li>
             <ElButton link type="primary" @click="showSettingsDlg">设置</ElButton>
           </li>
           <li>
@@ -72,12 +75,15 @@ import { useRecents, getRecentItemIcon } from '../stores/recents';
 import { useTabsStore } from '../stores/tabsStore';
 import {platform} from '../ipc/platform'
 import {useUpdateStore} from '../stores/update'
-import { onMounted, computed } from 'vue';
+import { onMounted, computed, onUnmounted } from 'vue';
 import {UpdateRotation} from '@icon-park/vue-next'
+import { useRegister } from '../stores/register';
 
 const {showSettingsDlg, showShortcutDlg} = useDialogStore()
 
 const { recents } = storeToRefs(useRecents())
+
+const register = useRegister()
 
 const update = useUpdateStore()
 const changeLog = computed(()=>{
@@ -104,8 +110,9 @@ async function checkNewVersion() {
   }
 }
 
-onMounted(()=>{update.checkNewVersion()})
-
+onMounted(()=>{
+  update.checkNewVersion()
+})
 </script>
 
 <style scoped>

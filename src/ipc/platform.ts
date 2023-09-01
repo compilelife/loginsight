@@ -1,6 +1,8 @@
 //@ts-ignore
 import { dispatcher } from "./dispatcher";
 
+export enum RegisterState {eTry, eTryEnd, eRegister}
+
 export function inRange(range: LogRange, v: number): boolean {
   return v >= range.begin && v <= range.end;
 }
@@ -76,6 +78,15 @@ class Backend implements IBackend {
     this.id = parcel.id
     this.callbackId = `${this.id}-callback`
   }
+
+  doRegister(arg: DoRegisterArg): Promise<DoRegisterResult> {
+      return this.invoke('doRegister', arg)
+  }
+
+  getRegisterState(): Promise<InitRegisterResult> {
+      return this.invoke('getRegisterState')
+  }
+
   clearLog(arg:{ logId: number }): Promise<void> {
       return this.invoke('clearLog', arg)
   }

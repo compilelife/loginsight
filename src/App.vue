@@ -33,6 +33,7 @@
   <SyntaxPreviewDialog ref="refToSyntaxDlg"/>
   <ShortcutDialog ref="refToShortcutDlg"/>
   <SyntaxManageDialog ref="refToSyntaxManagerDlg"/>
+  <RegisterDialog ref="refToRegisterDlg"/>
 </template>
   
 <script setup lang="ts">
@@ -52,6 +53,7 @@ import SettingsDlg from './views/SettingsDlg.vue';
 import { registerShortcuts } from './stores/shortcuts';
 import SyntaxPreviewDialog from './views/SyntaxPreviewDialog.vue';
 import SyntaxManageDialog from './views/SyntaxManageDialog.vue';
+import RegisterDialog from './views/RegisterDialog.vue';
 import { useDropZone } from '@vueuse/core';
 import { platform } from './ipc/platform';
 import ShortcutDialog from './views/ShortcutDialog.vue';
@@ -67,7 +69,8 @@ const {
   refToSettingsDlg, 
   refToSyntaxDlg, 
   refToShortcutDlg,
-  refToSyntaxManagerDlg
+  refToSyntaxManagerDlg,
+  refToRegisterDlg
 } = storeToRefs(dlgStore)
 
 function componentForTab(tab: Tab) {

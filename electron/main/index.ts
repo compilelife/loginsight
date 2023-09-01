@@ -67,7 +67,7 @@ async function createWindow() {
   win = new BrowserWindow({
     title: 'Loginsight',
     icon: join(process.env.PUBLIC, 'favicon.png'),
-    width: 1150,
+    width: 1180,
     height: 650,
     webPreferences: {
       preload,

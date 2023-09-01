@@ -1,11 +1,13 @@
-import { nativeImage,clipboard, dialog, BrowserWindow} from "electron";
+import { nativeImage,clipboard, dialog, BrowserWindow, app} from "electron";
 import { dispatcher } from "./dispatcher"
 import {ChildProcessWithoutNullStreams, spawn} from 'child_process'
 import iconv from 'iconv-lite'
 import fs from 'fs';
 import path from 'path'
 import os from 'os'
+import { machineIdSync } from 'node-machine-id'
 
+export enum RegisterState {eTry, eTryEnd, eRegister}
 const nativeEncode = process.platform === "win32" ? 'gbk' : 'utf-8';
 
 class Platform implements IPlatform {
@@ -101,6 +103,7 @@ class Backend implements IBackend , IBackendParcel{
   private tail = ''
   private cmdId = 0
   private pendingCmds = new Map<string, {resolve: Function, reject: Function}>()
+  private rstate!: InitRegisterResult
 
   constructor() {
     this.id = `Backend${Backend.instanceCount++}`;
@@ -126,6 +129,16 @@ class Backend implements IBackend , IBackendParcel{
     dispatcher.registerEx(this.id, 'openMultiFile', this.openMultiFile.bind(this))
     dispatcher.registerEx(this.id, 'exportLog', this.exportLog.bind(this))
     dispatcher.registerEx(this.id, 'clearLog', this.clearLog.bind(this))
+    dispatcher.registerEx(this.id, 'getRegisterState', this.getRegisterState.bind(this))
+    dispatcher.registerEx(this.id, 'doRegister', this.doRegister.bind(this))
+  }
+
+  doRegister(arg: DoRegisterArg): Promise<DoRegisterResult> {
+      return this.sendToCore<DoRegisterResult>('doRegister', arg)
+  }
+
+  getRegisterState(): Promise<InitRegisterResult> {
+      return Promise.resolve(this.rstate)
   }
 
   clearLog(arg:{ logId: number }): Promise<void> {
@@ -186,7 +199,7 @@ class Backend implements IBackend , IBackendParcel{
     dispatcher.unregisterAll(this.id)
   }
 
-  start() {
+  async start() {
     let appDir = path.dirname(process.execPath)
     if (process.env.VITE_DEV_SERVER_URL) {
       appDir = process.cwd()
@@ -197,6 +210,12 @@ class Backend implements IBackend , IBackendParcel{
 
     this.core.on('exit', ()=>{
       this.callback && this.callback({cmd: 'die'})
+    })
+
+    const pathSeparator = process.platform=='win32'?'\\':'/'
+    this.rstate = await this.sendToCore<InitRegisterResult>('initRegister', {
+      uid: machineIdSync(),
+      mydir: this.toNativeEncoded(app.getPath('home')+pathSeparator+'.loginsight'+pathSeparator)
     })
   }
 

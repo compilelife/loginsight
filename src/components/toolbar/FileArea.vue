@@ -31,7 +31,7 @@
 <script lang="ts" setup>
 
 import ToolButton from './ToolButton.vue';
-import { FolderOpen, FileDateOne, FileText as OpenFileIcon, FileCabinet as OpenProjectIcon, FolderClose as OpenFolderIcon, Terminal as OpenProcIcon, Clipboard as OpenClipboardIcon, SaveOne } from '@icon-park/vue-next'
+import { FolderOpen, FileDateOne, FileText as OpenFileIcon, FileCabinet as OpenProjectIcon, FolderClose as OpenFolderIcon, Terminal as OpenProcIcon, Clipboard as OpenClipboardIcon, SaveOne, VipOne } from '@icon-park/vue-next'
 import { ElDivider, ElDropdownItem, ElDropdownMenu, ElMessage } from 'element-plus';
 import { useTabsStore } from '../../stores/tabsStore'
 import { RecentItem, useRecents, getRecentItemIcon } from '../../stores/recents';

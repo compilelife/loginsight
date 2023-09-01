@@ -41,6 +41,20 @@ interface OpenLogResult {
   range: LogRange
 }
 
+interface InitRegisterResult {
+  rstate: number
+  left: number
+}
+
+interface DoRegisterArg {
+  orderId: string
+}
+
+interface DoRegisterResult {
+  ok: boolean
+  info: string
+}
+
 interface Line extends LineSyntax{
   //在自己log里的索引，一般用于显示logview里的行号
   index: number
@@ -146,7 +160,7 @@ interface ExportLogArg {
 
 interface IBackend {
   setListener(callback: IBackendCallback):void
-  start();
+  start(): Promise<void>;
   dispose()
   openFile(arg: OpenFileArg): Promise<OpenLogResult>;
   openProcess(arg: OpenProcessArg): Promise<OpenLogResult>
@@ -161,6 +175,8 @@ interface IBackend {
   openMultiFile(arg: OpenFolderArg): Promise<OpenLogResult>
   exportLog(arg: ExportLogArg): Promise<any>
   clearLog({logId: number}): Promise<void>
+  getRegisterState(): Promise<InitRegisterResult>
+  doRegister(arg: DoRegisterArg): Promise<DoRegisterResult>
 
   mapOffsetFromLog(line: string, values: LineRegion[]): LineRegion[] | Promise<LineRegion[]>
 }
