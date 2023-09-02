@@ -11,6 +11,7 @@ export function newHighlight(keywordV: string, colorV: string) {
 		return {
 			keyword,
 			color,
+			save: ()=>({keyword: keyword.value, color:color.value})
 		};
 	});
 }

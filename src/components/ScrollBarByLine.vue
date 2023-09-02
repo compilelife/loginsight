@@ -1,6 +1,11 @@
 <template>
 
-<ElScrollbar  always ref="root" class="log-scrollbar">
+<ElScrollbar native always 
+    ref="root" class="log-scrollbar" 
+    @mouseup="userReleaseMouse" 
+    @mousedown="userPressMouse"
+    @wheel.prevent=""
+    @scroll="handleScroll">
   <div class="content"></div>
 </ElScrollbar>
 
@@ -8,9 +13,9 @@
 
 <script setup lang="ts">
 
-import { useDebounceFn, useElementSize, useScroll, useFocus } from '@vueuse/core';
+import { useDebounceFn, useElementSize, useScroll, useThrottleFn, useTimeoutFn } from '@vueuse/core';
 import { ElScrollbar } from 'element-plus';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
     count: number,
@@ -40,36 +45,40 @@ const currentIndex = computed({
     }
 })
 
-let userScroll = true
-const {y: scrollOffset} = useScroll(()=>root.value?.wrapRef, {throttle:50})
-
+let userScroll = false
 const mapIndexToOffset = (index: number)=>index / (props.count - 1) * maxScrollHeight.value
 const mapOffsetToIndex = (offset: number)=>Math.floor(offset / maxScrollHeight.value * (props.count - 1))
-const setUserScroll = ()=>userScroll = true
-const setProgramScroll = ()=>userScroll = false
 
-async function _handleScroll() {
+function userPressMouse() {
+    userScroll=true
+}
+function userReleaseMouse() {
+    setTimeout(() => {
+        userScroll=false
+    }, 100);
+}
+
+const handleScroll = useThrottleFn(_handleScroll, 50)
+
+async function _handleScroll(ev: { scrollLeft: number, scrollTop: number }) {
+    //console.log(ev.scrollTop, userScroll)
     if (userScroll) {
-        const targetIndex = mapOffsetToIndex(scrollOffset.value)
+        const targetIndex = mapOffsetToIndex(ev.scrollTop)
         if (Number.isNaN(targetIndex))
             return
-        console.log('preload', targetIndex)
+        console.log('preload', targetIndex, ev.scrollTop)
         await props.preload(targetIndex)
         console.log('update to', targetIndex)
         emit('update:modelValue', targetIndex)
         emit('focused')
     }
-    else {
-        setUserScroll()
-    }
 }
 
-watch(scrollOffset, _handleScroll)
-
-watch([height, props], useDebounceFn(()=>{
-    setProgramScroll()
-    scrollOffset.value = mapIndexToOffset(currentIndex.value)
-}, 300))
+watch([props], ()=>{
+    if (!userScroll) {
+        root.value?.setScrollTop(mapIndexToOffset(currentIndex.value))
+    }
+})
 
 </script>
 

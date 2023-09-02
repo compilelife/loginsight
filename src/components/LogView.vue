@@ -153,13 +153,13 @@ watch([currentIndex, firstLoaded], ()=>setTimeout(() => {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (line.offsetTop + line.offsetHeight >= logViewHeight.value) {
-      data.visibleLastLineIndex = currentIndex.value + i
+      data.visibleLastLineIndex = Math.min(currentIndex.value + i, data.range.end)
       return
     }
   }
 
   if (lines.length > 0) {
-    data.visibleLastLineIndex = currentIndex.value + lines.length - 1
+    data.visibleLastLineIndex = Math.min(currentIndex.value + lines.length - 1, data.range.end)
   }
 }, 10),{flush: 'post'})
 </script>
