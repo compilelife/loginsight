@@ -10,7 +10,7 @@ export interface SearchHistory {
 
 export function newSearchData() {
   return createStoreInstance('search', ()=>{
-    const caseSense = ref(false)
+    const caseSense = ref(true)
     const regex = ref(false)
     const history = Array<SearchHistory>()
     const pattern = ref('')

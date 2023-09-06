@@ -73,7 +73,7 @@ const showFilterForm = ref(false)
 const revertFilter = ref(false)
 
 const pattern = ref('')
-const caseSense = ref(false)
+const caseSense = ref(true)
 const regex = ref(false)
 
 const inputRef = ref<InstanceType<typeof ElInput>>()
