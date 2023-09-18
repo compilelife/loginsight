@@ -1,6 +1,6 @@
 {
   "name": "loginsight",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "main": "dist-electron/main/index.js",
   "description": "Loginsight，洞察日志",
   "author": "瞎猫compilelife <compilelife@163.com>",
