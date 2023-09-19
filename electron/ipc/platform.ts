@@ -213,9 +213,14 @@ class Backend implements IBackend , IBackendParcel{
     })
 
     const pathSeparator = process.platform=='win32'?'\\':'/'
+    const loginsightDir = app.getPath('home')+pathSeparator+'.loginsight'+pathSeparator
+    const mydir = this.toNativeEncoded(loginsightDir)
+    if (!fs.existsSync(loginsightDir)) {
+      fs.mkdirSync(loginsightDir)
+    }
     this.rstate = await this.sendToCore<InitRegisterResult>('initRegister', {
       uid: machineIdSync(),
-      mydir: this.toNativeEncoded(app.getPath('home')+pathSeparator+'.loginsight'+pathSeparator)
+      mydir
     })
   }
 
