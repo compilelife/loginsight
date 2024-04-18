@@ -1,5 +1,7 @@
 loginsight致力于打造一款通用的日志分析利器
 
+QQ 交流群：762324244
+
 详细介绍请移步：[官网](https://www.loginsight.top) 
 
 [![pp7ekYq.png](https://s1.ax1x.com/2023/04/07/pp7ekYq.png)](https://imgse.com/i/pp7ekYq)
