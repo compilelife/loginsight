@@ -22,7 +22,15 @@
   "mac": {
     "artifactName": "${productName}_${version}.${ext}",
     "target": [
-      "dmg"
+      {
+        "target": "dmg",
+        "arch": [
+          "universal"
+        ]
+      },
+        {
+          "target": "mas-dev"
+        }
     ],
   },
   "win": {
