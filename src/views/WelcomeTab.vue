@@ -34,7 +34,7 @@
           <li>
             <ElButton link type="primary" @click="showShortcutDlg">快捷键</ElButton>
           </li>
-          <li>
+          <li v-if="update.manualUpdate">
             <ElButton link type="primary" @click="gotoGithub">开源地址</ElButton>
           </li>
           <li>
@@ -54,7 +54,7 @@
           </li>
         </ul>
       </ElCol>
-      <ElCol class="newVersion" :span="12">
+      <ElCol v-if="update.manualUpdate" class="newVersion" :span="12">
         <h2>新版本: 
           <ElButton v-if="update.hasNewVersion" link type="primary" @click="gotoDownload">{{update.newVersion!.version}}</ElButton>
           <ElButton v-else link type="primary" @click="checkNewVersion">点击检查</ElButton>

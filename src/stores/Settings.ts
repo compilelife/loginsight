@@ -8,7 +8,7 @@ export const useSettingsStore = defineStore('settings', () => {
   const logFontFamily = ref(localStorage.getItem('logFontFamily') || getDefaultFont());
   const defaultEncoding = ref(localStorage.getItem('defaultEncoding') || 'UTF-8');
   const lineSpacing = ref(parseFloat(localStorage.getItem('lineSpacing')!) || 1.5);
-  const enableCollect = ref(true)
+  const enableCollect = ref(window.host.platform !== 'darwin')
 
   const cssLogFont = computed(()=>`${logFontSize.value}px/${lineSpacing.value} ${logFontFamily.value}`)
 

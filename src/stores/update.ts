@@ -13,8 +13,12 @@ export const useUpdateStore = defineStore('update', ()=>{
     const hasNewVersion = computed(()=>{
         return newVersion.value && newVersion.value?.version != currentVersion.value
     })
+    const manualUpdate = ref(window.host.platform !== 'darwin')
 
     async function checkNewVersion() {
+        if (!manualUpdate.value) {
+            return
+        }
         let  newVersionResponse: UpdateInfo
         try {
             const response = await fetch('https://www.loginsight.top/api/web/version');
@@ -31,6 +35,7 @@ export const useUpdateStore = defineStore('update', ()=>{
         currentVersion,
         newVersion,
         hasNewVersion,
+        manualUpdate,
 
         checkNewVersion
     }

@@ -30,7 +30,7 @@
         <el-input-number v-model="lineSpacing" :min="1" :max="2" :step="0.1"></el-input-number>
       </el-col>
     </el-row>
-    <el-row style="margin-bottom: 10px;">
+    <el-row v-if="manualUpdate" style="margin-bottom: 10px;">
       <el-col :span="8">版本号:</el-col>
       <el-col :span="16">{{currentVersion}}</el-col>
     </el-row>
@@ -52,7 +52,7 @@ const logFontSize = toRef(setting, 'logFontSize')
 const defaultEncoding = toRef(setting, 'defaultEncoding')
 const lineSpacing = toRef(setting, 'lineSpacing')
 const logFontFamily = toRef(setting, 'logFontFamily')
-const {currentVersion} = useUpdateStore()
+const {currentVersion, manualUpdate} = useUpdateStore()
 
 const visible = ref(false)
 

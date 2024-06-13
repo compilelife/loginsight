@@ -137,6 +137,11 @@ app.on('second-instance', () => {
 })
 
 function collectPcStatus() {
+  if (os.platform() === 'darwin') {
+    console.log("not collect data on macos")
+    return
+  }
+
   const machineId = machineIdSync()
   const time = new Date().getTime()
   const cpus = os.cpus()
