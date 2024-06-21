@@ -1,4 +1,4 @@
-import { nativeImage,clipboard, dialog, BrowserWindow, app} from "electron";
+import { nativeImage,clipboard, dialog, BrowserWindow, app, systemPreferences} from "electron";
 import { dispatcher } from "./dispatcher"
 import {ChildProcessWithoutNullStreams, spawn} from 'child_process'
 import iconv from 'iconv-lite'
@@ -7,6 +7,9 @@ import path from 'path'
 import os from 'os'
 import { machineIdSync } from 'node-machine-id'
 
+const { inAppPurchase } = require('electron')
+const PRODUCT_IDS = ['id1', 'id2'] //TODO：替换为apple store connect里的product id
+
 export enum RegisterState {eTry, eTryEnd, eRegister}
 const nativeEncode = process.platform === "win32" ? 'gbk' : 'utf-8';
 
@@ -14,6 +17,8 @@ class Platform implements IPlatform {
   id = "platform";
   client: BrowserWindow
   args: string[] = []
+
+  iapCallback: IAPCallback | null = null
 
   constructor() {
     dispatcher.registerEx(this.id, 'createBackend', ()=>this.createBackend())
@@ -28,6 +33,90 @@ class Platform implements IPlatform {
     dispatcher.registerEx(this.id, 'isFile', this.isFile.bind(this))
     dispatcher.registerEx(this.id, 'getCmdlineArgs', this.getCmdlineArgs.bind(this))
     dispatcher.registerEx(this.id, 'openDevTool', this.openDevTool.bind(this))
+
+    dispatcher.registerEx(this.id, 'setIAPListener', (callbackName: string)=>{
+      this.setIAPListener(()=>{
+        platform.sendToClient(callbackName)
+      })
+    })
+    dispatcher.registerEx(this.id, 'IAPPurchase', this.IAPPurchase.bind(this));
+    dispatcher.registerEx(this.id, 'isIAPPurchased', this.isIAPPurchased.bind(this));
+    dispatcher.registerEx(this.id, 'restorePurchase', this.restorePurchase.bind(this));
+    dispatcher.registerEx(this.id, 'IAPCanPurchase', this.IAPCanPurchase.bind(this));
+    dispatcher.registerEx(this.id, 'IAPGetProducts', this.IAPGetProducts.bind(this));
+  }
+  IAPCanPurchase(): Promise<boolean> {
+    return Promise.resolve(inAppPurchase.canMakePayments())
+  }
+  IAPGetProducts(): Promise<IAPProduct[]> {
+    return inAppPurchase.getProducts(PRODUCT_IDS)
+  }
+
+  handleIAP() {
+    inAppPurchase.on('transactions-updated', (event, transactions) => {
+      if (!Array.isArray(transactions)) {
+        return
+      }
+    
+      // 检查每一笔交易.
+      for (const transaction of transactions) {
+        const payment = transaction.payment
+        switch (transaction.transactionState) {
+          case 'purchasing':
+            console.log(`Purchasing ${payment.productIdentifier}...`)
+            break
+          case 'purchased': {
+            console.log(`${payment.productIdentifier} purchased.`)
+            const receiptURL = inAppPurchase.getReceiptURL()
+            console.log(`Receipt URL: ${receiptURL}`)
+            // Submit the receipt file to the server and check if it is valid.
+            // @see https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html
+            // ...
+            // 如果收据通过校验，说明产品已经被购买了
+            // ...
+            // 交易完成.
+            inAppPurchase.finishTransactionByDate(transaction.transactionDate)
+            systemPreferences.setUserDefault('purchased', 'boolean', true)
+            if (this.iapCallback) {
+              this.iapCallback({type: 'purchased', errMsg: ''})
+            }
+            break
+          }
+          case 'failed':
+            console.log(`Failed to purchase ${payment.productIdentifier}.`)
+            // 终止交易
+            inAppPurchase.finishTransactionByDate(transaction.transactionDate)
+            systemPreferences.setUserDefault('purchased', 'boolean', false)
+            if (this.iapCallback) {
+              this.iapCallback({type: 'failed', errMsg: `${transaction.errorCode} - ${transaction.errorMessage}`})
+            }
+            break
+          case 'restored':
+            console.log(`The purchase of ${payment.productIdentifier} has been restored.`)
+            break
+          case 'deferred':
+            console.log(`The purchase of ${payment.productIdentifier} has been deferred.`)
+            break
+          default:
+            break
+        }
+      }
+    })
+
+    //检查票据，更新 purchased, 并通知UI是否购买成功
+  }
+
+  setIAPListener(callback: IAPCallback): void {
+    this.iapCallback = callback
+  }
+  IAPPurchase(identifier: string): Promise<boolean> {
+    return inAppPurchase.purchaseProduct(identifier)
+  }
+  isIAPPurchased(): Promise<boolean> {
+    return Promise.resolve(systemPreferences.getUserDefault('purchased', 'boolean'))
+  }
+  restorePurchase(): void {
+    return inAppPurchase.restoreCompletedTransactions()
   }
   openDevTool() {
     this.client.webContents.openDevTools()

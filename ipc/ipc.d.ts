@@ -12,6 +12,44 @@ interface IPlatform {
   isFile(path: string): Promise<boolean>; 
   getCmdlineArgs(): Promise<string[]>;
   openDevTool(): any
+
+  setIAPListener(callback: IAPCallback): void
+  IAPPurchase(identifier: string): Promise<boolean>
+  isIAPPurchased(): Promise<boolean>
+  restorePurchase(): void
+  IAPCanPurchase(): Promise<boolean>
+  IAPGetProducts(): Promise<IAPProduct[]>;
+}
+
+interface IAPProduct {
+  /**
+   * 3 character code presenting a product's currency based on the ISO 4217 standard.
+   */
+  currencyCode: string;
+  /**
+   * The locale formatted price of the product.
+   */
+  formattedPrice: string;
+  /**
+   * A description of the product.
+   */
+  localizedDescription: string;
+  /**
+   * The name of the product.
+   */
+  localizedTitle: string;
+  /**
+   * The cost of the product in the local currency.
+   */
+  price: number;
+  /**
+   * The string that identifies the product to the Apple App Store.
+   */
+  productIdentifier: string;
+  /**
+   * The identifier of the subscription group to which the subscription belongs.
+   */
+  subscriptionGroupIdentifier: string;
 }
 
 interface OpenFileDialogResult {
@@ -21,6 +59,15 @@ interface OpenFileDialogResult {
 interface SaveFileDialogResult {
   canceled: boolean;
   filePath?: string;
+}
+
+interface IAPMessage {
+  type: 'purchased' | 'failed';
+  errMsg: string;
+}
+
+interface IAPCallback {
+  (msg: IAPMessage):void
 }
 
 interface IBackendCallback{

@@ -37,7 +37,7 @@
           <li v-if="update.manualUpdate">
             <ElButton link type="primary" @click="gotoGithub">开源地址</ElButton>
           </li>
-          <li>
+          <li v-if="showDevEntry">
             <ElButton link type="primary" @click="()=>platform.openDevTool()">开发者工具</ElButton>
           </li>
         </ul>
@@ -75,9 +75,11 @@ import { useRecents, getRecentItemIcon } from '../stores/recents';
 import { useTabsStore } from '../stores/tabsStore';
 import {platform} from '../ipc/platform'
 import {useUpdateStore} from '../stores/update'
-import { onMounted, computed, onUnmounted } from 'vue';
+import { onMounted, computed, onUnmounted, ref } from 'vue';
 import {UpdateRotation} from '@icon-park/vue-next'
 import { useRegister } from '../stores/register';
+
+const showDevEntry = ref(window.host.platform !== 'darwin')
 
 const {showSettingsDlg, showShortcutDlg} = useDialogStore()
 

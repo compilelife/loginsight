@@ -23,6 +23,27 @@ export function isValidRange(range: LogRange): boolean {
 }
 
 class Platform implements IPlatform {
+  isIAPPurchased(): Promise<boolean> {
+    return this.invoke("isIAPPurchased")
+  }
+  iapCallbackId = "iapCallbackId"
+
+  IAPCanPurchase(): Promise<boolean> {
+    return this.invoke("IAPCanPurchase")
+  }
+  IAPGetProducts(): Promise<IAPProduct[]> {
+    return this.invoke("IAPGetProducts")
+  }
+  setIAPListener(callback: IAPCallback): void {
+    dispatcher.register(this.iapCallbackId, callback)
+    this.invoke("setIAPListener", this.iapCallbackId);
+  }
+  IAPPurchase(identifier: string): Promise<boolean> {
+    return this.invoke("IAPPurchase", identifier)
+  }
+  restorePurchase(): void {
+    this.invoke("restorePurchase")
+  }
   openDevTool() {
     return this.invoke("openDevTool")
   }

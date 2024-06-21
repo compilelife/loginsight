@@ -8,6 +8,7 @@ import SyntaxManageDialog from "../views/SyntaxManageDialog.vue";
 import { LogTabData } from "./LogTabData";
 import ShortcutDialog from '../views/ShortcutDialog.vue'
 import RegisterDialog from '../views/RegisterDialog.vue';
+import BuyDlg from '../views/BuyDlg.vue'
 
 export const useDialogStore = defineStore('dialogs', ()=>{
   const refToOpenProcDlg = ref<InstanceType<typeof OpenProcDialog>>()
@@ -17,6 +18,7 @@ export const useDialogStore = defineStore('dialogs', ()=>{
   const refToShortcutDlg = ref<InstanceType<typeof ShortcutDialog>>()
   const refToSyntaxManagerDlg = ref<InstanceType<typeof SyntaxManageDialog>>()
   const refToRegisterDlg = ref<InstanceType<typeof RegisterDialog>>()
+  const refToBuyDlg = ref<InstanceType<typeof BuyDlg>>()
 
   function showOpenProcDlg() {
     return refToOpenProcDlg.value!.show()
@@ -46,6 +48,10 @@ export const useDialogStore = defineStore('dialogs', ()=>{
     return refToRegisterDlg.value!.show()
   }
 
+  function showBuyDlg() {
+    return refToBuyDlg.value!.show()
+  }
+
   return {
     refToOpenProcDlg,
     refToOpenFolderDlg,
@@ -54,6 +60,7 @@ export const useDialogStore = defineStore('dialogs', ()=>{
     refToShortcutDlg,
     refToSyntaxManagerDlg,
     refToRegisterDlg,
+    refToBuyDlg,
 
     showOpenProcDlg,
     showOpenFolderDlg,
@@ -61,6 +68,7 @@ export const useDialogStore = defineStore('dialogs', ()=>{
     showSyntaxDlg,
     showShortcutDlg,
     showSyntaxManagerDlg,
-    showRegisterDlg
+    showRegisterDlg,
+    showBuyDlg
   }
 })

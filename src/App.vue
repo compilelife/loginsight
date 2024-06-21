@@ -34,6 +34,7 @@
   <ShortcutDialog ref="refToShortcutDlg"/>
   <SyntaxManageDialog ref="refToSyntaxManagerDlg"/>
   <RegisterDialog ref="refToRegisterDlg"/>
+  <BuyDlg ref="refToBuyDlg"/>
 </template>
   
 <script setup lang="ts">
@@ -58,6 +59,7 @@ import { useDropZone } from '@vueuse/core';
 import { platform } from './ipc/platform';
 import ShortcutDialog from './views/ShortcutDialog.vue';
 import EditableLabel from './components/EditableLabel.vue';
+import BuyDlg from './views/BuyDlg.vue';
 
 const tabsStore = useTabsStore()
 const {tabs, rmTab, smartOpen} = tabsStore
@@ -70,7 +72,8 @@ const {
   refToSyntaxDlg, 
   refToShortcutDlg,
   refToSyntaxManagerDlg,
-  refToRegisterDlg
+  refToRegisterDlg,
+  refToBuyDlg
 } = storeToRefs(dlgStore)
 
 function componentForTab(tab: Tab) {

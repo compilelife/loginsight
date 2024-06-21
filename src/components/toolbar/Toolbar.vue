@@ -44,7 +44,7 @@ const { showSettingsDlg } = useDialogStore()
 
 const register = useRegister()
 const registerBtnLabel = computed(()=>{
-  return register.rstate.rstate === RegisterState.eRegister ? '专业版' : '试用版'
+  return register.rstate.rstate === RegisterState.eRegister ? register.registerWord : register.tryEndWord
 })
 
 </script>

@@ -168,4 +168,6 @@ function collectPcStatus() {
   })
 }
 
+platform.handleIAP()
 collectPcStatus()
+
