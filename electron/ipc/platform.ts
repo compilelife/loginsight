@@ -1,4 +1,4 @@
-import { nativeImage,clipboard, dialog, BrowserWindow, app, systemPreferences} from "electron";
+import { nativeImage,clipboard, dialog, BrowserWindow, app, systemPreferences, MenuItemConstructorOptions, Menu} from "electron";
 import { dispatcher } from "./dispatcher"
 import {ChildProcessWithoutNullStreams, spawn} from 'child_process'
 import iconv from 'iconv-lite'
@@ -33,6 +33,7 @@ class Platform implements IPlatform {
     dispatcher.registerEx(this.id, 'isFile', this.isFile.bind(this))
     dispatcher.registerEx(this.id, 'getCmdlineArgs', this.getCmdlineArgs.bind(this))
     dispatcher.registerEx(this.id, 'openDevTool', this.openDevTool.bind(this))
+    dispatcher.registerEx(this.id, 'getFileSize', this.getFileSize.bind(this))
 
     dispatcher.registerEx(this.id, 'setIAPListener', (callbackName: string)=>{
       this.setIAPListener(()=>{
@@ -45,11 +46,40 @@ class Platform implements IPlatform {
     dispatcher.registerEx(this.id, 'IAPCanPurchase', this.IAPCanPurchase.bind(this));
     dispatcher.registerEx(this.id, 'IAPGetProducts', this.IAPGetProducts.bind(this));
   }
+  getFileSize(path: string): Promise<number> {
+    return Promise.resolve(fs.statSync(path).size)
+  }
   IAPCanPurchase(): Promise<boolean> {
     return Promise.resolve(inAppPurchase.canMakePayments())
   }
   IAPGetProducts(): Promise<IAPProduct[]> {
     return inAppPurchase.getProducts(PRODUCT_IDS)
+  }
+
+  async createAppleMenu() {
+    if (os.platform()!== 'darwin') return null
+  
+    const buyLabel = await platform.isIAPPurchased() ? '专业版' : '升级为专业版'
+  
+    const template: MenuItemConstructorOptions[] = [{
+      label: 'Loginsight', 
+      submenu: [
+        { label: buyLabel, click: () => this.sendMenuEvent('buy')},
+        { type:'separator' },
+        { label: '首选项' , click: () => this.sendMenuEvent('settings')},
+        { label: '快捷键', click: () => this.sendMenuEvent('shortcuts')},
+        { type:'separator' },
+        { label: '隐藏Loginsight', role: 'hide' },
+        { label: '隐藏其他', role: 'hideOthers' },
+        { label: '退出', role: 'quit' }
+      ]
+    }]
+    const menu = Menu.buildFromTemplate(template)
+    Menu.setApplicationMenu(menu)
+  }
+
+  sendMenuEvent(menu: string) {
+    this.sendToClient('menu', menu)
   }
 
   handleIAP() {
@@ -77,6 +107,7 @@ class Platform implements IPlatform {
             // 交易完成.
             inAppPurchase.finishTransactionByDate(transaction.transactionDate)
             systemPreferences.setUserDefault('purchased', 'boolean', true)
+            this.createAppleMenu()
             if (this.iapCallback) {
               this.iapCallback({type: 'purchased', errMsg: ''})
             }

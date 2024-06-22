@@ -10,6 +10,8 @@ import { maybeLongOperation, nextTabId } from './util';
 import { RecentItem } from './recents';
 import { useSettingsStore } from './Settings';
 import { useCollectStore } from './collect';
+import { useRegister } from './register';
+import { useDialogStore } from './dialogs';
 
 
 export type LogTabData = ReturnType<typeof newLogTabData>;
@@ -28,6 +30,7 @@ export interface Syntax {
 
 export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLogResult) {
   return createStoreInstance('tab', () => {
+    const register = useRegister()
     const {defaultEncoding} = useSettingsStore()
     const name = nextTabId()
     const desc = ref('')
@@ -91,6 +94,11 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
       const curView = activeLogView.value;
       if (curView.focusLineIndex < 0) {
         ElMessage.warning('没有选择当前行');
+        return;
+      }
+
+      if (register.limited && timeline.nodes.length >= 5) {
+        ElMessage.warning('免费版最多可创建5个时间节点，专业版无限制');
         return;
       }
 
@@ -318,6 +326,10 @@ export function newLogTabData(nameV: string, backendV: IBackend, rootLog: OpenLo
     }
 
     function filter(arg: FilterArg) {
+      if (register.limited && subLogViews.length >= 2) {
+        ElMessage.warning('免费版最多可创建2个过滤窗口，专业版无限制')
+        return
+      }
       maybeLongOperation(`正在过滤${arg.pattern}`, addSubViewByFilter(arg))
     }
 

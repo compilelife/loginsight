@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, MessageChannelMain, WebContents, session, Menu, dialog } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, MessageChannelMain, WebContents, session, Menu, dialog, MenuItem, MenuItemConstructorOptions } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
 import { dispatcher } from '../ipc/dispatcher'
@@ -34,8 +34,6 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0)
 }
 
-Menu.setApplicationMenu(null)
-
 let win: BrowserWindow | null = null
 
 const preload = join(__dirname, '../preload/index.js')
@@ -43,26 +41,7 @@ const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 
 async function createWindow() {
-  if (process.platform === 'darwin') {
-    const template = [
-      {
-        label: "Application",
-        submenu: [
-          { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
-        ]
-      }, 
-      {
-        label: "Edit",
-        submenu: [
-          { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-          { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-        ]
-      }
-    ];
-    Menu.setApplicationMenu(Menu.buildFromTemplate(template))
-  } else {
-    Menu.setApplicationMenu(null)
-  }
+  platform.createAppleMenu()
   
   win = new BrowserWindow({
     title: 'Loginsight',

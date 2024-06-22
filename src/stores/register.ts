@@ -77,6 +77,11 @@ export const useRegister = defineStore('register', ()=>{
     return ret
   }) 
 
+  //是否从UI层面执行限制
+  const limited = computed(()=>{
+    return rstate.value.rstate === RegisterState.eTry && window.host.platform === 'darwin'
+  })
+
   const tryEndWord = computed(()=>{
     return window.host.platform === 'darwin' ? '免费版' : '试用版'
   })
@@ -123,6 +128,7 @@ export const useRegister = defineStore('register', ()=>{
     registerWord,
     rstate,
     hint,
+    limited,
     doRegister,
     registerAction,
   }

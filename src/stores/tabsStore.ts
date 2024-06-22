@@ -1,13 +1,14 @@
 import { computed, reactive, ref, toRaw, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { LogTabData, newLogTabData } from './LogTabData'
-import { platform, rangeCount } from '../ipc/platform'
+import { RegisterState, platform, rangeCount } from '../ipc/platform'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { maybeLongOperation, nextTabId } from './util'
 import { useDialogStore } from './dialogs'
 import {openProject as openProjectImpl} from './project'
 import { OpenFileRecentItem, OpenFolderRecentItem, OpenProcRecentItem, OpenProjectRecentItem, RecentItem, useRecents } from './recents'
 import {useCollectStore} from './collect'
+import { useRegister } from './register'
 
 export type TabType = 'log' | 'welcome'
 export interface Tab {
@@ -20,6 +21,8 @@ export interface Tab {
 export const useTabsStore = defineStore('tabs', () => {
   const pathSeparator = window.host.platform === 'win32' ? '\\' : '/'
   const {collect} = useCollectStore()
+  const register = useRegister()
+  const dialogs = useDialogStore()
 
   const tabs = reactive<Array<Tab>>([{
     name: nextTabId(),
@@ -101,6 +104,15 @@ export const useTabsStore = defineStore('tabs', () => {
   }
 
   async function doOpenFile(path: string, saveToRecent: boolean = true) {
+    if (register.limited) {
+      const fileSize = await platform.getFileSize(path)
+      if (fileSize > 100 * 1024 * 1024) {
+        ElMessage.warning('试用版无法打开超大文件')
+        dialogs.showBuyDlg()
+        return
+      }
+    }
+    
     const fileName =getFilename(path)
     const action: RecentItem = {
       type: 'file',
@@ -145,6 +157,11 @@ export const useTabsStore = defineStore('tabs', () => {
   }
 
   async function doOpenFolder(arg: OpenFolderRecentItem | string): Promise<LogTabData|undefined> {
+    if (register.limited) {
+      ElMessage.warning('试用版无法打开文件夹')
+      dialogs.showBuyDlg()
+      return
+    }
     if (typeof arg === 'string') {
       const { showOpenFolderDlg } = useDialogStore()
       const folder = arg
@@ -207,6 +224,11 @@ export const useTabsStore = defineStore('tabs', () => {
   }
 
   async function doOpenProject(path: string){
+    if (register.limited) {
+      ElMessage.warning('试用版无法打开工程')
+      dialogs.showBuyDlg()
+      return
+    }
     const content = await platform.readFile(path)
     if (content.length === 0) {
       ElMessage.error('文件打开失败，或文件为空')

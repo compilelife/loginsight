@@ -23,6 +23,9 @@ export function isValidRange(range: LogRange): boolean {
 }
 
 class Platform implements IPlatform {
+  getFileSize(path: string): Promise<number> {
+    return this.invoke("getFileSize", path)
+  }
   isIAPPurchased(): Promise<boolean> {
     return this.invoke("isIAPPurchased")
   }

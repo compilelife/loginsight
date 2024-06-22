@@ -12,6 +12,7 @@ interface IPlatform {
   isFile(path: string): Promise<boolean>; 
   getCmdlineArgs(): Promise<string[]>;
   openDevTool(): any
+  getFileSize(path: string): Promise<number>
 
   setIAPListener(callback: IAPCallback): void
   IAPPurchase(identifier: string): Promise<boolean>

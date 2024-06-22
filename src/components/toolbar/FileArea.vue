@@ -40,6 +40,8 @@ import { LogTabData } from '../../stores/LogTabData';
 import { saveProject, openProject } from '../../stores/project'
 import { platform } from '../../ipc/platform';
 import { useCollectStore } from '../../stores/collect';
+import { useRegister } from '../../stores/register';
+import { useDialogStore } from '../../stores/dialogs';
 
 const tabs = useTabsStore()
 
@@ -47,7 +49,15 @@ const { recents } = useRecents()
 
 const {collect} = useCollectStore()
 
+const register = useRegister()
+
 async function userSaveProject() {
+  if (register.limited) {
+    ElMessage.warning('试用版无法保存工程')
+    useDialogStore().showBuyDlg()
+    return
+  }
+
   let { canceled, filePath } = await platform.showSaveDialog({
     properties: ['openFile'],
     filters: [

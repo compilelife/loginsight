@@ -23,10 +23,10 @@
     "artifactName": "${productName}_${version}.${ext}",
     "target": [
       {
-        "target": "dmg",
+        "target": "mas",
         "arch": [
           "universal"
-        ]
+        ],
       },
         {
           "target": "mas-dev"
