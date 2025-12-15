@@ -20,6 +20,7 @@
     "target": ["AppImage"]
   },
   "mac": {
+    "identity": null,
     "artifactName": "${productName}_${version}.${ext}",
     "target": [
       "dmg"
